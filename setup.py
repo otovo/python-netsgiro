@@ -31,6 +31,8 @@ setup(
     keywords='avtalegiro ocr giro',
     packages=find_packages(exclude=['tests', 'tests.*']),
     install_requires=[
+        'attrs',
+        'typing',  # Needed for Python 3.4
     ],
     extras_require={
         'dev': [
