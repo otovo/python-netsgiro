@@ -5,3 +5,4 @@ include tox.ini
 recursive-include docs *
 
 recursive-include tests *.py
+recursive-include tests/data *
