@@ -39,6 +39,7 @@ setup(
             'flake8-import-order',
             'mypy',
             'pytest',
+            'pytest-xdist',
             'tox',
         ],
     },
