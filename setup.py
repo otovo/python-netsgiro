@@ -34,6 +34,12 @@ setup(
     ],
     extras_require={
         'dev': [
+            'check-manifest',
+            'flake8',
+            'flake8-import-order',
+            'mypy',
+            'pytest',
+            'tox',
         ],
     },
 )
