@@ -13,7 +13,7 @@ class Record:
 
     @classmethod
     def from_string(cls, line: str) -> 'Record':
-        matches = re.match(cls._PATTERN, line)
+        matches = cls._PATTERN.match(line)
         if matches is None:
             raise ValueError('Data did not match data format')
         return cls(**matches.groupdict())
@@ -127,5 +127,88 @@ class AssignmentEnd(Record):
         (?P<nets_date_latest>\d{6})
 
         0{21}   # Filler
+        $
+    ''', re.VERBOSE)
+
+
+@attr.s
+class AvtaleGiroTransactionRecord(Record):
+    transaction_number = attr.ib()
+
+    @property
+    def transaction_type(self):
+        return self.subtype
+
+
+@attr.s
+class AvtaleGiroAmountItem1(AvtaleGiroTransactionRecord):
+    due_date = attr.ib()
+    amount = attr.ib()
+    kid = attr.ib()
+
+    _PATTERN = re.compile(r'''
+        ^
+        NY      # Format code
+        (?P<service_code>21)
+        (?P<subtype>\d{2})  # 02 or 21
+        (?P<record_type>30)
+
+        (?P<transaction_number>\d{7})
+        (?P<due_date>\d{6})
+
+        [ ]{11} # Filler
+
+        (?P<amount>\d{17})
+        (?P<kid>[\d ]{25})
+
+        0{6}    # Filler
+        $
+    ''', re.VERBOSE)
+
+
+@attr.s
+class AvtaleGiroAmountItem2(AvtaleGiroTransactionRecord):
+    payer_name = attr.ib()  # TODO Better name?
+    reference = attr.ib()   # TODO Better name?
+
+    _PATTERN = re.compile(r'''
+        ^
+        NY      # Format code
+        (?P<service_code>21)
+        (?P<subtype>\d{2})  # 02 or 21
+        (?P<record_type>31)
+
+        (?P<transaction_number>\d{7})
+        (?P<payer_name>.{10})
+
+        [ ]{25} # Filler
+
+        (?P<reference>.{25})
+
+        0{5}    # Filler
+        $
+    ''', re.VERBOSE)
+
+
+@attr.s
+class AvtaleGiroSpecification(AvtaleGiroTransactionRecord):
+    line_number = attr.ib()
+    column_number = attr.ib()
+    text = attr.ib()
+
+    _PATTERN = re.compile(r'''
+        ^
+        NY      # Format code
+        (?P<service_code>21)
+        (?P<subtype>21)
+        (?P<record_type>49)
+
+        (?P<transaction_number>\d{7})
+        4       # Payment notification
+        (?P<line_number>\d{3})
+        (?P<column_number>\d{1})
+        (?P<text>.{40})
+
+        0{20}    # Filler
         $
     ''', re.VERBOSE)
