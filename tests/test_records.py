@@ -1,3 +1,5 @@
+import pytest
+
 from netsgiro import records
 
 
@@ -16,6 +18,13 @@ def test_transmission_start():
     assert record.data_recipient == '00008080'
 
 
+def test_transmission_start_fails_when_invalid_format():
+    with pytest.raises(ValueError) as exc_info:
+        records.TransmissionStart.from_string('XX' + ('0' * 78))
+
+    assert 'not match data format' in str(exc_info)
+
+
 def test_transmission_end():
     record = records.TransmissionEnd.from_string(
         'NY00008900000006000000220000000000000060'
@@ -30,6 +39,13 @@ def test_transmission_end():
     assert record.num_records == '00000022'
     assert record.total_amount == '00000000000000600'
     assert record.nets_date == '170604'
+
+
+def test_transmission_end_fails_when_invalid_format():
+    with pytest.raises(ValueError) as exc_info:
+        records.TransmissionEnd.from_string('XX' + ('0' * 78))
+
+    assert 'not match data format' in str(exc_info)
 
 
 def test_assignment_start():
