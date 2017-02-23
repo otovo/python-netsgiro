@@ -2,6 +2,8 @@ import re
 
 import attr
 
+from netsgiro.enums import RecordType, ServiceType
+
 
 @attr.s
 class Record:
@@ -21,6 +23,8 @@ class Record:
 
 @attr.s
 class TransmissionStart(Record):
+    RECORD_TYPE = RecordType.TRANSMISSION_START
+
     data_transmitter = attr.ib()
     transmission_number = attr.ib()
     data_recipient = attr.ib()
@@ -47,6 +51,8 @@ class TransmissionStart(Record):
 
 @attr.s
 class TransmissionEnd(Record):
+    RECORD_TYPE = RecordType.TRANSMISSION_END
+
     num_transactions = attr.ib()
     num_records = attr.ib()
     total_amount = attr.ib()
@@ -75,6 +81,8 @@ class TransmissionEnd(Record):
 
 @attr.s
 class AssignmentStart(Record):
+    RECORD_TYPE = RecordType.ASSIGNMENT_START
+
     agreement_id = attr.ib()
     assignment_number = attr.ib()
     assignment_account = attr.ib()
@@ -101,6 +109,8 @@ class AssignmentStart(Record):
 
 @attr.s
 class AssignmentEnd(Record):
+    RECORD_TYPE = RecordType.ASSIGNMENT_END
+
     num_transactions = attr.ib()
     num_records = attr.ib()
     total_amount = attr.ib()
@@ -142,6 +152,9 @@ class AvtaleGiroTransactionRecord(Record):
 
 @attr.s
 class AvtaleGiroAmountItem1(AvtaleGiroTransactionRecord):
+    SERVICE_TYPE = ServiceType.AVTALEGIRO
+    RECORD_TYPE = RecordType.TRANSACTION_AMOUNT_1
+
     due_date = attr.ib()
     amount = attr.ib()
     kid = attr.ib()
@@ -168,6 +181,9 @@ class AvtaleGiroAmountItem1(AvtaleGiroTransactionRecord):
 
 @attr.s
 class AvtaleGiroAmountItem2(AvtaleGiroTransactionRecord):
+    SERVICE_TYPE = ServiceType.AVTALEGIRO
+    RECORD_TYPE = RecordType.TRANSACTION_AMOUNT_2
+
     payer_name = attr.ib()  # TODO Better name?
     reference = attr.ib()   # TODO Better name?
 
@@ -192,6 +208,9 @@ class AvtaleGiroAmountItem2(AvtaleGiroTransactionRecord):
 
 @attr.s
 class AvtaleGiroSpecification(AvtaleGiroTransactionRecord):
+    SERVICE_TYPE = ServiceType.AVTALEGIRO
+    RECORD_TYPE = RecordType.TRANSACTION_SPECIFICATION
+
     line_number = attr.ib()
     column_number = attr.ib()
     text = attr.ib()
@@ -212,3 +231,17 @@ class AvtaleGiroSpecification(AvtaleGiroTransactionRecord):
         0{20}    # Filler
         $
     ''', re.VERBOSE)
+
+
+def all_subclasses(cls):
+    return cls.__subclasses__() + [
+        subsubcls
+        for subcls in cls.__subclasses__()
+        for subsubcls in all_subclasses(subcls)]
+
+
+RECORD_CLASSES = {
+    cls.RECORD_TYPE: cls
+    for cls in all_subclasses(Record)
+    if getattr(cls, 'RECORD_TYPE', None)
+}
