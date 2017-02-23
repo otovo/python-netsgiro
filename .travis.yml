@@ -16,6 +16,9 @@ matrix:
       env: TOX_ENV=mypy
     - python: 3.6
       env: TOX_ENV=check-manifest
+  allow_failures:
+    - python: 3.6
+      env: TOX_ENV=mypy
 
 install:
   - "pip install tox"
