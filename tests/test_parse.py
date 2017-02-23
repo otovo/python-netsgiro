@@ -15,28 +15,6 @@ def payment_request_data():
         return fh.read()
 
 
-def test_transmission_with_invalid_start_record():
-    with pytest.raises(ValueError) as exc_info:
-        netsgiro.Transmission.from_ocr([
-            'XX' + ('0' * 78),
-            'NY00008900000006000000220000000000000060'
-            '0170604000000000000000000000000000000000',
-        ])
-
-    assert 'not match data format' in str(exc_info)
-
-
-def test_with_invalid_end_record():
-    with pytest.raises(ValueError) as exc_info:
-        netsgiro.Transmission.from_ocr([
-            'NY00001055555555100008100008080000000000'
-            '0000000000000000000000000000000000000000',
-            'XX' + ('0' * 78),
-        ])
-
-    assert 'not match data format' in str(exc_info)
-
-
 def test_empty_transmission():
     transmission = netsgiro.Transmission.from_ocr([
         'NY00001055555555100008100008080000000000'
