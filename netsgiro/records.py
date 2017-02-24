@@ -22,7 +22,6 @@ def optional_str(value: str) -> Optional[str]:
 @attr.s
 class Record:
     service_code = attr.ib()
-    subtype = attr.ib()
     record_type = attr.ib()
 
     _PATTERN = re.compile(r'^NY.{78}$')
@@ -39,19 +38,16 @@ class Record:
 class TransmissionStart(Record):
     RECORD_TYPE = RecordType.TRANSMISSION_START
 
+    transmission_type = attr.ib()
     data_transmitter = attr.ib()
     transmission_number = attr.ib()
     data_recipient = attr.ib()
-
-    @property
-    def transmission_type(self):
-        return self.subtype
 
     _PATTERN = re.compile(r'''
         ^
         NY      # Format code
         (?P<service_code>00)
-        (?P<subtype>00)
+        (?P<transmission_type>00)
         (?P<record_type>10)
 
         (?P<data_transmitter>\d{8})
@@ -67,20 +63,17 @@ class TransmissionStart(Record):
 class TransmissionEnd(Record):
     RECORD_TYPE = RecordType.TRANSMISSION_END
 
+    transmission_type = attr.ib()
     num_transactions = attr.ib(convert=int)
     num_records = attr.ib(convert=int)
     total_amount = attr.ib(convert=int)
     nets_date = attr.ib(convert=to_date)
 
-    @property
-    def transmission_type(self):
-        return self.subtype
-
     _PATTERN = re.compile(r'''
         ^
         NY      # Format code
         (?P<service_code>00)
-        (?P<subtype>00)
+        (?P<transmission_type>00)
         (?P<record_type>89)
 
         (?P<num_transactions>\d{8})
@@ -97,19 +90,16 @@ class TransmissionEnd(Record):
 class AssignmentStart(Record):
     RECORD_TYPE = RecordType.ASSIGNMENT_START
 
+    assignment_type = attr.ib()
     agreement_id = attr.ib()
     assignment_number = attr.ib()
     assignment_account = attr.ib()
-
-    @property
-    def assignment_type(self):
-        return self.subtype
 
     _PATTERN = re.compile(r'''
         ^
         NY      # Format code
         (?P<service_code>\d{2})
-        (?P<subtype>00)
+        (?P<assignment_type>00)
         (?P<record_type>20)
 
         (?P<agreement_id>\d{9})
@@ -125,6 +115,7 @@ class AssignmentStart(Record):
 class AssignmentEnd(Record):
     RECORD_TYPE = RecordType.ASSIGNMENT_END
 
+    assignment_type = attr.ib()
     num_transactions = attr.ib(convert=int)
     num_records = attr.ib(convert=int)
     total_amount = attr.ib(convert=int)
@@ -132,15 +123,11 @@ class AssignmentEnd(Record):
     nets_date_earliest = attr.ib(convert=to_date)
     nets_date_latest = attr.ib(convert=to_date)
 
-    @property
-    def assignment_type(self):
-        return self.subtype
-
     _PATTERN = re.compile(r'''
         ^
         NY      # Format code
         (?P<service_code>\d{2})
-        (?P<subtype>00)
+        (?P<assignment_type>00)
         (?P<record_type>88)
 
         (?P<num_transactions>\d{8})
@@ -157,11 +144,8 @@ class AssignmentEnd(Record):
 
 @attr.s
 class AvtaleGiroTransactionRecord(Record):
+    transaction_type = attr.ib()
     transaction_number = attr.ib()
-
-    @property
-    def transaction_type(self):
-        return self.subtype
 
 
 @attr.s
@@ -177,7 +161,7 @@ class AvtaleGiroAmountItem1(AvtaleGiroTransactionRecord):
         ^
         NY      # Format code
         (?P<service_code>21)
-        (?P<subtype>\d{2})  # 02 or 21
+        (?P<transaction_type>\d{2})  # 02 or 21
         (?P<record_type>30)
 
         (?P<transaction_number>\d{7})
@@ -205,7 +189,7 @@ class AvtaleGiroAmountItem2(AvtaleGiroTransactionRecord):
         ^
         NY      # Format code
         (?P<service_code>21)
-        (?P<subtype>\d{2})  # 02 or 21
+        (?P<transaction_type>\d{2})  # 02 or 21
         (?P<record_type>31)
 
         (?P<transaction_number>\d{7})
@@ -233,7 +217,7 @@ class AvtaleGiroSpecification(AvtaleGiroTransactionRecord):
         ^
         NY      # Format code
         (?P<service_code>21)
-        (?P<subtype>21)
+        (?P<transaction_type>21)
         (?P<record_type>49)
 
         (?P<transaction_number>\d{7})
