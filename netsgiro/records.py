@@ -52,7 +52,9 @@ class Record:
     def from_string(cls, line: str) -> 'Record':
         matches = cls._PATTERN.match(line)
         if matches is None:
-            raise ValueError('Data did not match data format')
+            raise ValueError(
+                '{!r} did not match {} record format'
+                .format(line, cls.__name__))
         return cls(**matches.groupdict())
 
 

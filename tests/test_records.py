@@ -21,10 +21,15 @@ def test_transmission_start():
 
 
 def test_transmission_start_fails_when_invalid_format():
-    with pytest.raises(ValueError) as exc_info:
-        records.TransmissionStart.from_string('XX' + ('0' * 78))
+    line = 'XX' + ('0' * 78)
 
-    assert 'not match data format' in str(exc_info)
+    with pytest.raises(ValueError) as exc_info:
+        records.TransmissionStart.from_string(line)
+
+    assert (
+        '{!r} did not match TransmissionStart record format'.format(line)
+        in str(exc_info)
+    )
 
 
 def test_transmission_end():
@@ -41,13 +46,6 @@ def test_transmission_end():
     assert record.num_records == 22
     assert record.total_amount == 600
     assert record.nets_date == date(2004, 6, 17)
-
-
-def test_transmission_end_fails_when_invalid_format():
-    with pytest.raises(ValueError) as exc_info:
-        records.TransmissionEnd.from_string('XX' + ('0' * 78))
-
-    assert 'not match data format' in str(exc_info)
 
 
 def test_assignment_start():
