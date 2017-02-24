@@ -1,8 +1,22 @@
+import datetime
 import re
+from typing import Optional, Union
 
 import attr
 
 from netsgiro.enums import RecordType, ServiceType
+
+
+def to_date(value: Union[datetime.date, str]) -> Optional[datetime.date]:
+    if isinstance(value, datetime.date):
+        return value
+    if value == '000000':
+        return None
+    return datetime.datetime.strptime(value, '%d%m%y').date()
+
+
+def optional_str(value: str) -> Optional[str]:
+    return value.strip() or None
 
 
 @attr.s
@@ -53,10 +67,10 @@ class TransmissionStart(Record):
 class TransmissionEnd(Record):
     RECORD_TYPE = RecordType.TRANSMISSION_END
 
-    num_transactions = attr.ib()
-    num_records = attr.ib()
-    total_amount = attr.ib()
-    nets_date = attr.ib()
+    num_transactions = attr.ib(convert=int)
+    num_records = attr.ib(convert=int)
+    total_amount = attr.ib(convert=int)
+    nets_date = attr.ib(convert=to_date)
 
     @property
     def transmission_type(self):
@@ -111,12 +125,12 @@ class AssignmentStart(Record):
 class AssignmentEnd(Record):
     RECORD_TYPE = RecordType.ASSIGNMENT_END
 
-    num_transactions = attr.ib()
-    num_records = attr.ib()
-    total_amount = attr.ib()
-    nets_date = attr.ib()
-    nets_date_earliest = attr.ib()
-    nets_date_latest = attr.ib()
+    num_transactions = attr.ib(convert=int)
+    num_records = attr.ib(convert=int)
+    total_amount = attr.ib(convert=int)
+    nets_date = attr.ib(convert=to_date)
+    nets_date_earliest = attr.ib(convert=to_date)
+    nets_date_latest = attr.ib(convert=to_date)
 
     @property
     def assignment_type(self):
@@ -155,9 +169,9 @@ class AvtaleGiroAmountItem1(AvtaleGiroTransactionRecord):
     SERVICE_TYPE = ServiceType.AVTALEGIRO
     RECORD_TYPE = RecordType.TRANSACTION_AMOUNT_1
 
-    due_date = attr.ib()
-    amount = attr.ib()
-    kid = attr.ib()
+    due_date = attr.ib(convert=to_date)
+    amount = attr.ib(convert=int)
+    kid = attr.ib(convert=optional_str)
 
     _PATTERN = re.compile(r'''
         ^
@@ -184,8 +198,8 @@ class AvtaleGiroAmountItem2(AvtaleGiroTransactionRecord):
     SERVICE_TYPE = ServiceType.AVTALEGIRO
     RECORD_TYPE = RecordType.TRANSACTION_AMOUNT_2
 
-    payer_name = attr.ib()  # TODO Better name?
-    reference = attr.ib()   # TODO Better name?
+    payer_name = attr.ib(convert=optional_str)  # TODO Better name?
+    reference = attr.ib(convert=optional_str)   # TODO Better name?
 
     _PATTERN = re.compile(r'''
         ^
@@ -211,8 +225,8 @@ class AvtaleGiroSpecification(AvtaleGiroTransactionRecord):
     SERVICE_TYPE = ServiceType.AVTALEGIRO
     RECORD_TYPE = RecordType.TRANSACTION_SPECIFICATION
 
-    line_number = attr.ib()
-    column_number = attr.ib()
+    line_number = attr.ib(convert=int)
+    column_number = attr.ib(convert=int)
     text = attr.ib()
 
     _PATTERN = re.compile(r'''

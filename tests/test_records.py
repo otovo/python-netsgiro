@@ -1,3 +1,5 @@
+from datetime import date
+
 import pytest
 
 from netsgiro import records
@@ -35,10 +37,10 @@ def test_transmission_end():
     assert record.transmission_type == '00'
     assert record.record_type == '89'
 
-    assert record.num_transactions == '00000006'
-    assert record.num_records == '00000022'
-    assert record.total_amount == '00000000000000600'
-    assert record.nets_date == '170604'
+    assert record.num_transactions == 6
+    assert record.num_records == 22
+    assert record.total_amount == 600
+    assert record.nets_date == date(2004, 6, 17)
 
 
 def test_transmission_end_fails_when_invalid_format():
@@ -73,12 +75,12 @@ def test_assignment_end():
     assert record.assignment_type == '00'
     assert record.record_type == '88'
 
-    assert record.num_transactions == '00000006'
-    assert record.num_records == '00000020'
-    assert record.total_amount == '00000000000000600'
-    assert record.nets_date == '170604'
-    assert record.nets_date_earliest == '170604'
-    assert record.nets_date_latest == '000000'
+    assert record.num_transactions == 6
+    assert record.num_records == 20
+    assert record.total_amount == 600
+    assert record.nets_date == date(2004, 6, 17)
+    assert record.nets_date_earliest == date(2004, 6, 17)
+    assert record.nets_date_latest is None
 
 
 def test_avtalegiro_amount_item_1():
@@ -92,9 +94,9 @@ def test_avtalegiro_amount_item_1():
     assert record.record_type == '30'
 
     assert record.transaction_number == '0000001'
-    assert record.due_date == '170604'
-    assert record.amount == '00000000000000100'
-    assert record.kid == '          008000011688373'
+    assert record.due_date == date(2004, 6, 17)
+    assert record.amount == 100
+    assert record.kid == '008000011688373'
 
 
 def test_avtalegiro_amount_item_2():
@@ -108,8 +110,8 @@ def test_avtalegiro_amount_item_2():
     assert record.record_type == '31'
 
     assert record.transaction_number == '0000001'
-    assert record.payer_name == 'NAVN      '
-    assert record.reference == ' ' * 25
+    assert record.payer_name == 'NAVN'
+    assert record.reference is None
 
 
 def test_avtalegiro_specification():
@@ -123,6 +125,6 @@ def test_avtalegiro_specification():
     assert record.record_type == '49'
 
     assert record.transaction_number == '0000001'
-    assert record.line_number == '001'
-    assert record.column_number == '1'
+    assert record.line_number == 1
+    assert record.column_number == 1
     assert record.text == ' Gjelder Faktura: 168837  Dato: 19/03/04'
