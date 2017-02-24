@@ -1,7 +1,7 @@
 from enum import IntEnum
 
 
-class ServiceType(IntEnum):
+class ServiceCode(IntEnum):
     NONE = 0
     OCR_GIRO = 9
     AVTALEGIRO = 21
