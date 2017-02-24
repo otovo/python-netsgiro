@@ -4,7 +4,7 @@ from typing import Optional, Union
 
 import attr
 
-from netsgiro.enums import RecordType, ServiceType
+from netsgiro.enums import RecordType, ServiceCode
 
 
 def to_date(value: Union[datetime.date, str]) -> Optional[datetime.date]:
@@ -150,7 +150,7 @@ class AvtaleGiroTransactionRecord(Record):
 
 @attr.s
 class AvtaleGiroAmountItem1(AvtaleGiroTransactionRecord):
-    SERVICE_TYPE = ServiceType.AVTALEGIRO
+    SERVICE_CODE = ServiceCode.AVTALEGIRO
     RECORD_TYPE = RecordType.TRANSACTION_AMOUNT_1
 
     due_date = attr.ib(convert=to_date)
@@ -179,7 +179,7 @@ class AvtaleGiroAmountItem1(AvtaleGiroTransactionRecord):
 
 @attr.s
 class AvtaleGiroAmountItem2(AvtaleGiroTransactionRecord):
-    SERVICE_TYPE = ServiceType.AVTALEGIRO
+    SERVICE_CODE = ServiceCode.AVTALEGIRO
     RECORD_TYPE = RecordType.TRANSACTION_AMOUNT_2
 
     payer_name = attr.ib(convert=optional_str)  # TODO Better name?
@@ -206,7 +206,7 @@ class AvtaleGiroAmountItem2(AvtaleGiroTransactionRecord):
 
 @attr.s
 class AvtaleGiroSpecification(AvtaleGiroTransactionRecord):
-    SERVICE_TYPE = ServiceType.AVTALEGIRO
+    SERVICE_CODE = ServiceCode.AVTALEGIRO
     RECORD_TYPE = RecordType.TRANSACTION_SPECIFICATION
 
     line_number = attr.ib(convert=int)
