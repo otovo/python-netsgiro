@@ -7,6 +7,28 @@ import attr
 from netsgiro import enums
 
 
+def to_service_code(
+        value: Union[enums.ServiceCode, int, str]) -> enums.ServiceCode:
+    if isinstance(value, enums.ServiceCode):
+        return value
+    return enums.ServiceCode(int(value))
+
+
+def to_record_type(
+        value: Union[enums.RecordType, int, str]) -> enums.RecordType:
+    if isinstance(value, enums.RecordType):
+        return value
+    return enums.RecordType(int(value))
+
+
+def to_avtalegiro_transaction_type(
+        value: Union[enums.AvtaleGiroTransactionType, int, str]
+        ) -> enums.AvtaleGiroTransactionType:
+    if isinstance(value, enums.AvtaleGiroTransactionType):
+        return value
+    return enums.AvtaleGiroTransactionType(int(value))
+
+
 def to_date(value: Union[datetime.date, str]) -> Optional[datetime.date]:
     if isinstance(value, datetime.date):
         return value
@@ -21,8 +43,8 @@ def optional_str(value: str) -> Optional[str]:
 
 @attr.s
 class Record:
-    service_code = attr.ib()
-    record_type = attr.ib()
+    service_code = attr.ib(convert=to_service_code)
+    record_type = attr.ib(convert=to_record_type)
 
     _PATTERN = re.compile(r'^NY.{78}$')
 
@@ -38,7 +60,7 @@ class Record:
 class TransmissionStart(Record):
     RECORD_TYPE = enums.RecordType.TRANSMISSION_START
 
-    transmission_type = attr.ib()
+    transmission_type = attr.ib(convert=int)
     data_transmitter = attr.ib()
     transmission_number = attr.ib()
     data_recipient = attr.ib()
@@ -63,7 +85,7 @@ class TransmissionStart(Record):
 class TransmissionEnd(Record):
     RECORD_TYPE = enums.RecordType.TRANSMISSION_END
 
-    transmission_type = attr.ib()
+    transmission_type = attr.ib(convert=int)
     num_transactions = attr.ib(convert=int)
     num_records = attr.ib(convert=int)
     total_amount = attr.ib(convert=int)
@@ -90,7 +112,7 @@ class TransmissionEnd(Record):
 class AssignmentStart(Record):
     RECORD_TYPE = enums.RecordType.ASSIGNMENT_START
 
-    assignment_type = attr.ib()
+    assignment_type = attr.ib(convert=int)
     agreement_id = attr.ib()
     assignment_number = attr.ib()
     assignment_account = attr.ib()
@@ -115,7 +137,7 @@ class AssignmentStart(Record):
 class AssignmentEnd(Record):
     RECORD_TYPE = enums.RecordType.ASSIGNMENT_END
 
-    assignment_type = attr.ib()
+    assignment_type = attr.ib(convert=int)
     num_transactions = attr.ib(convert=int)
     num_records = attr.ib(convert=int)
     total_amount = attr.ib(convert=int)
@@ -144,7 +166,7 @@ class AssignmentEnd(Record):
 
 @attr.s
 class AvtaleGiroTransactionRecord(Record):
-    transaction_type = attr.ib()
+    transaction_type = attr.ib(convert=to_avtalegiro_transaction_type)
     transaction_number = attr.ib()
 
 

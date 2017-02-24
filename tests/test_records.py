@@ -2,7 +2,7 @@ from datetime import date
 
 import pytest
 
-from netsgiro import records
+from netsgiro import enums, records
 
 
 def test_transmission_start():
@@ -11,9 +11,9 @@ def test_transmission_start():
         '0000000000000000000000000000000000000000'
     )
 
-    assert record.service_code == '00'
-    assert record.transmission_type == '00'
-    assert record.record_type == '10'
+    assert record.service_code == enums.ServiceCode.NONE
+    assert record.transmission_type == 0
+    assert record.record_type == enums.RecordType.TRANSMISSION_START
 
     assert record.data_transmitter == '55555555'
     assert record.transmission_number == '1000081'
@@ -33,9 +33,9 @@ def test_transmission_end():
         '0170604000000000000000000000000000000000'
     )
 
-    assert record.service_code == '00'
-    assert record.transmission_type == '00'
-    assert record.record_type == '89'
+    assert record.service_code == enums.ServiceCode.NONE
+    assert record.transmission_type == 0
+    assert record.record_type == enums.RecordType.TRANSMISSION_END
 
     assert record.num_transactions == 6
     assert record.num_records == 22
@@ -56,9 +56,9 @@ def test_assignment_start():
         '0000000000000000000000000000000000000000'
     )
 
-    assert record.service_code == '21'
-    assert record.assignment_type == '00'
-    assert record.record_type == '20'
+    assert record.service_code == enums.ServiceCode.AVTALEGIRO
+    assert record.assignment_type == 0
+    assert record.record_type == enums.RecordType.ASSIGNMENT_START
 
     assert record.agreement_id == '000000000'
     assert record.assignment_number == '4000086'
@@ -71,9 +71,9 @@ def test_assignment_end():
         '0170604170604000000000000000000000000000'
     )
 
-    assert record.service_code == '21'
-    assert record.assignment_type == '00'
-    assert record.record_type == '88'
+    assert record.service_code == enums.ServiceCode.AVTALEGIRO
+    assert record.assignment_type == 0
+    assert record.record_type == enums.RecordType.ASSIGNMENT_END
 
     assert record.num_transactions == 6
     assert record.num_records == 20
@@ -89,9 +89,10 @@ def test_avtalegiro_amount_item_1():
         '000000100          008000011688373000000'
     )
 
-    assert record.service_code == '21'
-    assert record.transaction_type == '21'
-    assert record.record_type == '30'
+    assert record.service_code == enums.ServiceCode.AVTALEGIRO
+    assert record.transaction_type == (
+        enums.AvtaleGiroTransactionType.NOTIFICATION_FROM_BANK)
+    assert record.record_type == enums.RecordType.TRANSACTION_AMOUNT_1
 
     assert record.transaction_number == '0000001'
     assert record.due_date == date(2004, 6, 17)
@@ -105,9 +106,10 @@ def test_avtalegiro_amount_item_2():
         '                                   00000'
     )
 
-    assert record.service_code == '21'
-    assert record.transaction_type == '21'
-    assert record.record_type == '31'
+    assert record.service_code == enums.ServiceCode.AVTALEGIRO
+    assert record.transaction_type == (
+        enums.AvtaleGiroTransactionType.NOTIFICATION_FROM_BANK)
+    assert record.record_type == enums.RecordType.TRANSACTION_AMOUNT_2
 
     assert record.transaction_number == '0000001'
     assert record.payer_name == 'NAVN'
@@ -120,9 +122,10 @@ def test_avtalegiro_specification():
         '8837  Dato: 19/03/0400000000000000000000'
     )
 
-    assert record.service_code == '21'
-    assert record.transaction_type == '21'
-    assert record.record_type == '49'
+    assert record.service_code == enums.ServiceCode.AVTALEGIRO
+    assert record.transaction_type == (
+        enums.AvtaleGiroTransactionType.NOTIFICATION_FROM_BANK)
+    assert record.record_type == enums.RecordType.TRANSACTION_SPECIFICATION
 
     assert record.transaction_number == '0000001'
     assert record.line_number == 1
