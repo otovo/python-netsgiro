@@ -16,6 +16,20 @@ def test_get_records_with_too_short_lines_fails():
     assert 'exactly 80 chars long' in str(exc_info)
 
 
+def test_get_records_with_nonnumeric_record_type():
+    with pytest.raises(ValueError) as exc_info:
+        netsgiro.get_records('NY0000AA' + '0' * 72)
+
+    assert "Record type must be numeric, got 'AA'" in str(exc_info)
+
+
+def test_get_records_with_unknown_record_type():
+    with pytest.raises(ValueError) as exc_info:
+        netsgiro.get_records('NY000099' + '0' * 72)
+
+    assert '99 is not a valid RecordType' in str(exc_info)
+
+
 def test_get_records(payment_request_data):
     result = netsgiro.get_records(payment_request_data)
 
