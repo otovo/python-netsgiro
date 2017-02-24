@@ -4,7 +4,7 @@ from typing import Optional, Union
 
 import attr
 
-from netsgiro.enums import RecordType, ServiceCode
+from netsgiro import enums
 
 
 def to_date(value: Union[datetime.date, str]) -> Optional[datetime.date]:
@@ -36,7 +36,7 @@ class Record:
 
 @attr.s
 class TransmissionStart(Record):
-    RECORD_TYPE = RecordType.TRANSMISSION_START
+    RECORD_TYPE = enums.RecordType.TRANSMISSION_START
 
     transmission_type = attr.ib()
     data_transmitter = attr.ib()
@@ -61,7 +61,7 @@ class TransmissionStart(Record):
 
 @attr.s
 class TransmissionEnd(Record):
-    RECORD_TYPE = RecordType.TRANSMISSION_END
+    RECORD_TYPE = enums.RecordType.TRANSMISSION_END
 
     transmission_type = attr.ib()
     num_transactions = attr.ib(convert=int)
@@ -88,7 +88,7 @@ class TransmissionEnd(Record):
 
 @attr.s
 class AssignmentStart(Record):
-    RECORD_TYPE = RecordType.ASSIGNMENT_START
+    RECORD_TYPE = enums.RecordType.ASSIGNMENT_START
 
     assignment_type = attr.ib()
     agreement_id = attr.ib()
@@ -113,7 +113,7 @@ class AssignmentStart(Record):
 
 @attr.s
 class AssignmentEnd(Record):
-    RECORD_TYPE = RecordType.ASSIGNMENT_END
+    RECORD_TYPE = enums.RecordType.ASSIGNMENT_END
 
     assignment_type = attr.ib()
     num_transactions = attr.ib(convert=int)
@@ -150,8 +150,8 @@ class AvtaleGiroTransactionRecord(Record):
 
 @attr.s
 class AvtaleGiroAmountItem1(AvtaleGiroTransactionRecord):
-    SERVICE_CODE = ServiceCode.AVTALEGIRO
-    RECORD_TYPE = RecordType.TRANSACTION_AMOUNT_1
+    SERVICE_CODE = enums.ServiceCode.AVTALEGIRO
+    RECORD_TYPE = enums.RecordType.TRANSACTION_AMOUNT_1
 
     due_date = attr.ib(convert=to_date)
     amount = attr.ib(convert=int)
@@ -179,8 +179,8 @@ class AvtaleGiroAmountItem1(AvtaleGiroTransactionRecord):
 
 @attr.s
 class AvtaleGiroAmountItem2(AvtaleGiroTransactionRecord):
-    SERVICE_CODE = ServiceCode.AVTALEGIRO
-    RECORD_TYPE = RecordType.TRANSACTION_AMOUNT_2
+    SERVICE_CODE = enums.ServiceCode.AVTALEGIRO
+    RECORD_TYPE = enums.RecordType.TRANSACTION_AMOUNT_2
 
     payer_name = attr.ib(convert=optional_str)  # TODO Better name?
     reference = attr.ib(convert=optional_str)   # TODO Better name?
@@ -206,8 +206,8 @@ class AvtaleGiroAmountItem2(AvtaleGiroTransactionRecord):
 
 @attr.s
 class AvtaleGiroSpecification(AvtaleGiroTransactionRecord):
-    SERVICE_CODE = ServiceCode.AVTALEGIRO
-    RECORD_TYPE = RecordType.TRANSACTION_SPECIFICATION
+    SERVICE_CODE = enums.ServiceCode.AVTALEGIRO
+    RECORD_TYPE = enums.RecordType.TRANSACTION_SPECIFICATION
 
     line_number = attr.ib(convert=int)
     column_number = attr.ib(convert=int)
