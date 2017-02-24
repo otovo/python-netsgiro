@@ -1,6 +1,15 @@
 from enum import IntEnum
 
 
+__all__ = [
+    'ServiceCode',
+    'RecordType',
+    'AvtaleGiroAssignmentType',
+    'AvtaleGiroTransactionType',
+    'OcrGiroTransactionType',
+]
+
+
 class ServiceCode(IntEnum):
     NONE = 0
     OCR_GIRO = 9
