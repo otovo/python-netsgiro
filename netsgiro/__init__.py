@@ -11,17 +11,21 @@ NETS_ID = '00008080'
 
 
 def get_records(data: str) -> List[records.Record]:
-    lines = data.strip().splitlines()
+    results = []
 
-    for line in lines:
+    for line in data.strip().splitlines():
         if len(line) != 80:
             raise ValueError('All lines must be exactly 80 chars long')
 
-    results = []
+        record_type_str = line[6:8]
+        if not record_type_str.isnumeric():
+            raise ValueError(
+                'Record type must be numeric, got {!r}'
+                .format(record_type_str))
 
-    for line in lines:
-        record_type = enums.RecordType(int(line[6:8]))
+        record_type = enums.RecordType(int(record_type_str))
         record_cls = records.RECORD_CLASSES[record_type]
+
         results.append(record_cls.from_string(line))
 
     return results
