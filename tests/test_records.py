@@ -98,8 +98,8 @@ def test_avtalegiro_amount_item_1():
 
     assert record.transaction_type == (
         netsgiro.AvtaleGiroTransactionType.NOTIFICATION_FROM_BANK)
-
     assert record.transaction_number == '0000001'
+
     assert record.due_date == date(2004, 6, 17)
     assert record.amount == 100
     assert record.kid == '008000011688373'
@@ -116,8 +116,8 @@ def test_avtalegiro_amount_item_2():
 
     assert record.transaction_type == (
         netsgiro.AvtaleGiroTransactionType.NOTIFICATION_FROM_BANK)
-
     assert record.transaction_number == '0000001'
+
     assert record.payer_name == 'NAVN'
     assert record.reference is None
 
@@ -133,8 +133,8 @@ def test_avtalegiro_specification():
 
     assert record.transaction_type == (
         netsgiro.AvtaleGiroTransactionType.NOTIFICATION_FROM_BANK)
-
     assert record.transaction_number == '0000001'
+
     assert record.line_number == 1
     assert record.column_number == 1
     assert record.text == ' Gjelder Faktura: 168837  Dato: 19/03/04'
