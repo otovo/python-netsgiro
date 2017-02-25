@@ -147,9 +147,10 @@ def get_specification_text(records: List[Record]) -> str:
     MAX_COLUMNS = 2
     MAX_RECORDS = MAX_LINES * MAX_COLUMNS
 
-    if len(records) >= MAX_RECORDS:
+    if len(records) > MAX_RECORDS:
         raise ValueError(
-            'Too many specification records, max {}'.format(MAX_RECORDS))
+            'Max {} specification records allowed, got {}'
+            .format(MAX_RECORDS, len(records)))
 
     tuples = sorted([
         (r.line_number, r.column_number, r)
