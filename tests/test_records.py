@@ -12,8 +12,9 @@ def test_transmission_start():
     )
 
     assert record.service_code == netsgiro.ServiceCode.NONE
-    assert record.transmission_type == 0
     assert record.record_type == netsgiro.RecordType.TRANSMISSION_START
+
+    assert record.transmission_type == 0
 
     assert record.data_transmitter == '55555555'
     assert record.transmission_number == '1000081'
@@ -39,8 +40,9 @@ def test_transmission_end():
     )
 
     assert record.service_code == netsgiro.ServiceCode.NONE
-    assert record.transmission_type == 0
     assert record.record_type == netsgiro.RecordType.TRANSMISSION_END
+
+    assert record.transmission_type == 0
 
     assert record.num_transactions == 6
     assert record.num_records == 22
@@ -55,9 +57,10 @@ def test_assignment_start():
     )
 
     assert record.service_code == netsgiro.ServiceCode.AVTALEGIRO
+    assert record.record_type == netsgiro.RecordType.ASSIGNMENT_START
+
     assert record.assignment_type == (
         netsgiro.AvtaleGiroAssignmentType.PAYMENT_REQUEST)
-    assert record.record_type == netsgiro.RecordType.ASSIGNMENT_START
 
     assert record.agreement_id == '000000000'
     assert record.assignment_number == '4000086'
@@ -71,9 +74,10 @@ def test_assignment_end():
     )
 
     assert record.service_code == netsgiro.ServiceCode.AVTALEGIRO
+    assert record.record_type == netsgiro.RecordType.ASSIGNMENT_END
+
     assert record.assignment_type == (
         netsgiro.AvtaleGiroAssignmentType.PAYMENT_REQUEST)
-    assert record.record_type == netsgiro.RecordType.ASSIGNMENT_END
 
     assert record.num_transactions == 6
     assert record.num_records == 20
@@ -90,9 +94,10 @@ def test_avtalegiro_amount_item_1():
     )
 
     assert record.service_code == netsgiro.ServiceCode.AVTALEGIRO
+    assert record.record_type == netsgiro.RecordType.TRANSACTION_AMOUNT_1
+
     assert record.transaction_type == (
         netsgiro.AvtaleGiroTransactionType.NOTIFICATION_FROM_BANK)
-    assert record.record_type == netsgiro.RecordType.TRANSACTION_AMOUNT_1
 
     assert record.transaction_number == '0000001'
     assert record.due_date == date(2004, 6, 17)
@@ -107,9 +112,10 @@ def test_avtalegiro_amount_item_2():
     )
 
     assert record.service_code == netsgiro.ServiceCode.AVTALEGIRO
+    assert record.record_type == netsgiro.RecordType.TRANSACTION_AMOUNT_2
+
     assert record.transaction_type == (
         netsgiro.AvtaleGiroTransactionType.NOTIFICATION_FROM_BANK)
-    assert record.record_type == netsgiro.RecordType.TRANSACTION_AMOUNT_2
 
     assert record.transaction_number == '0000001'
     assert record.payer_name == 'NAVN'
@@ -123,9 +129,10 @@ def test_avtalegiro_specification():
     )
 
     assert record.service_code == netsgiro.ServiceCode.AVTALEGIRO
+    assert record.record_type == netsgiro.RecordType.TRANSACTION_SPECIFICATION
+
     assert record.transaction_type == (
         netsgiro.AvtaleGiroTransactionType.NOTIFICATION_FROM_BANK)
-    assert record.record_type == netsgiro.RecordType.TRANSACTION_SPECIFICATION
 
     assert record.transaction_number == '0000001'
     assert record.line_number == 1
