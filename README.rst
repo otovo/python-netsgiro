@@ -5,12 +5,11 @@ netsgiro
 File parsers for Nets AvtaleGiro and OCR Giro.
 
 
-Low level API
-=============
+File format examples
+====================
 
-netsgiro's low level API parses OCR files into a list of records::
+The following is an example of an AvtaleGiro payment request file::
 
-    >>> import netsgiro
     >>> data = open('tests/data/avtalegiro_payment_request.txt').read()
     >>> print(data)
     NY000010555555551000081000080800000000000000000000000000000000000000000000000000
@@ -35,6 +34,16 @@ netsgiro's low level API parses OCR files into a list of records::
     NY2102310000006NAVN                                                        00000
     NY210088000000060000002000000000000000600170604170604000000000000000000000000000
     NY000089000000060000002200000000000000600170604000000000000000000000000000000000
+
+The same file is used in the API examples below.
+
+
+Low level API
+=============
+
+netsgiro's low level API parses OCR files into a list of records::
+
+    >>> import netsgiro
     >>> netsgiro.get_records(data)
     [TransmissionStart(service_code=<ServiceCode.NONE: 0>, record_type=<RecordType.TRANSMISSION_START: 10>, transmission_type=0, data_transmitter='55555555', transmission_number='1000081', data_recipient='00008080'),
     AssignmentStart(service_code=<ServiceCode.AVTALEGIRO: 21>, record_type=<RecordType.ASSIGNMENT_START: 20>, assignment_type=0, agreement_id='000000000', assignment_number='4000086', assignment_account='88888888888'),
@@ -66,7 +75,6 @@ High level API
 netsgiro's high level API parses OCR files into a tree of objects::
 
     >>> import netsgiro
-    >>> data = open('tests/data/avtalegiro_payment_request.txt').read()
     >>> transmission = netsgiro.parse(data)
     >>> transmission.to_dict()
     {'assignments': [{'account': '88888888888',
