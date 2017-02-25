@@ -1,7 +1,10 @@
 from datetime import date
 from decimal import Decimal
 
+import pytest
+
 import netsgiro
+from netsgiro import objects
 
 
 def test_parse_payment_request(payment_request_data):
@@ -40,3 +43,39 @@ def test_parse_payment_request(payment_request_data):
         ' Gjelder Faktura: 168837  Dato: 19/03/04'
         '                  ForfallsDato: 17/06/04\n'
     )
+
+
+def make_specification_records(num_lines, num_columns=2):
+    return [
+        netsgiro.AvtaleGiroSpecification(
+            service_code=netsgiro.ServiceCode.AVTALEGIRO,
+            transaction_type=(
+                netsgiro.AvtaleGiroTransactionType.NOTIFICATION_FROM_BANK),
+            record_type=netsgiro.RecordType.TRANSACTION_SPECIFICATION,
+            transaction_number='0000001',
+            line_number=line,
+            column_number=column,
+            text='Line {}, column {}'.format(line, column),
+        )
+        for line in range(1, num_lines + 1)
+        for column in range(1, num_columns + 1)
+    ]
+
+
+def test_get_specification_text_max_number_of_records():
+    records = make_specification_records(42)
+
+    result = objects.get_specification_text(records)
+
+    assert len(result.splitlines()) == 42
+    assert 'Line 1, column 1' in result
+    assert 'Line 42, column 2' in result
+
+
+def test_get_specification_text_too_many_records():
+    records = make_specification_records(43)
+
+    with pytest.raises(ValueError) as exc_info:
+        objects.get_specification_text(records)
+
+    assert 'Max 84 specification records allowed, got 86' in str(exc_info)
