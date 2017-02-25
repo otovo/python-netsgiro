@@ -60,7 +60,7 @@ def test_assignment_start():
     assert record.record_type == netsgiro.RecordType.ASSIGNMENT_START
 
     assert record.assignment_type == (
-        netsgiro.AvtaleGiroAssignmentType.PAYMENT_REQUEST)
+        netsgiro.AvtaleGiroAssignmentType.PAYMENT_REQUESTS)
 
     assert record.agreement_id == '000000000'
     assert record.assignment_number == '4000086'
@@ -94,7 +94,7 @@ def test_assignment_end():
     assert record.record_type == netsgiro.RecordType.ASSIGNMENT_END
 
     assert record.assignment_type == (
-        netsgiro.AvtaleGiroAssignmentType.PAYMENT_REQUEST)
+        netsgiro.AvtaleGiroAssignmentType.PAYMENT_REQUESTS)
 
     assert record.num_transactions == 6
     assert record.num_records == 20

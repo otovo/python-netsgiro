@@ -166,7 +166,7 @@ class AssignmentStart(Record):
     agreement_id = attr.ib(default=None)
 
     _PATTERNS = {
-        netsgiro.AvtaleGiroAssignmentType.PAYMENT_REQUEST: re.compile(r'''
+        netsgiro.AvtaleGiroAssignmentType.PAYMENT_REQUESTS: re.compile(r'''
             ^
             NY      # Format code
             (?P<service_code>21)  # TODO: Verify if both 9 and 21?
@@ -213,7 +213,7 @@ class AssignmentEnd(Record):
     nets_date_latest = attr.ib(default=None, convert=to_date)
 
     _PATTERNS = {
-        netsgiro.AvtaleGiroAssignmentType.PAYMENT_REQUEST: re.compile(r'''
+        netsgiro.AvtaleGiroAssignmentType.PAYMENT_REQUESTS: re.compile(r'''
             ^
             NY      # Format code
             (?P<service_code>21)  # TODO: Verify if both 9 and 21?
