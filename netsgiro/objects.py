@@ -1,0 +1,170 @@
+import collections
+from decimal import Decimal
+from typing import List
+
+import attr
+
+import netsgiro
+from netsgiro.records import Record
+
+
+__all__ = [
+    'Transmission',
+    'Assignment',
+    'Transaction',
+    'parse',
+]
+
+
+@attr.s
+class Transmission:
+    number = attr.ib()
+    data_transmitter = attr.ib()
+    data_recipient = attr.ib()
+
+    # TODO For AvtaleGiro payment request, this should be the earliest due date
+    nets_date = attr.ib()
+
+    assignments = attr.ib(default=[])
+
+    @classmethod
+    def from_records(cls, records: List[Record]) -> 'Transmission':
+        # TODO Check len(records) >= 2
+
+        start, body, end = records[0], records[1:-1], records[-1]
+
+        assert isinstance(start, netsgiro.TransmissionStart)
+        assert isinstance(end, netsgiro.TransmissionEnd)
+
+        return cls(
+            number=start.transmission_number,
+            data_transmitter=start.data_transmitter,
+            data_recipient=start.data_recipient,
+            nets_date=end.nets_date,
+            assignments=get_assignments(body),
+        )
+
+
+@attr.s
+class Assignment:
+    service_code = attr.ib(convert=netsgiro.ServiceCode)
+    agreement_id = attr.ib()
+    number = attr.ib()
+    account = attr.ib()
+
+    transactions = attr.ib(default=[])
+
+    @classmethod
+    def from_records(cls, records: List[Record]) -> 'Assignment':
+        # TODO Check len(records) >= 2
+
+        start, body, end = records[0], records[1:-1], records[-1]
+
+        assert isinstance(start, netsgiro.AssignmentStart)
+        assert isinstance(end, netsgiro.AssignmentEnd)
+
+        return cls(
+            service_code=start.service_code,
+            agreement_id=start.agreement_id,
+            number=start.assignment_number,
+            account=start.assignment_account,
+            transactions=get_transactions(body)
+        )
+
+
+def get_assignments(records: List[Record]) -> List[Assignment]:
+    assignments = collections.OrderedDict()
+
+    current_assignment_number = None
+    for record in records:
+        if isinstance(record, netsgiro.AssignmentStart):
+            current_assignment_number = record.assignment_number
+            assignments[current_assignment_number] = []
+        if current_assignment_number is None:
+            raise ValueError(
+                'Expected AssignmentStart record, got {!r}'.format(record))
+        assignments[current_assignment_number].append(record)
+        if isinstance(record, netsgiro.AssignmentEnd):
+            current_assignment_number = None
+
+    return [Assignment.from_records(rs) for rs in assignments.values()]
+
+
+@attr.s
+class Transaction:
+    service_code = attr.ib(convert=netsgiro.ServiceCode)
+    type = attr.ib(convert=netsgiro.AvtaleGiroTransactionType)  # TODO: Type
+    number = attr.ib()
+    due_date = attr.ib()
+    amount = attr.ib(convert=Decimal)
+    kid = attr.ib()
+    payer_name = attr.ib()
+    reference = attr.ib()
+    specification_text = attr.ib()
+
+    @property
+    def amount_in_cents(self):
+        return int(self.amount * 100)
+
+    @classmethod
+    def from_records(cls, records: List[Record]) -> 'Transaction':
+        amount_item_1 = records.pop(0)
+        assert isinstance(amount_item_1, netsgiro.AvtaleGiroAmountItem1)
+        amount_item_2 = records.pop(0)
+        assert isinstance(amount_item_2, netsgiro.AvtaleGiroAmountItem2)
+
+        # TODO If service_code is OCR_GIRO and transaction_type is 20 or 21,
+        # pop amount_item_3 here
+
+        specifications = records
+
+        return cls(
+            service_code=amount_item_1.service_code,
+            type=amount_item_1.transaction_type,
+            number=amount_item_1.transaction_number,
+            due_date=amount_item_1.due_date,
+            amount=Decimal(amount_item_1.amount) / 100,
+            kid=amount_item_1.kid,
+            payer_name=amount_item_2.payer_name,
+            reference=amount_item_2.reference,
+            specification_text=get_specification_text(specifications),
+        )
+
+
+def get_transactions(records: List[Record]) -> List[Transaction]:
+    transactions = collections.OrderedDict()
+
+    for record in records:
+        if record.transaction_number not in transactions:
+            transactions[record.transaction_number] = []
+        transactions[record.transaction_number].append(record)
+
+    return [Transaction.from_records(rs) for rs in transactions.values()]
+
+
+def get_specification_text(records: List[Record]) -> str:
+    MAX_LINES = 42
+    MAX_COLUMNS = 2
+    MAX_RECORDS = MAX_LINES * MAX_COLUMNS
+
+    if len(records) >= MAX_RECORDS:
+        raise ValueError(
+            'Too many specification records, max {}'.format(MAX_RECORDS))
+
+    tuples = sorted([
+        (r.line_number, r.column_number, r)
+        for r in records
+    ])
+
+    text = ''
+    for _, column, specification in tuples:
+        text += specification.text
+        if column == MAX_COLUMNS:
+            text += '\n'
+
+    return text
+
+
+def parse(data: str) -> Transmission:
+    records = netsgiro.get_records(data)
+    return Transmission.from_records(records)
