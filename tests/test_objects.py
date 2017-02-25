@@ -31,6 +31,7 @@ def test_parse_payment_request(payment_request_data):
 
     assert isinstance(assignment, netsgiro.Assignment)
     assert assignment.service_code == netsgiro.ServiceCode.AVTALEGIRO
+    assert assignment.type == netsgiro.AvtaleGiroAssignmentType.PAYMENT_REQUEST
     assert assignment.agreement_id == '000000000'
     assert assignment.number == '4000086'
     assert assignment.account == '88888888888'
