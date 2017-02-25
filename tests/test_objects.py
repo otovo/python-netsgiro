@@ -7,6 +7,16 @@ import netsgiro
 from netsgiro import objects
 
 
+@pytest.fixture
+def transmission():
+    return netsgiro.Transmission(
+        number='0000001',
+        data_transmitter='12341234',
+        data_recipient=netsgiro.NETS_ID,
+        nets_date=date(2004, 6, 17),
+    )
+
+
 def test_parse_payment_request(payment_request_data):
     transmission = netsgiro.parse(payment_request_data)
 
@@ -93,3 +103,13 @@ def test_get_specification_text_too_many_records():
         objects.get_specification_text(records)
 
     assert 'Max 84 specification records allowed, got 86' in str(exc_info)
+
+
+def test_to_dict(transmission):
+    assert transmission.to_dict() == {
+        'number': '0000001',
+        'data_transmitter': '12341234',
+        'data_recipient': netsgiro.NETS_ID,
+        'nets_date': date(2004, 6, 17),
+        'assignments': [],
+    }
