@@ -30,9 +30,9 @@ class RecordType(IntEnum):
 
 
 class AvtaleGiroAssignmentType(IntEnum):
-    PAYMENT_REQUEST = 0     # TODO Better name?
+    PAYMENT_REQUESTS = 0    # TODO Better name?
     AGREEMENTS = 24         # TODO Better name?
-    CANCELATION = 36        # TODO Better name?
+    CANCELATIONS = 36       # TODO Better name?
 
 
 class AvtaleGiroTransactionType(IntEnum):
