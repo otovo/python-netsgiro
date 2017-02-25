@@ -55,7 +55,8 @@ def test_assignment_start():
     )
 
     assert record.service_code == netsgiro.ServiceCode.AVTALEGIRO
-    assert record.assignment_type == 0
+    assert record.assignment_type == (
+        netsgiro.AvtaleGiroAssignmentType.PAYMENT_REQUEST)
     assert record.record_type == netsgiro.RecordType.ASSIGNMENT_START
 
     assert record.agreement_id == '000000000'
@@ -70,7 +71,8 @@ def test_assignment_end():
     )
 
     assert record.service_code == netsgiro.ServiceCode.AVTALEGIRO
-    assert record.assignment_type == 0
+    assert record.assignment_type == (
+        netsgiro.AvtaleGiroAssignmentType.PAYMENT_REQUEST)
     assert record.record_type == netsgiro.RecordType.ASSIGNMENT_END
 
     assert record.num_transactions == 6

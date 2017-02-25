@@ -46,7 +46,7 @@ netsgiro's low level API parses OCR files into a list of records::
     >>> import netsgiro
     >>> netsgiro.get_records(data)
     [TransmissionStart(service_code=<ServiceCode.NONE: 0>, record_type=<RecordType.TRANSMISSION_START: 10>, transmission_type=0, data_transmitter='55555555', transmission_number='1000081', data_recipient='00008080'),
-    AssignmentStart(service_code=<ServiceCode.AVTALEGIRO: 21>, record_type=<RecordType.ASSIGNMENT_START: 20>, assignment_type=0, agreement_id='000000000', assignment_number='4000086', assignment_account='88888888888'),
+    AssignmentStart(service_code=<ServiceCode.AVTALEGIRO: 21>, record_type=<RecordType.ASSIGNMENT_START: 20>, assignment_type=<AvtaleGiroAssignmentType.PAYMENT_REQUEST: 0>, agreement_id='000000000', assignment_number='4000086', assignment_account='88888888888'),
     AvtaleGiroAmountItem1(service_code=<ServiceCode.AVTALEGIRO: 21>, record_type=<RecordType.TRANSACTION_AMOUNT_1: 30>, transaction_type=<AvtaleGiroTransactionType.NOTIFICATION_FROM_BANK: 21>, transaction_number='0000001', due_date=datetime.date(2004, 6, 17), amount=100, kid='008000011688373'),
     AvtaleGiroAmountItem2(service_code=<ServiceCode.AVTALEGIRO: 21>, record_type=<RecordType.TRANSACTION_AMOUNT_2: 31>, transaction_type=<AvtaleGiroTransactionType.NOTIFICATION_FROM_BANK: 21>, transaction_number='0000001', payer_name='NAVN', reference=None),
     AvtaleGiroSpecification(service_code=<ServiceCode.AVTALEGIRO: 21>, record_type=<RecordType.TRANSACTION_SPECIFICATION: 49>, transaction_type=<AvtaleGiroTransactionType.NOTIFICATION_FROM_BANK: 21>, transaction_number='0000001', line_number=1, column_number=1, text=' Gjelder Faktura: 168837  Dato: 19/03/04'),
@@ -65,7 +65,7 @@ netsgiro's low level API parses OCR files into a list of records::
     AvtaleGiroSpecification(service_code=<ServiceCode.AVTALEGIRO: 21>, record_type=<RecordType.TRANSACTION_SPECIFICATION: 49>, transaction_type=<AvtaleGiroTransactionType.NOTIFICATION_FROM_BANK: 21>, transaction_number='0000005', line_number=1, column_number=2, text='                  ForfallsDato: 17/06/04'),
     AvtaleGiroAmountItem1(service_code=<ServiceCode.AVTALEGIRO: 21>, record_type=<RecordType.TRANSACTION_AMOUNT_1: 30>, transaction_type=<AvtaleGiroTransactionType.NO_NOTIFICATION_FROM_BANK: 2>, transaction_number='0000006', due_date=datetime.date(2004, 6, 17), amount=100, kid='008000061688422'),
     AvtaleGiroAmountItem2(service_code=<ServiceCode.AVTALEGIRO: 21>, record_type=<RecordType.TRANSACTION_AMOUNT_2: 31>, transaction_type=<AvtaleGiroTransactionType.NO_NOTIFICATION_FROM_BANK: 2>, transaction_number='0000006', payer_name='NAVN', reference=None),
-    AssignmentEnd(service_code=<ServiceCode.AVTALEGIRO: 21>, record_type=<RecordType.ASSIGNMENT_END: 88>, assignment_type=0, num_transactions=6, num_records=20, total_amount=600, nets_date=datetime.date(2004, 6, 17), nets_date_earliest=datetime.date(2004, 6, 17), nets_date_latest=None),
+    AssignmentEnd(service_code=<ServiceCode.AVTALEGIRO: 21>, record_type=<RecordType.ASSIGNMENT_END: 88>, assignment_type=<AvtaleGiroAssignmentType.PAYMENT_REQUEST: 0>, num_transactions=6, num_records=20, total_amount=600, nets_date=datetime.date(2004, 6, 17), nets_date_earliest=datetime.date(2004, 6, 17), nets_date_latest=None),
     TransmissionEnd(service_code=<ServiceCode.NONE: 0>, record_type=<RecordType.TRANSMISSION_END: 89>, transmission_type=0, num_transactions=6, num_records=22, total_amount=600, nets_date=datetime.date(2004, 6, 17))]
 
 

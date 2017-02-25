@@ -21,23 +21,23 @@ __all__ = [
 
 def to_service_code(
         value: Union[netsgiro.ServiceCode, int, str]) -> netsgiro.ServiceCode:
-    if isinstance(value, netsgiro.ServiceCode):
-        return value
     return netsgiro.ServiceCode(int(value))
 
 
 def to_record_type(
         value: Union[netsgiro.RecordType, int, str]) -> netsgiro.RecordType:
-    if isinstance(value, netsgiro.RecordType):
-        return value
     return netsgiro.RecordType(int(value))
+
+
+def to_assignment_type(
+        value: Union[netsgiro.AvtaleGiroAssignmentType, int, str]
+        ) -> netsgiro.AvtaleGiroAssignmentType:
+    return netsgiro.AvtaleGiroAssignmentType(int(value))
 
 
 def to_avtalegiro_transaction_type(
         value: Union[netsgiro.AvtaleGiroTransactionType, int, str]
         ) -> netsgiro.AvtaleGiroTransactionType:
-    if isinstance(value, netsgiro.AvtaleGiroTransactionType):
-        return value
     return netsgiro.AvtaleGiroTransactionType(int(value))
 
 
@@ -126,7 +126,7 @@ class TransmissionEnd(Record):
 class AssignmentStart(Record):
     RECORD_TYPE = netsgiro.RecordType.ASSIGNMENT_START
 
-    assignment_type = attr.ib(convert=int)
+    assignment_type = attr.ib(convert=to_assignment_type)
     agreement_id = attr.ib()
     assignment_number = attr.ib()
     assignment_account = attr.ib()
@@ -151,7 +151,7 @@ class AssignmentStart(Record):
 class AssignmentEnd(Record):
     RECORD_TYPE = netsgiro.RecordType.ASSIGNMENT_END
 
-    assignment_type = attr.ib(convert=int)
+    assignment_type = attr.ib(convert=to_assignment_type)
     num_transactions = attr.ib(convert=int)
     num_records = attr.ib(convert=int)
     total_amount = attr.ib(convert=int)
