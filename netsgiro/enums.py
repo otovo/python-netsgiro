@@ -6,6 +6,7 @@ __all__ = [
     'RecordType',
     'AvtaleGiroAssignmentType',
     'AvtaleGiroTransactionType',
+    'AvtaleGiroRegistrationType',
     'OcrGiroTransactionType',
 ]
 
@@ -23,7 +24,7 @@ class RecordType(IntEnum):
     TRANSACTION_AMOUNT_2 = 31
     TRANSACTION_AMOUNT_3 = 32  # Only for TransactionType 20 and 21
     TRANSACTION_SPECIFICATION = 49
-    AGREEMENTS = 78         # TODO Better name?
+    TRANSACTION_AGREEMENTS = 70  # TODO Better name?
     ASSIGNMENT_END = 88
     TRANSMISSION_END = 89
 
@@ -39,6 +40,12 @@ class AvtaleGiroTransactionType(IntEnum):
     NOTIFICATION_FROM_BANK = 21     # TODO Better name?
     CANCELATION = 93                # TODO Better name?
     AGREEMENTS = 94                 # TODO Better name?
+
+
+class AvtaleGiroRegistrationType(IntEnum):
+    ALL_AGREEMENTS = 0
+    NEW_OR_UPDATED_AGREEMENTS = 1
+    DELETED_AGREEMENTS = 2
 
 
 class OcrGiroTransactionType(IntEnum):

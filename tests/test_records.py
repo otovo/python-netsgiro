@@ -67,6 +67,23 @@ def test_assignment_start():
     assert record.assignment_account == '88888888888'
 
 
+def test_assignment_start_for_avtalegiro_agreements():
+    record = netsgiro.AssignmentStart.from_string(
+        'NY21242000000000040000868888888888800000'
+        '0000000000000000000000000000000000000000'
+    )
+
+    assert record.service_code == netsgiro.ServiceCode.AVTALEGIRO
+    assert record.record_type == netsgiro.RecordType.ASSIGNMENT_START
+
+    assert record.assignment_type == (
+        netsgiro.AvtaleGiroAssignmentType.AGREEMENTS)
+
+    assert record.agreement_id is None
+    assert record.assignment_number == '4000086'
+    assert record.assignment_account == '88888888888'
+
+
 def test_assignment_end():
     record = netsgiro.AssignmentEnd.from_string(
         'NY21008800000006000000200000000000000060'
@@ -84,6 +101,26 @@ def test_assignment_end():
     assert record.total_amount == 600
     assert record.nets_date == date(2004, 6, 17)
     assert record.nets_date_earliest == date(2004, 6, 17)
+    assert record.nets_date_latest is None
+
+
+def test_assignment_end_for_avtalegiro_agreements():
+    record = netsgiro.AssignmentEnd.from_string(
+        'NY21248800000006000000200000000000000000'
+        '0000000000000000000000000000000000000000'
+    )
+
+    assert record.service_code == netsgiro.ServiceCode.AVTALEGIRO
+    assert record.record_type == netsgiro.RecordType.ASSIGNMENT_END
+
+    assert record.assignment_type == (
+        netsgiro.AvtaleGiroAssignmentType.AGREEMENTS)
+
+    assert record.num_transactions == 6
+    assert record.num_records == 20
+    assert record.total_amount is None
+    assert record.nets_date is None
+    assert record.nets_date_earliest is None
     assert record.nets_date_latest is None
 
 
@@ -138,3 +175,41 @@ def test_avtalegiro_specification():
     assert record.line_number == 1
     assert record.column_number == 1
     assert record.text == ' Gjelder Faktura: 168837  Dato: 19/03/04'
+
+
+def test_avtalegiro_all_agreements():
+    record = netsgiro.AvtaleGiroAgreement.from_string(
+        'NY21947000000010          00800001168837'
+        '3J00000000000000000000000000000000000000'
+    )
+
+    assert record.service_code == netsgiro.ServiceCode.AVTALEGIRO
+    assert record.record_type == netsgiro.RecordType.TRANSACTION_AGREEMENTS
+
+    assert record.transaction_type == (
+        netsgiro.AvtaleGiroTransactionType.AGREEMENTS)
+    assert record.transaction_number == '0000001'
+
+    assert record.registration_type == (
+        netsgiro.AvtaleGiroRegistrationType.ALL_AGREEMENTS)
+    assert record.kid == '008000011688373'
+    assert record.notify is True
+
+
+def test_avtalegiro_new_or_updated_agreements():
+    record = netsgiro.AvtaleGiroAgreement.from_string(
+        'NY21947000000011          00800001168837'
+        '3N00000000000000000000000000000000000000'
+    )
+
+    assert record.service_code == netsgiro.ServiceCode.AVTALEGIRO
+    assert record.record_type == netsgiro.RecordType.TRANSACTION_AGREEMENTS
+
+    assert record.transaction_type == (
+        netsgiro.AvtaleGiroTransactionType.AGREEMENTS)
+    assert record.transaction_number == '0000001'
+
+    assert record.registration_type == (
+        netsgiro.AvtaleGiroRegistrationType.NEW_OR_UPDATED_AGREEMENTS)
+    assert record.kid == '008000011688373'
+    assert record.notify is False

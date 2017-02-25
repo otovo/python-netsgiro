@@ -15,6 +15,7 @@ __all__ = [
     'AvtaleGiroAmountItem1',
     'AvtaleGiroAmountItem2',
     'AvtaleGiroSpecification',
+    'AvtaleGiroAgreement',
     'get_records',
 ]
 
@@ -41,12 +42,36 @@ def to_avtalegiro_transaction_type(
     return netsgiro.AvtaleGiroTransactionType(int(value))
 
 
-def to_date(value: Union[datetime.date, str]) -> Optional[datetime.date]:
+def to_avtalegiro_registration_type(
+        value: Union[netsgiro.AvtaleGiroRegistrationType, int, str]
+        ) -> netsgiro.AvtaleGiroRegistrationType:
+    return netsgiro.AvtaleGiroRegistrationType(int(value))
+
+
+def to_date(value: Union[datetime.date, str, None]) -> Optional[datetime.date]:
     if isinstance(value, datetime.date):
         return value
-    if value == '000000':
+    if value == '000000' or value is None:
         return None
     return datetime.datetime.strptime(value, '%d%m%y').date()
+
+
+def to_bool(value: Union[bool, str]) -> bool:
+    if isinstance(value, bool):
+        return value
+    if value == 'J':
+        return True
+    elif value == 'N':
+        return False
+    else:
+        raise ValueError("Expected 'J' or 'N', got {!r}".format(value))
+
+
+def optional_int(value: Union[int, str, None]) -> Optional[int]:
+    if value is None:
+        return None
+    else:
+        return int(value)
 
 
 def optional_str(value: str) -> Optional[str]:
@@ -62,11 +87,18 @@ class Record:
 
     @classmethod
     def from_string(cls, line: str) -> 'Record':
-        matches = cls._PATTERN.match(line)
+        if hasattr(cls, '_PATTERNS'):
+            record_subtype = int(line[4:6])
+            pattern = cls._PATTERNS[record_subtype]
+        else:
+            pattern = cls._PATTERN
+
+        matches = pattern.match(line)
         if matches is None:
             raise ValueError(
                 '{!r} did not match {} record format'
                 .format(line, cls.__name__))
+
         return cls(**matches.groupdict())
 
 
@@ -127,24 +159,43 @@ class AssignmentStart(Record):
     RECORD_TYPE = netsgiro.RecordType.ASSIGNMENT_START
 
     assignment_type = attr.ib(convert=to_assignment_type)
-    agreement_id = attr.ib()
     assignment_number = attr.ib()
     assignment_account = attr.ib()
 
-    _PATTERN = re.compile(r'''
-        ^
-        NY      # Format code
-        (?P<service_code>\d{2})
-        (?P<assignment_type>00)
-        (?P<record_type>20)
+    # Only for assignment_type == 0
+    agreement_id = attr.ib(default=None)
 
-        (?P<agreement_id>\d{9})
-        (?P<assignment_number>\d{7})
-        (?P<assignment_account>\d{11})
+    _PATTERNS = {
+        netsgiro.AvtaleGiroAssignmentType.PAYMENT_REQUEST: re.compile(r'''
+            ^
+            NY      # Format code
+            (?P<service_code>21)  # TODO: Verify if both 9 and 21?
+            (?P<assignment_type>00)
+            (?P<record_type>20)
 
-        0{45}   # Filler
-        $
-    ''', re.VERBOSE)
+            (?P<agreement_id>\d{9})
+            (?P<assignment_number>\d{7})
+            (?P<assignment_account>\d{11})
+
+            0{45}   # Filler
+            $
+        ''', re.VERBOSE),
+        netsgiro.AvtaleGiroAssignmentType.AGREEMENTS: re.compile(r'''
+            ^
+            NY      # Format code
+            (?P<service_code>21)
+            (?P<assignment_type>24)
+            (?P<record_type>20)
+
+            0{9}    # Filler
+
+            (?P<assignment_number>\d{7})
+            (?P<assignment_account>\d{11})
+
+            0{45}   # Filler
+            $
+        ''', re.VERBOSE),
+    }
 
 
 @attr.s
@@ -154,28 +205,45 @@ class AssignmentEnd(Record):
     assignment_type = attr.ib(convert=to_assignment_type)
     num_transactions = attr.ib(convert=int)
     num_records = attr.ib(convert=int)
-    total_amount = attr.ib(convert=int)
-    nets_date = attr.ib(convert=to_date)
-    nets_date_earliest = attr.ib(convert=to_date)
-    nets_date_latest = attr.ib(convert=to_date)
 
-    _PATTERN = re.compile(r'''
-        ^
-        NY      # Format code
-        (?P<service_code>\d{2})
-        (?P<assignment_type>00)
-        (?P<record_type>88)
+    # Only for assignment_type == 0
+    total_amount = attr.ib(default=None, convert=optional_int)
+    nets_date = attr.ib(default=None, convert=to_date)
+    nets_date_earliest = attr.ib(default=None, convert=to_date)
+    nets_date_latest = attr.ib(default=None, convert=to_date)
 
-        (?P<num_transactions>\d{8})
-        (?P<num_records>\d{8})
-        (?P<total_amount>\d{17})
-        (?P<nets_date>\d{6})
-        (?P<nets_date_earliest>\d{6})
-        (?P<nets_date_latest>\d{6})
+    _PATTERNS = {
+        netsgiro.AvtaleGiroAssignmentType.PAYMENT_REQUEST: re.compile(r'''
+            ^
+            NY      # Format code
+            (?P<service_code>21)  # TODO: Verify if both 9 and 21?
+            (?P<assignment_type>00)
+            (?P<record_type>88)
 
-        0{21}   # Filler
-        $
-    ''', re.VERBOSE)
+            (?P<num_transactions>\d{8})
+            (?P<num_records>\d{8})
+            (?P<total_amount>\d{17})
+            (?P<nets_date>\d{6})
+            (?P<nets_date_earliest>\d{6})
+            (?P<nets_date_latest>\d{6})
+
+            0{21}   # Filler
+            $
+        ''', re.VERBOSE),
+        netsgiro.AvtaleGiroAssignmentType.AGREEMENTS: re.compile(r'''
+            ^
+            NY      # Format code
+            (?P<service_code>21)
+            (?P<assignment_type>24)
+            (?P<record_type>88)
+
+            (?P<num_transactions>\d{8})
+            (?P<num_records>\d{8})
+
+            0{56}   # Filler
+            $
+        ''', re.VERBOSE),
+    }
 
 
 @attr.s
@@ -263,6 +331,32 @@ class AvtaleGiroSpecification(AvtaleGiroTransactionRecord):
         (?P<text>.{40})
 
         0{20}    # Filler
+        $
+    ''', re.VERBOSE)
+
+
+@attr.s
+class AvtaleGiroAgreement(AvtaleGiroTransactionRecord):
+    SERVICE_CODE = netsgiro.ServiceCode.AVTALEGIRO
+    RECORD_TYPE = netsgiro.RecordType.TRANSACTION_AGREEMENTS
+
+    registration_type = attr.ib(convert=to_avtalegiro_registration_type)
+    kid = attr.ib(convert=optional_str)
+    notify = attr.ib(convert=to_bool)
+
+    _PATTERN = re.compile(r'''
+        ^
+        NY      # Format code
+        (?P<service_code>21)
+        (?P<transaction_type>94)
+        (?P<record_type>70)
+
+        (?P<transaction_number>\d{7})
+        (?P<registration_type>\d{1})
+        (?P<kid>[\d ]{25})
+        (?P<notify>[JN]{1})
+
+        0{38}   # Filler
         $
     ''', re.VERBOSE)
 
