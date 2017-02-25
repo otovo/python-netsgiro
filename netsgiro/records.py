@@ -89,6 +89,10 @@ class Record:
     def from_string(cls, line: str) -> 'Record':
         if hasattr(cls, '_PATTERNS'):
             record_subtype = int(line[4:6])
+            if record_subtype not in cls._PATTERNS:
+                raise ValueError(
+                    'Unknown {} record subtype: {}'
+                    .format(cls.__name__, record_subtype))
             pattern = cls._PATTERNS[record_subtype]
         else:
             pattern = cls._PATTERN
@@ -195,6 +199,21 @@ class AssignmentStart(Record):
             0{45}   # Filler
             $
         ''', re.VERBOSE),
+        netsgiro.AvtaleGiroAssignmentType.CANCELATIONS: re.compile(r'''
+            ^
+            NY      # Format code
+            (?P<service_code>21)
+            (?P<assignment_type>36)
+            (?P<record_type>20)
+
+            0{9}    # Filler
+
+            (?P<assignment_number>\d{7})
+            (?P<assignment_account>\d{11})
+
+            0{45}   # Filler
+            $
+        ''', re.VERBOSE),
     }
 
 
@@ -243,6 +262,23 @@ class AssignmentEnd(Record):
             0{56}   # Filler
             $
         ''', re.VERBOSE),
+        netsgiro.AvtaleGiroAssignmentType.CANCELATIONS: re.compile(r'''
+            ^
+            NY      # Format code
+            (?P<service_code>21)
+            (?P<assignment_type>36)
+            (?P<record_type>88)
+
+            (?P<num_transactions>\d{8})
+            (?P<num_records>\d{8})
+            (?P<total_amount>\d{17})
+            (?P<nets_date>\d{6})
+            (?P<nets_date_earliest>\d{6})
+            (?P<nets_date_latest>\d{6})
+
+            0{21}   # Filler
+            $
+        ''', re.VERBOSE),
     }
 
 
@@ -265,7 +301,7 @@ class AvtaleGiroAmountItem1(AvtaleGiroTransactionRecord):
         ^
         NY      # Format code
         (?P<service_code>21)
-        (?P<transaction_type>\d{2})  # 02 or 21
+        (?P<transaction_type>\d{2})  # 02, 21, or 93
         (?P<record_type>30)
 
         (?P<transaction_number>\d{7})
@@ -293,7 +329,7 @@ class AvtaleGiroAmountItem2(AvtaleGiroTransactionRecord):
         ^
         NY      # Format code
         (?P<service_code>21)
-        (?P<transaction_type>\d{2})  # 02 or 21
+        (?P<transaction_type>\d{2})  # 02, 21, or 93
         (?P<record_type>31)
 
         (?P<transaction_number>\d{7})

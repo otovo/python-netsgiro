@@ -50,7 +50,7 @@ def test_transmission_end():
     assert record.nets_date == date(2004, 6, 17)
 
 
-def test_assignment_start():
+def test_assignment_start_for_avtalegiro_payment_requests():
     record = netsgiro.AssignmentStart.from_string(
         'NY21002000000000040000868888888888800000'
         '0000000000000000000000000000000000000000'
@@ -84,7 +84,24 @@ def test_assignment_start_for_avtalegiro_agreements():
     assert record.assignment_account == '88888888888'
 
 
-def test_assignment_end():
+def test_assignment_start_for_avtalegiro_cancelation():
+    record = netsgiro.AssignmentStart.from_string(
+        'NY21362000000000040000868888888888800000'
+        '0000000000000000000000000000000000000000'
+    )
+
+    assert record.service_code == netsgiro.ServiceCode.AVTALEGIRO
+    assert record.record_type == netsgiro.RecordType.ASSIGNMENT_START
+
+    assert record.assignment_type == (
+        netsgiro.AvtaleGiroAssignmentType.CANCELATIONS)
+
+    assert record.agreement_id is None
+    assert record.assignment_number == '4000086'
+    assert record.assignment_account == '88888888888'
+
+
+def test_assignment_end_for_avtalegiro_payment_requests():
     record = netsgiro.AssignmentEnd.from_string(
         'NY21008800000006000000200000000000000060'
         '0170604170604000000000000000000000000000'
@@ -124,6 +141,26 @@ def test_assignment_end_for_avtalegiro_agreements():
     assert record.nets_date_latest is None
 
 
+def test_assignment_end_for_avtalegiro_cancelations():
+    record = netsgiro.AssignmentEnd.from_string(
+        'NY21368800000006000000200000000000000060'
+        '0170604170604000000000000000000000000000'
+    )
+
+    assert record.service_code == netsgiro.ServiceCode.AVTALEGIRO
+    assert record.record_type == netsgiro.RecordType.ASSIGNMENT_END
+
+    assert record.assignment_type == (
+        netsgiro.AvtaleGiroAssignmentType.CANCELATIONS)
+
+    assert record.num_transactions == 6
+    assert record.num_records == 20
+    assert record.total_amount == 600
+    assert record.nets_date == date(2004, 6, 17)
+    assert record.nets_date_earliest == date(2004, 6, 17)
+    assert record.nets_date_latest is None
+
+
 def test_avtalegiro_amount_item_1():
     record = netsgiro.AvtaleGiroAmountItem1.from_string(
         'NY2121300000001170604           00000000'
@@ -135,6 +172,24 @@ def test_avtalegiro_amount_item_1():
 
     assert record.transaction_type == (
         netsgiro.AvtaleGiroTransactionType.NOTIFICATION_FROM_BANK)
+    assert record.transaction_number == '0000001'
+
+    assert record.due_date == date(2004, 6, 17)
+    assert record.amount == 100
+    assert record.kid == '008000011688373'
+
+
+def test_avtalegiro_amount_item_1_for_avtalegiro_cancelation():
+    record = netsgiro.AvtaleGiroAmountItem1.from_string(
+        'NY2193300000001170604           00000000'
+        '000000100          008000011688373000000'
+    )
+
+    assert record.service_code == netsgiro.ServiceCode.AVTALEGIRO
+    assert record.record_type == netsgiro.RecordType.TRANSACTION_AMOUNT_1
+
+    assert record.transaction_type == (
+        netsgiro.AvtaleGiroTransactionType.CANCELATION)
     assert record.transaction_number == '0000001'
 
     assert record.due_date == date(2004, 6, 17)
