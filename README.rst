@@ -60,6 +60,79 @@ netsgiro's low level API parses OCR files into a list of records::
     TransmissionEnd(service_code=<ServiceCode.NONE: 0>, record_type=<RecordType.TRANSMISSION_END: 89>, transmission_type=0, num_transactions=6, num_records=22, total_amount=600, nets_date=datetime.date(2004, 6, 17))]
 
 
+High level API
+==============
+
+netsgiro's high level API parses OCR files into a tree of objects::
+
+    >>> import netsgiro
+    >>> data = open('tests/data/avtalegiro_payment_request.txt').read()
+    >>> transmission = netsgiro.parse(data)
+    >>> transmission.to_dict()
+    {'assignments': [{'account': '88888888888',
+       'agreement_id': '000000000',
+       'number': '4000086',
+       'service_code': <ServiceCode.AVTALEGIRO: 21>,
+       'transactions': [{'amount': Decimal('1'),
+         'due_date': datetime.date(2004, 6, 17),
+         'kid': '008000011688373',
+         'number': '0000001',
+         'payer_name': 'NAVN',
+         'reference': None,
+         'service_code': <ServiceCode.AVTALEGIRO: 21>,
+         'specification_text': ' Gjelder Faktura: 168837  Dato: 19/03/04                  ForfallsDato: 17/06/04\n',
+         'type': <AvtaleGiroTransactionType.NOTIFICATION_FROM_BANK: 21>},
+        {'amount': Decimal('1'),
+         'due_date': datetime.date(2004, 6, 17),
+         'kid': '008000021688389',
+         'number': '0000002',
+         'payer_name': 'NAVN',
+         'reference': None,
+         'service_code': <ServiceCode.AVTALEGIRO: 21>,
+         'specification_text': ' Gjelder Faktura: 168838  Dato: 19/03/04                  ForfallsDato: 17/06/04\n',
+         'type': <AvtaleGiroTransactionType.NOTIFICATION_FROM_BANK: 21>},
+        {'amount': Decimal('1'),
+         'due_date': datetime.date(2004, 6, 17),
+         'kid': '008000031688395',
+         'number': '0000003',
+         'payer_name': 'NAVN',
+         'reference': None,
+         'service_code': <ServiceCode.AVTALEGIRO: 21>,
+         'specification_text': '',
+         'type': <AvtaleGiroTransactionType.NOTIFICATION_FROM_BANK: 21>},
+        {'amount': Decimal('1'),
+         'due_date': datetime.date(2004, 6, 17),
+         'kid': '008000041688401',
+         'number': '0000004',
+         'payer_name': 'NAVN',
+         'reference': None,
+         'service_code': <ServiceCode.AVTALEGIRO: 21>,
+         'specification_text': '',
+         'type': <AvtaleGiroTransactionType.NOTIFICATION_FROM_BANK: 21>},
+        {'amount': Decimal('1'),
+         'due_date': datetime.date(2004, 6, 17),
+         'kid': '008000051688416',
+         'number': '0000005',
+         'payer_name': 'NAVN',
+         'reference': None,
+         'service_code': <ServiceCode.AVTALEGIRO: 21>,
+         'specification_text': ' Gjelder Faktura: 168841  Dato: 19/03/04                  ForfallsDato: 17/06/04\n',
+         'type': <AvtaleGiroTransactionType.NOTIFICATION_FROM_BANK: 21>},
+        {'amount': Decimal('1'),
+         'due_date': datetime.date(2004, 6, 17),
+         'kid': '008000061688422',
+         'number': '0000006',
+         'payer_name': 'NAVN',
+         'reference': None,
+         'service_code': <ServiceCode.AVTALEGIRO: 21>,
+         'specification_text': '',
+         'type': <AvtaleGiroTransactionType.NO_NOTIFICATION_FROM_BANK: 2>}]}],
+     'data_recipient': '00008080',
+     'data_transmitter': '55555555',
+     'nets_date': datetime.date(2004, 6, 17),
+     'number': '1000081'}
+
+
 License
 =======
 
