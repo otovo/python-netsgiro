@@ -16,8 +16,13 @@ __all__ = [
 ]
 
 
+class Serializable:
+    def to_dict(self):
+        return attr.asdict(self)
+
+
 @attr.s
-class Transmission:
+class Transmission(Serializable):
     number = attr.ib()
     data_transmitter = attr.ib()
     data_recipient = attr.ib()
@@ -48,7 +53,7 @@ class Transmission:
 
 
 @attr.s
-class Assignment:
+class Assignment(Serializable):
     service_code = attr.ib(convert=netsgiro.ServiceCode)
     agreement_id = attr.ib()
     number = attr.ib()
@@ -95,7 +100,7 @@ def get_assignments(records: List[Record]) -> List[Assignment]:
 
 
 @attr.s
-class Transaction:
+class Transaction(Serializable):
     service_code = attr.ib(convert=netsgiro.ServiceCode)
     type = attr.ib(convert=netsgiro.AvtaleGiroTransactionType)  # TODO: Type
     number = attr.ib()
