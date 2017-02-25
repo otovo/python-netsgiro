@@ -29,7 +29,9 @@ class Transmission:
 
     @classmethod
     def from_records(cls, records: List[Record]) -> 'Transmission':
-        # TODO Check len(records) >= 2
+        if len(records) < 2:
+            raise ValueError(
+                'At least 2 records required, got {}'.format(len(records)))
 
         start, body, end = records[0], records[1:-1], records[-1]
 
@@ -56,7 +58,9 @@ class Assignment:
 
     @classmethod
     def from_records(cls, records: List[Record]) -> 'Assignment':
-        # TODO Check len(records) >= 2
+        if len(records) < 2:
+            raise ValueError(
+                'At least 2 records required, got {}'.format(len(records)))
 
         start, body, end = records[0], records[1:-1], records[-1]
 

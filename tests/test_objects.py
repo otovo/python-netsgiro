@@ -45,6 +45,20 @@ def test_parse_payment_request(payment_request_data):
     )
 
 
+def test_transmission_from_zero_records_fails():
+    with pytest.raises(ValueError) as exc_info:
+        objects.Transmission.from_records([])
+
+    assert 'At least 2 records required, got 0' in str(exc_info)
+
+
+def test_assignment_from_zero_records_fails():
+    with pytest.raises(ValueError) as exc_info:
+        objects.Assignment.from_records([])
+
+    assert 'At least 2 records required, got 0' in str(exc_info)
+
+
 def make_specification_records(num_lines, num_columns=2):
     return [
         netsgiro.AvtaleGiroSpecification(
