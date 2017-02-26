@@ -55,7 +55,7 @@ class Transmission(Serializable):
 @attr.s
 class Assignment(Serializable):
     service_code = attr.ib(convert=netsgiro.ServiceCode)
-    type = attr.ib(convert=netsgiro.AvtaleGiroAssignmentType)  # TODO: Type
+    type = attr.ib(convert=netsgiro.AssignmentType)
     agreement_id = attr.ib()
     number = attr.ib()
     account = attr.ib()

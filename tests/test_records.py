@@ -59,8 +59,7 @@ def test_assignment_start_for_avtalegiro_payment_requests():
     assert record.service_code == netsgiro.ServiceCode.AVTALEGIRO
     assert record.record_type == netsgiro.RecordType.ASSIGNMENT_START
 
-    assert record.assignment_type == (
-        netsgiro.AvtaleGiroAssignmentType.PAYMENT_REQUESTS)
+    assert record.assignment_type == netsgiro.AssignmentType.TRANSACTIONS
 
     assert record.agreement_id == '000000000'
     assert record.assignment_number == '4000086'
@@ -77,7 +76,7 @@ def test_assignment_start_for_avtalegiro_agreements():
     assert record.record_type == netsgiro.RecordType.ASSIGNMENT_START
 
     assert record.assignment_type == (
-        netsgiro.AvtaleGiroAssignmentType.AGREEMENTS)
+        netsgiro.AssignmentType.AVTALEGIRO_AGREEMENTS)
 
     assert record.agreement_id is None
     assert record.assignment_number == '4000086'
@@ -94,7 +93,7 @@ def test_assignment_start_for_avtalegiro_cancellation():
     assert record.record_type == netsgiro.RecordType.ASSIGNMENT_START
 
     assert record.assignment_type == (
-        netsgiro.AvtaleGiroAssignmentType.CANCELLATIONS)
+        netsgiro.AssignmentType.AVTALEGIRO_CANCELLATIONS)
 
     assert record.agreement_id is None
     assert record.assignment_number == '4000086'
@@ -110,8 +109,7 @@ def test_assignment_start_for_ocr_giro_transactions():
     assert record.service_code == netsgiro.ServiceCode.OCR_GIRO
     assert record.record_type == netsgiro.RecordType.ASSIGNMENT_START
 
-    assert record.assignment_type == (
-        netsgiro.AvtaleGiroAssignmentType.PAYMENT_REQUESTS)  # TODO Rename
+    assert record.assignment_type == netsgiro.AssignmentType.TRANSACTIONS
 
     assert record.agreement_id == '001008566'
     assert record.assignment_number == '0000002'
@@ -127,8 +125,7 @@ def test_assignment_end_for_avtalegiro_payment_requests():
     assert record.service_code == netsgiro.ServiceCode.AVTALEGIRO
     assert record.record_type == netsgiro.RecordType.ASSIGNMENT_END
 
-    assert record.assignment_type == (
-        netsgiro.AvtaleGiroAssignmentType.PAYMENT_REQUESTS)
+    assert record.assignment_type == netsgiro.AssignmentType.TRANSACTIONS
 
     assert record.num_transactions == 6
     assert record.num_records == 20
@@ -148,7 +145,7 @@ def test_assignment_end_for_avtalegiro_agreements():
     assert record.record_type == netsgiro.RecordType.ASSIGNMENT_END
 
     assert record.assignment_type == (
-        netsgiro.AvtaleGiroAssignmentType.AGREEMENTS)
+        netsgiro.AssignmentType.AVTALEGIRO_AGREEMENTS)
 
     assert record.num_transactions == 6
     assert record.num_records == 20
@@ -168,7 +165,7 @@ def test_assignment_end_for_avtalegiro_cancellations():
     assert record.record_type == netsgiro.RecordType.ASSIGNMENT_END
 
     assert record.assignment_type == (
-        netsgiro.AvtaleGiroAssignmentType.CANCELLATIONS)
+        netsgiro.AssignmentType.AVTALEGIRO_CANCELLATIONS)
 
     assert record.num_transactions == 6
     assert record.num_records == 20
@@ -187,8 +184,7 @@ def test_assignment_end_for_ocr_giro_transactions():
     assert record.service_code == netsgiro.ServiceCode.OCR_GIRO
     assert record.record_type == netsgiro.RecordType.ASSIGNMENT_END
 
-    assert record.assignment_type == (
-        netsgiro.AvtaleGiroAssignmentType.PAYMENT_REQUESTS)  # TODO: Rename
+    assert record.assignment_type == netsgiro.AssignmentType.TRANSACTIONS
 
     assert record.num_transactions == 20
     assert record.num_records == 42
