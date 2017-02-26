@@ -14,6 +14,7 @@ __all__ = [
     'AssignmentEnd',
     'TransactionAmountItem1',
     'TransactionAmountItem2',
+    'TransactionAmountItem3',
     'TransactionSpecification',
     'AvtaleGiroAgreement',
     'get_records',
@@ -74,8 +75,8 @@ def optional_int(value: Union[int, str, None]) -> Optional[int]:
         return int(value)
 
 
-def optional_str(value: str) -> Optional[str]:
-    return value.strip() or None
+def optional_str(value: Optional[str]) -> Optional[str]:
+    return value and value.strip() or None
 
 
 @attr.s
@@ -231,7 +232,7 @@ class AssignmentEnd(Record):
         re.compile(r'''
             ^
             NY      # Format code
-            (?P<service_code>21)  # TODO: Verify if both 9 and 21?
+            (?P<service_code>(09|21))
             (?P<assignment_type>00)     # Payment requests
             (?P<record_type>88)
 
@@ -292,49 +293,131 @@ class TransactionAmountItem1(TransactionRecord):
     amount = attr.ib(convert=int)
     kid = attr.ib(convert=optional_str)
 
-    _PATTERN = re.compile(r'''
-        ^
-        NY      # Format code
-        (?P<service_code>21)
-        (?P<transaction_type>\d{2})  # 02, 21, or 93
-        (?P<record_type>30)
+    # Only OCR Giro
+    centre_id = attr.ib(default=None)
+    day_code = attr.ib(default=None, convert=optional_int)
+    partial_settlement_number = attr.ib(default=None, convert=optional_int)
+    partial_settlement_serial_number = attr.ib(default=None)
+    sign = attr.ib(default=None)
 
-        (?P<transaction_number>\d{7})
-        (?P<nets_date>\d{6})
+    _PATTERNS = [
+        re.compile(r'''
+            ^
+            NY      # Format code
+            (?P<service_code>09)
+            (?P<transaction_type>\d{2})  # 10-21
+            (?P<record_type>30)
 
-        [ ]{11} # Filler
+            (?P<transaction_number>\d{7})
+            (?P<nets_date>\d{6})
 
-        (?P<amount>\d{17})
-        (?P<kid>[\d ]{25})
+            (?P<centre_id>\d{2})
+            (?P<day_code>\d{2})
+            (?P<partial_settlement_number>\d{1})
+            (?P<partial_settlement_serial_number>\d{5})
+            (?P<sign>[-0]{1})
 
-        0{6}    # Filler
-        $
-    ''', re.VERBOSE)
+            (?P<amount>\d{17})
+            (?P<kid>[\d ]{25})
+
+            0{6}    # Filler
+            $
+        ''', re.VERBOSE),
+        re.compile(r'''
+            ^
+            NY      # Format code
+            (?P<service_code>21)
+            (?P<transaction_type>\d{2})  # 02, 21, or 93
+            (?P<record_type>30)
+
+            (?P<transaction_number>\d{7})
+            (?P<nets_date>\d{6})
+
+            [ ]{11} # Filler
+
+            (?P<amount>\d{17})
+            (?P<kid>[\d ]{25})
+
+            0{6}    # Filler
+            $
+        ''', re.VERBOSE),
+    ]
 
 
 @attr.s
 class TransactionAmountItem2(TransactionRecord):
     RECORD_TYPE = netsgiro.RecordType.TRANSACTION_AMOUNT_2
 
-    payer_name = attr.ib(convert=optional_str)  # TODO Better name?
-    reference = attr.ib(convert=optional_str)   # TODO Better name?
+    reference = attr.ib(convert=optional_str)
+
+    # Only OCR Giro
+    form_number = attr.ib(default=None)
+    bank_date = attr.ib(default=None, convert=to_date)
+    debit_account = attr.ib(default=None)
+
+    # Only AvtaleGiro
+    payer_name = attr.ib(default=None, convert=optional_str)
+
+    # TODO Add accessors to parts of reference depending on transaction_type
+
+    _PATTERNS = [
+        re.compile(r'''
+            ^
+            NY      # Format code
+            (?P<service_code>09)
+            (?P<transaction_type>\d{2})  # 10-21
+            (?P<record_type>31)
+
+            (?P<transaction_number>\d{7})
+            (?P<form_number>\d{10})
+            (?P<reference>\d{9})
+
+            .{7} # Filler   # TODO Not always zero in test data
+
+            (?P<bank_date>\d{6})
+            (?P<debit_account>\d{11})
+
+            0{22}    # Filler
+            $
+        ''', re.VERBOSE),
+        re.compile(r'''
+            ^
+            NY      # Format code
+            (?P<service_code>21)
+            (?P<transaction_type>\d{2})  # 02, 21, or 93
+            (?P<record_type>31)
+
+            (?P<transaction_number>\d{7})
+            (?P<payer_name>.{10})
+
+            [ ]{25} # Filler
+
+            (?P<reference>.{25})
+
+            0{5}    # Filler
+            $
+        ''', re.VERBOSE),
+    ]
+
+
+@attr.s
+class TransactionAmountItem3(TransactionRecord):
+    RECORD_TYPE = netsgiro.RecordType.TRANSACTION_AMOUNT_3
+
+    text = attr.ib(convert=optional_str)
 
     _PATTERN = re.compile(r'''
-        ^
-        NY      # Format code
-        (?P<service_code>21)
-        (?P<transaction_type>\d{2})  # 02, 21, or 93
-        (?P<record_type>31)
+            ^
+            NY      # Format code
+            (?P<service_code>09)
+            (?P<transaction_type>\d{2})  # 20-21
+            (?P<record_type>32)
 
-        (?P<transaction_number>\d{7})
-        (?P<payer_name>.{10})
+            (?P<transaction_number>\d{7})
+            (?P<text>.{40})
 
-        [ ]{25} # Filler
-
-        (?P<reference>.{25})
-
-        0{5}    # Filler
-        $
+            0{25}    # Filler
+            $
     ''', re.VERBOSE)
 
 
