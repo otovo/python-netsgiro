@@ -25,3 +25,6 @@ install:
 
 script:
   - "tox -e $TOX_ENV"
+
+after_success:
+  - "if [ $TOX_ENV == 'py36' ]; then pip install coveralls; coveralls; fi"

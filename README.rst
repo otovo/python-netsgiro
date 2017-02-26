@@ -162,3 +162,7 @@ Project resources
 .. image:: https://img.shields.io/travis/otovo/python-netsgiro/master.svg?style=flat
     :target: https://travis-ci.org/otovo/python-netsgiro
     :alt: Travis CI build status
+
+.. image:: https://img.shields.io/coveralls/otovo/python-netsgiro/master.svg?style=flat
+    :target: https://coveralls.io/github/otovo/python-netsgiro
+    :alt: Test coverage
