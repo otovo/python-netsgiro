@@ -84,7 +84,7 @@ def test_assignment_start_for_avtalegiro_agreements():
     assert record.assignment_account == '88888888888'
 
 
-def test_assignment_start_for_avtalegiro_cancelation():
+def test_assignment_start_for_avtalegiro_cancellation():
     record = netsgiro.AssignmentStart.from_string(
         'NY21362000000000040000868888888888800000'
         '0000000000000000000000000000000000000000'
@@ -94,7 +94,7 @@ def test_assignment_start_for_avtalegiro_cancelation():
     assert record.record_type == netsgiro.RecordType.ASSIGNMENT_START
 
     assert record.assignment_type == (
-        netsgiro.AvtaleGiroAssignmentType.CANCELATIONS)
+        netsgiro.AvtaleGiroAssignmentType.CANCELLATIONS)
 
     assert record.agreement_id is None
     assert record.assignment_number == '4000086'
@@ -158,7 +158,7 @@ def test_assignment_end_for_avtalegiro_agreements():
     assert record.nets_date_latest is None
 
 
-def test_assignment_end_for_avtalegiro_cancelations():
+def test_assignment_end_for_avtalegiro_cancellations():
     record = netsgiro.AssignmentEnd.from_string(
         'NY21368800000006000000200000000000000060'
         '0170604170604000000000000000000000000000'
@@ -168,7 +168,7 @@ def test_assignment_end_for_avtalegiro_cancelations():
     assert record.record_type == netsgiro.RecordType.ASSIGNMENT_END
 
     assert record.assignment_type == (
-        netsgiro.AvtaleGiroAssignmentType.CANCELATIONS)
+        netsgiro.AvtaleGiroAssignmentType.CANCELLATIONS)
 
     assert record.num_transactions == 6
     assert record.num_records == 20
@@ -216,7 +216,7 @@ def test_transaction_amount_item_1_for_avtalegiro_payment_request():
     assert record.kid == '008000011688373'
 
 
-def test_transaction_amount_item_1_for_avtalegiro_cancelation():
+def test_transaction_amount_item_1_for_avtalegiro_cancellation():
     record = netsgiro.TransactionAmountItem1.from_string(
         'NY2193300000001170604           00000000'
         '000000100          008000011688373000000'
@@ -226,7 +226,7 @@ def test_transaction_amount_item_1_for_avtalegiro_cancelation():
     assert record.record_type == netsgiro.RecordType.TRANSACTION_AMOUNT_1
 
     assert record.transaction_type == (
-        netsgiro.TransactionType.AVTALEGIRO_CANCELATION)
+        netsgiro.TransactionType.AVTALEGIRO_CANCELLATION)
     assert record.transaction_number == '0000001'
 
     assert record.nets_date == date(2004, 6, 17)
