@@ -45,14 +45,14 @@ class TransactionType(IntEnum):
 
     AVTALEGIRO_NO_NOTIFICATION_FROM_BANK = 2   # TODO Better name?
     AVTALEGIRO_NOTIFICATION_FROM_BANK = 21     # TODO Better name?
-    AVTALEGIRO_CANCELATION = 93                # TODO Better name?
+    AVTALEGIRO_CANCELLATION = 93               # TODO Better name?
     AVTALEGIRO_AGREEMENTS = 94                 # TODO Better name?
 
 
 class AvtaleGiroAssignmentType(IntEnum):
     PAYMENT_REQUESTS = 0    # TODO Better name?
     AGREEMENTS = 24         # TODO Better name?
-    CANCELATIONS = 36       # TODO Better name?
+    CANCELLATIONS = 36      # TODO Better name?
 
 
 class AvtaleGiroRegistrationType(IntEnum):
