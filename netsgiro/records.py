@@ -88,22 +88,18 @@ class Record:
     @classmethod
     def from_string(cls, line: str) -> 'Record':
         if hasattr(cls, '_PATTERNS'):
-            record_subtype = int(line[4:6])
-            if record_subtype not in cls._PATTERNS:
-                raise ValueError(
-                    'Unknown {} record subtype: {}'
-                    .format(cls.__name__, record_subtype))
-            pattern = cls._PATTERNS[record_subtype]
+            patterns = cls._PATTERNS
         else:
-            pattern = cls._PATTERN
+            patterns = [cls._PATTERN]
 
-        matches = pattern.match(line)
-        if matches is None:
-            raise ValueError(
-                '{!r} did not match {} record format'
-                .format(line, cls.__name__))
+        for pattern in patterns:
+            matches = pattern.match(line)
+            if matches is not None:
+                return cls(**matches.groupdict())
 
-        return cls(**matches.groupdict())
+        raise ValueError(
+            '{!r} did not match {} record formats'
+            .format(line, cls.__name__))
 
 
 @attr.s
@@ -169,11 +165,11 @@ class AssignmentStart(Record):
     # Only for assignment_type == 0
     agreement_id = attr.ib(default=None)
 
-    _PATTERNS = {
-        netsgiro.AvtaleGiroAssignmentType.PAYMENT_REQUESTS: re.compile(r'''
+    _PATTERNS = [
+        re.compile(r'''
             ^
             NY      # Format code
-            (?P<service_code>21)  # TODO: Verify if both 9 and 21?
+            (?P<service_code>(09|21))
             (?P<assignment_type>00)
             (?P<record_type>20)
 
@@ -184,7 +180,7 @@ class AssignmentStart(Record):
             0{45}   # Filler
             $
         ''', re.VERBOSE),
-        netsgiro.AvtaleGiroAssignmentType.AGREEMENTS: re.compile(r'''
+        re.compile(r'''
             ^
             NY      # Format code
             (?P<service_code>21)
@@ -199,7 +195,7 @@ class AssignmentStart(Record):
             0{45}   # Filler
             $
         ''', re.VERBOSE),
-        netsgiro.AvtaleGiroAssignmentType.CANCELATIONS: re.compile(r'''
+        re.compile(r'''
             ^
             NY      # Format code
             (?P<service_code>21)
@@ -214,7 +210,7 @@ class AssignmentStart(Record):
             0{45}   # Filler
             $
         ''', re.VERBOSE),
-    }
+    ]
 
 
 @attr.s
@@ -231,12 +227,12 @@ class AssignmentEnd(Record):
     nets_date_earliest = attr.ib(default=None, convert=to_date)
     nets_date_latest = attr.ib(default=None, convert=to_date)
 
-    _PATTERNS = {
-        netsgiro.AvtaleGiroAssignmentType.PAYMENT_REQUESTS: re.compile(r'''
+    _PATTERNS = [
+        re.compile(r'''
             ^
             NY      # Format code
             (?P<service_code>21)  # TODO: Verify if both 9 and 21?
-            (?P<assignment_type>00)
+            (?P<assignment_type>00)     # Payment requests
             (?P<record_type>88)
 
             (?P<num_transactions>\d{8})
@@ -249,11 +245,11 @@ class AssignmentEnd(Record):
             0{21}   # Filler
             $
         ''', re.VERBOSE),
-        netsgiro.AvtaleGiroAssignmentType.AGREEMENTS: re.compile(r'''
+        re.compile(r'''
             ^
             NY      # Format code
             (?P<service_code>21)
-            (?P<assignment_type>24)
+            (?P<assignment_type>24)     # Agreements
             (?P<record_type>88)
 
             (?P<num_transactions>\d{8})
@@ -262,11 +258,11 @@ class AssignmentEnd(Record):
             0{56}   # Filler
             $
         ''', re.VERBOSE),
-        netsgiro.AvtaleGiroAssignmentType.CANCELATIONS: re.compile(r'''
+        re.compile(r'''
             ^
             NY      # Format code
             (?P<service_code>21)
-            (?P<assignment_type>36)
+            (?P<assignment_type>36)     # Cancelations
             (?P<record_type>88)
 
             (?P<num_transactions>\d{8})
@@ -279,7 +275,7 @@ class AssignmentEnd(Record):
             0{21}   # Filler
             $
         ''', re.VERBOSE),
-    }
+    ]
 
 
 @attr.s
