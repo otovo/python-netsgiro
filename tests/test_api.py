@@ -51,20 +51,20 @@ def test_get_records(payment_request_data):
     assert isinstance(assignment_start, records.AssignmentStart)
     assert assignment_start.assignment_account == '88888888888'
 
-    assert isinstance(transaction_amount_1, records.AvtaleGiroAmountItem1)
+    assert isinstance(transaction_amount_1, records.TransactionAmountItem1)
     assert transaction_amount_1.nets_date == date(2004, 6, 17)
     assert transaction_amount_1.amount == 100
     assert transaction_amount_1.kid == '008000011688373'
 
-    assert isinstance(transaction_amount_2, records.AvtaleGiroAmountItem2)
+    assert isinstance(transaction_amount_2, records.TransactionAmountItem2)
     assert transaction_amount_2.payer_name == 'NAVN'
     assert transaction_amount_2.reference is None
 
-    assert isinstance(transaction_spec_1, records.AvtaleGiroSpecification)
+    assert isinstance(transaction_spec_1, records.TransactionSpecification)
     assert transaction_spec_1.text == (
         ' Gjelder Faktura: 168837  Dato: 19/03/04')
 
-    assert isinstance(transaction_spec_2, records.AvtaleGiroSpecification)
+    assert isinstance(transaction_spec_2, records.TransactionSpecification)
     assert transaction_spec_2.text == (
         '                  ForfallsDato: 17/06/04')
 
