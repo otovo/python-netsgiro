@@ -120,9 +120,9 @@ class Transaction(Serializable):
     @classmethod
     def from_records(cls, records: List[Record]) -> 'Transaction':
         amount_item_1 = records.pop(0)
-        assert isinstance(amount_item_1, netsgiro.AvtaleGiroAmountItem1)
+        assert isinstance(amount_item_1, netsgiro.TransactionAmountItem1)
         amount_item_2 = records.pop(0)
-        assert isinstance(amount_item_2, netsgiro.AvtaleGiroAmountItem2)
+        assert isinstance(amount_item_2, netsgiro.TransactionAmountItem2)
 
         # TODO If service_code is OCR_GIRO and transaction_type is 20 or 21,
         # pop amount_item_3 here

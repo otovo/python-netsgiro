@@ -73,7 +73,7 @@ def test_assignment_from_zero_records_fails():
 
 def make_specification_records(num_lines, num_columns=2):
     return [
-        netsgiro.AvtaleGiroSpecification(
+        netsgiro.TransactionSpecification(
             service_code=netsgiro.ServiceCode.AVTALEGIRO,
             transaction_type=(
                 netsgiro.TransactionType.AVTALEGIRO_NOTIFICATION_FROM_BANK),

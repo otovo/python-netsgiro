@@ -12,9 +12,9 @@ __all__ = [
     'TransmissionEnd',
     'AssignmentStart',
     'AssignmentEnd',
-    'AvtaleGiroAmountItem1',
-    'AvtaleGiroAmountItem2',
-    'AvtaleGiroSpecification',
+    'TransactionAmountItem1',
+    'TransactionAmountItem2',
+    'TransactionSpecification',
     'AvtaleGiroAgreement',
     'get_records',
 ]
@@ -283,14 +283,13 @@ class AssignmentEnd(Record):
 
 
 @attr.s
-class AvtaleGiroTransactionRecord(Record):
+class TransactionRecord(Record):
     transaction_type = attr.ib(convert=to_transaction_type)
     transaction_number = attr.ib()
 
 
 @attr.s
-class AvtaleGiroAmountItem1(AvtaleGiroTransactionRecord):
-    SERVICE_CODE = netsgiro.ServiceCode.AVTALEGIRO
+class TransactionAmountItem1(TransactionRecord):
     RECORD_TYPE = netsgiro.RecordType.TRANSACTION_AMOUNT_1
 
     nets_date = attr.ib(convert=to_date)
@@ -318,8 +317,7 @@ class AvtaleGiroAmountItem1(AvtaleGiroTransactionRecord):
 
 
 @attr.s
-class AvtaleGiroAmountItem2(AvtaleGiroTransactionRecord):
-    SERVICE_CODE = netsgiro.ServiceCode.AVTALEGIRO
+class TransactionAmountItem2(TransactionRecord):
     RECORD_TYPE = netsgiro.RecordType.TRANSACTION_AMOUNT_2
 
     payer_name = attr.ib(convert=optional_str)  # TODO Better name?
@@ -345,8 +343,7 @@ class AvtaleGiroAmountItem2(AvtaleGiroTransactionRecord):
 
 
 @attr.s
-class AvtaleGiroSpecification(AvtaleGiroTransactionRecord):
-    SERVICE_CODE = netsgiro.ServiceCode.AVTALEGIRO
+class TransactionSpecification(TransactionRecord):
     RECORD_TYPE = netsgiro.RecordType.TRANSACTION_SPECIFICATION
 
     line_number = attr.ib(convert=int)
@@ -372,8 +369,7 @@ class AvtaleGiroSpecification(AvtaleGiroTransactionRecord):
 
 
 @attr.s
-class AvtaleGiroAgreement(AvtaleGiroTransactionRecord):
-    SERVICE_CODE = netsgiro.ServiceCode.AVTALEGIRO
+class AvtaleGiroAgreement(TransactionRecord):
     RECORD_TYPE = netsgiro.RecordType.TRANSACTION_AGREEMENTS
 
     registration_type = attr.ib(convert=to_avtalegiro_registration_type)

@@ -161,8 +161,8 @@ def test_assignment_end_for_avtalegiro_cancelations():
     assert record.nets_date_latest is None
 
 
-def test_avtalegiro_amount_item_1():
-    record = netsgiro.AvtaleGiroAmountItem1.from_string(
+def test_transaction_amount_item_1_for_avtalegiro_payment_request():
+    record = netsgiro.TransactionAmountItem1.from_string(
         'NY2121300000001170604           00000000'
         '000000100          008000011688373000000'
     )
@@ -179,8 +179,8 @@ def test_avtalegiro_amount_item_1():
     assert record.kid == '008000011688373'
 
 
-def test_avtalegiro_amount_item_1_for_avtalegiro_cancelation():
-    record = netsgiro.AvtaleGiroAmountItem1.from_string(
+def test_transaction_amount_item_1_for_avtalegiro_cancelation():
+    record = netsgiro.TransactionAmountItem1.from_string(
         'NY2193300000001170604           00000000'
         '000000100          008000011688373000000'
     )
@@ -197,8 +197,8 @@ def test_avtalegiro_amount_item_1_for_avtalegiro_cancelation():
     assert record.kid == '008000011688373'
 
 
-def test_avtalegiro_amount_item_2():
-    record = netsgiro.AvtaleGiroAmountItem2.from_string(
+def test_transaction_amount_item_2_for_avtalegiro_payment_request():
+    record = netsgiro.TransactionAmountItem2.from_string(
         'NY2121310000001NAVN                     '
         '                                   00000'
     )
@@ -214,8 +214,8 @@ def test_avtalegiro_amount_item_2():
     assert record.reference is None
 
 
-def test_avtalegiro_specification():
-    record = netsgiro.AvtaleGiroSpecification.from_string(
+def test_transaction_specification_for_avtalegiro_payment_request():
+    record = netsgiro.TransactionSpecification.from_string(
         'NY212149000000140011 Gjelder Faktura: 16'
         '8837  Dato: 19/03/0400000000000000000000'
     )
