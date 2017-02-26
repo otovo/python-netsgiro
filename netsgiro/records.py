@@ -84,16 +84,11 @@ class Record:
     service_code = attr.ib(convert=to_service_code)
     record_type = attr.ib(convert=to_record_type)
 
-    _PATTERN = re.compile(r'^NY.{78}$')
+    _PATTERNS = []
 
     @classmethod
     def from_string(cls, line: str) -> 'Record':
-        if hasattr(cls, '_PATTERNS'):
-            patterns = cls._PATTERNS
-        else:
-            patterns = [cls._PATTERN]
-
-        for pattern in patterns:
+        for pattern in cls._PATTERNS:
             matches = pattern.match(line)
             if matches is not None:
                 return cls(**matches.groupdict())
@@ -112,20 +107,22 @@ class TransmissionStart(Record):
     transmission_number = attr.ib()
     data_recipient = attr.ib()
 
-    _PATTERN = re.compile(r'''
-        ^
-        NY      # Format code
-        (?P<service_code>00)
-        (?P<transmission_type>00)
-        (?P<record_type>10)
+    _PATTERNS = [
+        re.compile(r'''
+            ^
+            NY      # Format code
+            (?P<service_code>00)
+            (?P<transmission_type>00)
+            (?P<record_type>10)
 
-        (?P<data_transmitter>\d{8})
-        (?P<transmission_number>\d{7})
-        (?P<data_recipient>\d{8})
+            (?P<data_transmitter>\d{8})
+            (?P<transmission_number>\d{7})
+            (?P<data_recipient>\d{8})
 
-        0{49}   # Padding
-        $
-    ''', re.VERBOSE)
+            0{49}   # Padding
+            $
+        ''', re.VERBOSE),
+    ]
 
 
 @attr.s
@@ -138,21 +135,23 @@ class TransmissionEnd(Record):
     total_amount = attr.ib(convert=int)
     nets_date = attr.ib(convert=to_date)
 
-    _PATTERN = re.compile(r'''
-        ^
-        NY      # Format code
-        (?P<service_code>00)
-        (?P<transmission_type>00)
-        (?P<record_type>89)
+    _PATTERNS = [
+        re.compile(r'''
+            ^
+            NY      # Format code
+            (?P<service_code>00)
+            (?P<transmission_type>00)
+            (?P<record_type>89)
 
-        (?P<num_transactions>\d{8})
-        (?P<num_records>\d{8})
-        (?P<total_amount>\d{17})
-        (?P<nets_date>\d{6})
+            (?P<num_transactions>\d{8})
+            (?P<num_records>\d{8})
+            (?P<total_amount>\d{17})
+            (?P<nets_date>\d{6})
 
-        0{33}   # Filler
-        $
-    ''', re.VERBOSE)
+            0{33}   # Filler
+            $
+        ''', re.VERBOSE),
+    ]
 
 
 @attr.s
@@ -406,7 +405,8 @@ class TransactionAmountItem3(TransactionRecord):
 
     text = attr.ib(convert=optional_str)
 
-    _PATTERN = re.compile(r'''
+    _PATTERNS = [
+        re.compile(r'''
             ^
             NY      # Format code
             (?P<service_code>09)
@@ -418,7 +418,8 @@ class TransactionAmountItem3(TransactionRecord):
 
             0{25}    # Filler
             $
-    ''', re.VERBOSE)
+        ''', re.VERBOSE),
+    ]
 
 
 @attr.s
@@ -429,22 +430,24 @@ class TransactionSpecification(TransactionRecord):
     column_number = attr.ib(convert=int)
     text = attr.ib()
 
-    _PATTERN = re.compile(r'''
-        ^
-        NY      # Format code
-        (?P<service_code>21)
-        (?P<transaction_type>21)
-        (?P<record_type>49)
+    _PATTERNS = [
+        re.compile(r'''
+            ^
+            NY      # Format code
+            (?P<service_code>21)
+            (?P<transaction_type>21)
+            (?P<record_type>49)
 
-        (?P<transaction_number>\d{7})
-        4       # Payment notification
-        (?P<line_number>\d{3})
-        (?P<column_number>\d{1})
-        (?P<text>.{40})
+            (?P<transaction_number>\d{7})
+            4       # Payment notification
+            (?P<line_number>\d{3})
+            (?P<column_number>\d{1})
+            (?P<text>.{40})
 
-        0{20}    # Filler
-        $
-    ''', re.VERBOSE)
+            0{20}    # Filler
+            $
+        ''', re.VERBOSE),
+    ]
 
 
 @attr.s
@@ -455,21 +458,23 @@ class AvtaleGiroAgreement(TransactionRecord):
     kid = attr.ib(convert=optional_str)
     notify = attr.ib(convert=to_bool)
 
-    _PATTERN = re.compile(r'''
-        ^
-        NY      # Format code
-        (?P<service_code>21)
-        (?P<transaction_type>94)
-        (?P<record_type>70)
+    _PATTERNS = [
+        re.compile(r'''
+            ^
+            NY      # Format code
+            (?P<service_code>21)
+            (?P<transaction_type>94)
+            (?P<record_type>70)
 
-        (?P<transaction_number>\d{7})
-        (?P<registration_type>\d{1})
-        (?P<kid>[\d ]{25})
-        (?P<notify>[JN]{1})
+            (?P<transaction_number>\d{7})
+            (?P<registration_type>\d{1})
+            (?P<kid>[\d ]{25})
+            (?P<notify>[JN]{1})
 
-        0{38}   # Filler
-        $
-    ''', re.VERBOSE)
+            0{38}   # Filler
+            $
+        ''', re.VERBOSE),
+    ]
 
 
 def all_subclasses(cls):
