@@ -36,10 +36,10 @@ def to_assignment_type(
     return netsgiro.AvtaleGiroAssignmentType(int(value))
 
 
-def to_avtalegiro_transaction_type(
-        value: Union[netsgiro.AvtaleGiroTransactionType, int, str]
-        ) -> netsgiro.AvtaleGiroTransactionType:
-    return netsgiro.AvtaleGiroTransactionType(int(value))
+def to_transaction_type(
+        value: Union[netsgiro.TransactionType, int, str]
+        ) -> netsgiro.TransactionType:
+    return netsgiro.TransactionType(int(value))
 
 
 def to_avtalegiro_registration_type(
@@ -284,7 +284,7 @@ class AssignmentEnd(Record):
 
 @attr.s
 class AvtaleGiroTransactionRecord(Record):
-    transaction_type = attr.ib(convert=to_avtalegiro_transaction_type)
+    transaction_type = attr.ib(convert=to_transaction_type)
     transaction_number = attr.ib()
 
 

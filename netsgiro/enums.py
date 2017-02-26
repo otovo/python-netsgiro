@@ -5,9 +5,8 @@ __all__ = [
     'ServiceCode',
     'RecordType',
     'AvtaleGiroAssignmentType',
-    'AvtaleGiroTransactionType',
+    'TransactionType',
     'AvtaleGiroRegistrationType',
-    'OcrGiroTransactionType',
 ]
 
 
@@ -29,26 +28,7 @@ class RecordType(IntEnum):
     TRANSMISSION_END = 89
 
 
-class AvtaleGiroAssignmentType(IntEnum):
-    PAYMENT_REQUESTS = 0    # TODO Better name?
-    AGREEMENTS = 24         # TODO Better name?
-    CANCELATIONS = 36       # TODO Better name?
-
-
-class AvtaleGiroTransactionType(IntEnum):
-    NO_NOTIFICATION_FROM_BANK = 2   # TODO Better name?
-    NOTIFICATION_FROM_BANK = 21     # TODO Better name?
-    CANCELATION = 93                # TODO Better name?
-    AGREEMENTS = 94                 # TODO Better name?
-
-
-class AvtaleGiroRegistrationType(IntEnum):
-    ALL_AGREEMENTS = 0
-    NEW_OR_UPDATED_AGREEMENTS = 1
-    DELETED_AGREEMENTS = 2
-
-
-class OcrGiroTransactionType(IntEnum):
+class TransactionType(IntEnum):
     FROM_GIRO_DEBITED_ACCOUNT = 10
     FROM_STANDING_ORDERS = 11
     FROM_DIRECT_REMITTANCE = 12
@@ -62,3 +42,20 @@ class OcrGiroTransactionType(IntEnum):
     PURCHASE_WITH_KID = 19
     REVERSING_WITH_TEXT = 20
     PURCHASE_WITH_TEXT = 21
+
+    AVTALEGIRO_NO_NOTIFICATION_FROM_BANK = 2   # TODO Better name?
+    AVTALEGIRO_NOTIFICATION_FROM_BANK = 21     # TODO Better name?
+    AVTALEGIRO_CANCELATION = 93                # TODO Better name?
+    AVTALEGIRO_AGREEMENTS = 94                 # TODO Better name?
+
+
+class AvtaleGiroAssignmentType(IntEnum):
+    PAYMENT_REQUESTS = 0    # TODO Better name?
+    AGREEMENTS = 24         # TODO Better name?
+    CANCELATIONS = 36       # TODO Better name?
+
+
+class AvtaleGiroRegistrationType(IntEnum):
+    ALL_AGREEMENTS = 0
+    NEW_OR_UPDATED_AGREEMENTS = 1
+    DELETED_AGREEMENTS = 2

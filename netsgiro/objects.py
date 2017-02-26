@@ -104,7 +104,7 @@ def get_assignments(records: List[Record]) -> List[Assignment]:
 @attr.s
 class Transaction(Serializable):
     service_code = attr.ib(convert=netsgiro.ServiceCode)
-    type = attr.ib(convert=netsgiro.AvtaleGiroTransactionType)  # TODO: Type
+    type = attr.ib(convert=netsgiro.TransactionType)
     number = attr.ib()
     due_date = attr.ib()
     amount = attr.ib(convert=Decimal)
