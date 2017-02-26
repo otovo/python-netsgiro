@@ -45,7 +45,7 @@ def test_parse_payment_request(payment_request_data):
     assert transaction.type == (
         netsgiro.TransactionType.AVTALEGIRO_NOTIFICATION_FROM_BANK)
     assert transaction.number == '0000001'
-    assert transaction.due_date == date(2004, 6, 17)
+    assert transaction.nets_date == date(2004, 6, 17)
     assert transaction.amount == Decimal('1.00')
     assert transaction.amount_in_cents == 100
     assert transaction.kid == '008000011688373'

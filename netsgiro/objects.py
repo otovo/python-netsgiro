@@ -106,7 +106,7 @@ class Transaction(Serializable):
     service_code = attr.ib(convert=netsgiro.ServiceCode)
     type = attr.ib(convert=netsgiro.TransactionType)
     number = attr.ib()
-    due_date = attr.ib()
+    nets_date = attr.ib()
     amount = attr.ib(convert=Decimal)
     kid = attr.ib()
     payer_name = attr.ib()
@@ -133,7 +133,7 @@ class Transaction(Serializable):
             service_code=amount_item_1.service_code,
             type=amount_item_1.transaction_type,
             number=amount_item_1.transaction_number,
-            due_date=amount_item_1.due_date,
+            nets_date=amount_item_1.nets_date,
             amount=Decimal(amount_item_1.amount) / 100,
             kid=amount_item_1.kid,
             payer_name=amount_item_2.payer_name,
