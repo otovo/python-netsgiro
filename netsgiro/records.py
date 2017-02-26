@@ -32,9 +32,9 @@ def to_record_type(
 
 
 def to_assignment_type(
-        value: Union[netsgiro.AvtaleGiroAssignmentType, int, str]
-        ) -> netsgiro.AvtaleGiroAssignmentType:
-    return netsgiro.AvtaleGiroAssignmentType(int(value))
+        value: Union[netsgiro.AssignmentType, int, str]
+        ) -> netsgiro.AssignmentType:
+    return netsgiro.AssignmentType(int(value))
 
 
 def to_transaction_type(
@@ -263,7 +263,7 @@ class AssignmentEnd(Record):
             ^
             NY      # Format code
             (?P<service_code>21)
-            (?P<assignment_type>36)     # Cancelations
+            (?P<assignment_type>36)     # Cancellations
             (?P<record_type>88)
 
             (?P<num_transactions>\d{8})

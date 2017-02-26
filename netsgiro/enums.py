@@ -4,7 +4,7 @@ from enum import IntEnum
 __all__ = [
     'ServiceCode',
     'RecordType',
-    'AvtaleGiroAssignmentType',
+    'AssignmentType',
     'TransactionType',
     'AvtaleGiroRegistrationType',
 ]
@@ -23,9 +23,15 @@ class RecordType(IntEnum):
     TRANSACTION_AMOUNT_2 = 31
     TRANSACTION_AMOUNT_3 = 32  # Only for TransactionType 20 and 21
     TRANSACTION_SPECIFICATION = 49
-    TRANSACTION_AGREEMENTS = 70  # TODO Better name?
+    TRANSACTION_AGREEMENTS = 70
     ASSIGNMENT_END = 88
     TRANSMISSION_END = 89
+
+
+class AssignmentType(IntEnum):
+    TRANSACTIONS = 0
+    AVTALEGIRO_AGREEMENTS = 24
+    AVTALEGIRO_CANCELLATIONS = 36
 
 
 class TransactionType(IntEnum):
@@ -45,14 +51,8 @@ class TransactionType(IntEnum):
 
     AVTALEGIRO_NO_NOTIFICATION_FROM_BANK = 2   # TODO Better name?
     AVTALEGIRO_NOTIFICATION_FROM_BANK = 21     # TODO Better name?
-    AVTALEGIRO_CANCELLATION = 93               # TODO Better name?
-    AVTALEGIRO_AGREEMENTS = 94                 # TODO Better name?
-
-
-class AvtaleGiroAssignmentType(IntEnum):
-    PAYMENT_REQUESTS = 0    # TODO Better name?
-    AGREEMENTS = 24         # TODO Better name?
-    CANCELLATIONS = 36      # TODO Better name?
+    AVTALEGIRO_CANCELLATION = 93
+    AVTALEGIRO_AGREEMENTS = 94
 
 
 class AvtaleGiroRegistrationType(IntEnum):
