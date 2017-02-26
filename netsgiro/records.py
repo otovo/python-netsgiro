@@ -293,7 +293,7 @@ class AvtaleGiroAmountItem1(AvtaleGiroTransactionRecord):
     SERVICE_CODE = netsgiro.ServiceCode.AVTALEGIRO
     RECORD_TYPE = netsgiro.RecordType.TRANSACTION_AMOUNT_1
 
-    due_date = attr.ib(convert=to_date)
+    nets_date = attr.ib(convert=to_date)
     amount = attr.ib(convert=int)
     kid = attr.ib(convert=optional_str)
 
@@ -305,7 +305,7 @@ class AvtaleGiroAmountItem1(AvtaleGiroTransactionRecord):
         (?P<record_type>30)
 
         (?P<transaction_number>\d{7})
-        (?P<due_date>\d{6})
+        (?P<nets_date>\d{6})
 
         [ ]{11} # Filler
 

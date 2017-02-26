@@ -52,7 +52,7 @@ def test_get_records(payment_request_data):
     assert assignment_start.assignment_account == '88888888888'
 
     assert isinstance(transaction_amount_1, records.AvtaleGiroAmountItem1)
-    assert transaction_amount_1.due_date == date(2004, 6, 17)
+    assert transaction_amount_1.nets_date == date(2004, 6, 17)
     assert transaction_amount_1.amount == 100
     assert transaction_amount_1.kid == '008000011688373'
 

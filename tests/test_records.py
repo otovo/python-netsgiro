@@ -174,7 +174,7 @@ def test_avtalegiro_amount_item_1():
         netsgiro.TransactionType.AVTALEGIRO_NOTIFICATION_FROM_BANK)
     assert record.transaction_number == '0000001'
 
-    assert record.due_date == date(2004, 6, 17)
+    assert record.nets_date == date(2004, 6, 17)
     assert record.amount == 100
     assert record.kid == '008000011688373'
 
@@ -192,7 +192,7 @@ def test_avtalegiro_amount_item_1_for_avtalegiro_cancelation():
         netsgiro.TransactionType.AVTALEGIRO_CANCELATION)
     assert record.transaction_number == '0000001'
 
-    assert record.due_date == date(2004, 6, 17)
+    assert record.nets_date == date(2004, 6, 17)
     assert record.amount == 100
     assert record.kid == '008000011688373'
 
