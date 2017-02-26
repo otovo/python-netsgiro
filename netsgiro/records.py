@@ -51,7 +51,7 @@ def to_avtalegiro_registration_type(
 def to_date(value: Union[datetime.date, str, None]) -> Optional[datetime.date]:
     if isinstance(value, datetime.date):
         return value
-    if value == '000000' or value is None:
+    if value is None or value == '000000':
         return None
     return datetime.datetime.strptime(value, '%d%m%y').date()
 
