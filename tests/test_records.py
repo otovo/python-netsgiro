@@ -171,7 +171,7 @@ def test_avtalegiro_amount_item_1():
     assert record.record_type == netsgiro.RecordType.TRANSACTION_AMOUNT_1
 
     assert record.transaction_type == (
-        netsgiro.AvtaleGiroTransactionType.NOTIFICATION_FROM_BANK)
+        netsgiro.TransactionType.AVTALEGIRO_NOTIFICATION_FROM_BANK)
     assert record.transaction_number == '0000001'
 
     assert record.due_date == date(2004, 6, 17)
@@ -189,7 +189,7 @@ def test_avtalegiro_amount_item_1_for_avtalegiro_cancelation():
     assert record.record_type == netsgiro.RecordType.TRANSACTION_AMOUNT_1
 
     assert record.transaction_type == (
-        netsgiro.AvtaleGiroTransactionType.CANCELATION)
+        netsgiro.TransactionType.AVTALEGIRO_CANCELATION)
     assert record.transaction_number == '0000001'
 
     assert record.due_date == date(2004, 6, 17)
@@ -207,7 +207,7 @@ def test_avtalegiro_amount_item_2():
     assert record.record_type == netsgiro.RecordType.TRANSACTION_AMOUNT_2
 
     assert record.transaction_type == (
-        netsgiro.AvtaleGiroTransactionType.NOTIFICATION_FROM_BANK)
+        netsgiro.TransactionType.AVTALEGIRO_NOTIFICATION_FROM_BANK)
     assert record.transaction_number == '0000001'
 
     assert record.payer_name == 'NAVN'
@@ -224,7 +224,7 @@ def test_avtalegiro_specification():
     assert record.record_type == netsgiro.RecordType.TRANSACTION_SPECIFICATION
 
     assert record.transaction_type == (
-        netsgiro.AvtaleGiroTransactionType.NOTIFICATION_FROM_BANK)
+        netsgiro.TransactionType.AVTALEGIRO_NOTIFICATION_FROM_BANK)
     assert record.transaction_number == '0000001'
 
     assert record.line_number == 1
@@ -242,7 +242,7 @@ def test_avtalegiro_all_agreements():
     assert record.record_type == netsgiro.RecordType.TRANSACTION_AGREEMENTS
 
     assert record.transaction_type == (
-        netsgiro.AvtaleGiroTransactionType.AGREEMENTS)
+        netsgiro.TransactionType.AVTALEGIRO_AGREEMENTS)
     assert record.transaction_number == '0000001'
 
     assert record.registration_type == (
@@ -261,7 +261,7 @@ def test_avtalegiro_new_or_updated_agreements():
     assert record.record_type == netsgiro.RecordType.TRANSACTION_AGREEMENTS
 
     assert record.transaction_type == (
-        netsgiro.AvtaleGiroTransactionType.AGREEMENTS)
+        netsgiro.TransactionType.AVTALEGIRO_AGREEMENTS)
     assert record.transaction_number == '0000001'
 
     assert record.registration_type == (
