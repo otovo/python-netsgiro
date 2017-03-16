@@ -82,7 +82,6 @@ def optional_str(value: Optional[str]) -> Optional[str]:
 @attr.s
 class Record:
     service_code = attr.ib(convert=to_service_code)
-    record_type = attr.ib(convert=to_record_type)
 
     _PATTERNS = []
 
@@ -105,6 +104,8 @@ class TransmissionStart(Record):
     data_recipient = attr.ib()
 
     _RECORD_TYPE = netsgiro.RecordType.TRANSMISSION_START
+    record_type = attr.ib(default=_RECORD_TYPE, convert=to_record_type)
+
     _PATTERNS = [
         re.compile(r'''
             ^
@@ -131,6 +132,8 @@ class TransmissionEnd(Record):
     nets_date = attr.ib(convert=to_date)
 
     _RECORD_TYPE = netsgiro.RecordType.TRANSMISSION_END
+    record_type = attr.ib(default=_RECORD_TYPE, convert=to_record_type)
+
     _PATTERNS = [
         re.compile(r'''
             ^
@@ -160,6 +163,8 @@ class AssignmentStart(Record):
     agreement_id = attr.ib(default=None)
 
     _RECORD_TYPE = netsgiro.RecordType.ASSIGNMENT_START
+    record_type = attr.ib(default=_RECORD_TYPE, convert=to_record_type)
+
     _PATTERNS = [
         re.compile(r'''
             ^
@@ -221,6 +226,8 @@ class AssignmentEnd(Record):
     nets_date_latest = attr.ib(default=None, convert=to_date)
 
     _RECORD_TYPE = netsgiro.RecordType.ASSIGNMENT_END
+    record_type = attr.ib(default=_RECORD_TYPE, convert=to_record_type)
+
     _PATTERNS = [
         re.compile(r'''
             ^
@@ -292,6 +299,8 @@ class TransactionAmountItem1(TransactionRecord):
     sign = attr.ib(default=None)
 
     _RECORD_TYPE = netsgiro.RecordType.TRANSACTION_AMOUNT_1
+    record_type = attr.ib(default=_RECORD_TYPE, convert=to_record_type)
+
     _PATTERNS = [
         re.compile(r'''
             ^
@@ -351,6 +360,8 @@ class TransactionAmountItem2(TransactionRecord):
     # TODO Add accessors to parts of reference depending on transaction_type
 
     _RECORD_TYPE = netsgiro.RecordType.TRANSACTION_AMOUNT_2
+    record_type = attr.ib(default=_RECORD_TYPE, convert=to_record_type)
+
     _PATTERNS = [
         re.compile(r'''
             ^
@@ -396,6 +407,8 @@ class TransactionAmountItem3(TransactionRecord):
     text = attr.ib(convert=optional_str)
 
     _RECORD_TYPE = netsgiro.RecordType.TRANSACTION_AMOUNT_3
+    record_type = attr.ib(default=_RECORD_TYPE, convert=to_record_type)
+
     _PATTERNS = [
         re.compile(r'''
             ^
@@ -420,6 +433,8 @@ class TransactionSpecification(TransactionRecord):
     text = attr.ib()
 
     _RECORD_TYPE = netsgiro.RecordType.TRANSACTION_SPECIFICATION
+    record_type = attr.ib(default=_RECORD_TYPE, convert=to_record_type)
+
     _PATTERNS = [
         re.compile(r'''
             ^
@@ -447,6 +462,8 @@ class AvtaleGiroAgreement(TransactionRecord):
     notify = attr.ib(convert=to_bool)
 
     _RECORD_TYPE = netsgiro.RecordType.TRANSACTION_AGREEMENTS
+    record_type = attr.ib(default=_RECORD_TYPE, convert=to_record_type)
+
     _PATTERNS = [
         re.compile(r'''
             ^
