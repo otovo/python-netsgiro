@@ -86,12 +86,13 @@ def test_get_records_with_avtalegiro_data(payment_request_data):
 def test_get_records_with_ocr_giro_data(ocr_giro_transactions_data):
     result = netsgiro.get_records(ocr_giro_transactions_data)
 
-    assert len(result) == 44
+    assert len(result) == 45
 
     transmission_start = result[0]
     assignment_start = result[1]
     transaction_amount_1 = result[2]
     transaction_amount_2 = result[3]
+    transaction_amount_3 = result[4]
     assignment_end = result[-2]
     transmission_end = result[-1]
 
@@ -113,6 +114,9 @@ def test_get_records_with_ocr_giro_data(ocr_giro_transactions_data):
     assert transaction_amount_2.reference == '099038562'
     assert transaction_amount_2.bank_date == date(1992, 1, 16)
     assert transaction_amount_2.debit_account == '99990512341'
+
+    assert isinstance(transaction_amount_3, records.TransactionAmountItem3)
+    assert transaction_amount_3.text == 'Foo bar baz'
 
     assert isinstance(assignment_end, records.AssignmentEnd)
     assert assignment_end.num_transactions == 20
