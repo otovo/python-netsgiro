@@ -14,8 +14,6 @@ def test_transmission_start():
     assert record.service_code == netsgiro.ServiceCode.NONE
     assert record.record_type == netsgiro.RecordType.TRANSMISSION_START
 
-    assert record.transmission_type == 0
-
     assert record.data_transmitter == '55555555'
     assert record.transmission_number == '1000081'
     assert record.data_recipient == '00008080'
@@ -41,8 +39,6 @@ def test_transmission_end():
 
     assert record.service_code == netsgiro.ServiceCode.NONE
     assert record.record_type == netsgiro.RecordType.TRANSMISSION_END
-
-    assert record.transmission_type == 0
 
     assert record.num_transactions == 6
     assert record.num_records == 22

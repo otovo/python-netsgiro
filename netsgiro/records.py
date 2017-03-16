@@ -100,9 +100,8 @@ class Record:
 
 @attr.s
 class TransmissionStart(Record):
-    transmission_type = attr.ib(convert=int)
-    data_transmitter = attr.ib()
     transmission_number = attr.ib()
+    data_transmitter = attr.ib()
     data_recipient = attr.ib()
 
     _RECORD_TYPE = netsgiro.RecordType.TRANSMISSION_START
@@ -111,7 +110,7 @@ class TransmissionStart(Record):
             ^
             NY      # Format code
             (?P<service_code>00)
-            (?P<transmission_type>00)
+            00      # Transmission type, always 00
             (?P<record_type>10)
 
             (?P<data_transmitter>\d{8})
@@ -126,7 +125,6 @@ class TransmissionStart(Record):
 
 @attr.s
 class TransmissionEnd(Record):
-    transmission_type = attr.ib(convert=int)
     num_transactions = attr.ib(convert=int)
     num_records = attr.ib(convert=int)
     total_amount = attr.ib(convert=int)
@@ -138,7 +136,7 @@ class TransmissionEnd(Record):
             ^
             NY      # Format code
             (?P<service_code>00)
-            (?P<transmission_type>00)
+            00      # Transmission type, always 00
             (?P<record_type>89)
 
             (?P<num_transactions>\d{8})
