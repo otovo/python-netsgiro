@@ -79,6 +79,16 @@ def optional_str(value: Optional[str]) -> Optional[str]:
     return value and value.strip() or None
 
 
+def str_of_length(length):
+    def validator(instance, attribute, value):
+        attr.validators.instance_of(str)(instance, attribute, value)
+        if len(value) != length:
+            raise ValueError(
+                '{0.name} must be exactly {1} chars, got {2!r}'
+                .format(attribute, length, value))
+    return validator
+
+
 @attr.s
 class Record:
     service_code = attr.ib(convert=to_service_code)
@@ -96,12 +106,15 @@ class Record:
             '{!r} did not match {} record formats'
             .format(line, cls.__name__))
 
+    def to_ocr(self):
+        raise NotImplementedError
+
 
 @attr.s
 class TransmissionStart(Record):
-    transmission_number = attr.ib()
-    data_transmitter = attr.ib()
-    data_recipient = attr.ib()
+    transmission_number = attr.ib(validator=str_of_length(7))
+    data_transmitter = attr.ib(validator=str_of_length(8))
+    data_recipient = attr.ib(validator=str_of_length(8))
 
     _RECORD_TYPE = netsgiro.RecordType.TRANSMISSION_START
     record_type = attr.ib(default=_RECORD_TYPE, convert=to_record_type)
@@ -122,6 +135,15 @@ class TransmissionStart(Record):
             $
         ''', re.VERBOSE),
     ]
+
+    def to_ocr(self):
+        return (
+            'NY000010'
+            '{self.data_transmitter:8}'
+            '{self.transmission_number:7}'
+            '{self.data_recipient:8}'
+            + ('0' * 49)
+        ).format(self=self)
 
 
 @attr.s
@@ -151,6 +173,16 @@ class TransmissionEnd(Record):
             $
         ''', re.VERBOSE),
     ]
+
+    def to_ocr(self):
+        return (
+            'NY000089'
+            '{self.num_transactions:08d}'
+            '{self.num_records:08d}'
+            '{self.total_amount:017d}'
+            '{self.nets_date:%d%m%y}'
+            + ('0' * 33)
+        ).format(self=self)
 
 
 @attr.s
