@@ -112,6 +112,16 @@ class Transaction(Serializable):
     reference = attr.ib()
     text = attr.ib()
 
+    # Specific to OCR Giro
+    centre_id = attr.ib()
+    day_code = attr.ib()
+    partial_settlement_number = attr.ib()
+    partial_settlement_serial_number = attr.ib()
+    sign = attr.ib()
+    form_number = attr.ib()
+    bank_date = attr.ib()
+    debit_account = attr.ib()
+
     # Specific to AvtaleGiro
     payer_name = attr.ib()
 
@@ -126,9 +136,12 @@ class Transaction(Serializable):
         amount_item_2 = records.pop(0)
         assert isinstance(amount_item_2, netsgiro.TransactionAmountItem2)
 
-        # TODO If service_code is OCR_GIRO and transaction_type is 20 or 21,
-        # pop amount_item_3 here
-        text = get_avtalegiro_specification_text(records)
+        if amount_item_1.service_code == netsgiro.ServiceCode.OCR_GIRO:
+            text = get_ocr_giro_text(records)
+        elif amount_item_1.service_code == netsgiro.ServiceCode.AVTALEGIRO:
+            text = get_avtalegiro_specification_text(records)
+        else:
+            text = None
 
         return cls(
             service_code=amount_item_1.service_code,
@@ -139,6 +152,17 @@ class Transaction(Serializable):
             kid=amount_item_1.kid,
             reference=amount_item_2.reference,
             text=text,
+
+            # Specific to OCR Giro
+            centre_id=amount_item_1.centre_id,
+            day_code=amount_item_1.day_code,
+            partial_settlement_number=amount_item_1.partial_settlement_number,
+            partial_settlement_serial_number=(
+                amount_item_1.partial_settlement_serial_number),
+            sign=amount_item_1.sign,
+            form_number=amount_item_2.form_number,
+            bank_date=amount_item_2.bank_date,
+            debit_account=amount_item_2.debit_account,
 
             # Specific to AvtaleGiro
             payer_name=amount_item_2.payer_name,
@@ -154,6 +178,13 @@ def get_transactions(records: List[Record]) -> List[Transaction]:
         transactions[record.transaction_number].append(record)
 
     return [Transaction.from_records(rs) for rs in transactions.values()]
+
+
+def get_ocr_giro_text(records: List[Record]) -> str:
+    if (
+            len(records) == 1 and
+            isinstance(records[0], netsgiro.TransactionAmountItem3)):
+        return records[0].text
 
 
 def get_avtalegiro_specification_text(records: List[Record]) -> str:
