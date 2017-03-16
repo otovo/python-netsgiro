@@ -50,7 +50,7 @@ def test_parse_payment_request(payment_request_data):
     assert transaction.kid == '008000011688373'
     assert transaction.payer_name == 'NAVN'
     assert transaction.reference is None
-    assert transaction.specification_text == (
+    assert transaction.text == (
         ' Gjelder Faktura: 168837  Dato: 19/03/04'
         '                  ForfallsDato: 17/06/04\n'
     )
@@ -87,21 +87,21 @@ def make_specification_records(num_lines, num_columns=2):
     ]
 
 
-def test_get_specification_text_max_number_of_records():
+def test_get_avtalegiro_specification_text_max_number_of_records():
     records = make_specification_records(42)
 
-    result = objects.get_specification_text(records)
+    result = objects.get_avtalegiro_specification_text(records)
 
     assert len(result.splitlines()) == 42
     assert 'Line 1, column 1' in result
     assert 'Line 42, column 2' in result
 
 
-def test_get_specification_text_too_many_records():
+def test_get_avtalegiro_specification_text_too_many_records():
     records = make_specification_records(43)
 
     with pytest.raises(ValueError) as exc_info:
-        objects.get_specification_text(records)
+        objects.get_avtalegiro_specification_text(records)
 
     assert 'Max 84 specification records allowed, got 86' in str(exc_info)
 

@@ -111,7 +111,7 @@ class Transaction(Serializable):
     kid = attr.ib()
     payer_name = attr.ib()
     reference = attr.ib()
-    specification_text = attr.ib()
+    text = attr.ib()
 
     @property
     def amount_in_cents(self):
@@ -126,8 +126,7 @@ class Transaction(Serializable):
 
         # TODO If service_code is OCR_GIRO and transaction_type is 20 or 21,
         # pop amount_item_3 here
-
-        specifications = records
+        text = get_avtalegiro_specification_text(records)
 
         return cls(
             service_code=amount_item_1.service_code,
@@ -138,7 +137,7 @@ class Transaction(Serializable):
             kid=amount_item_1.kid,
             payer_name=amount_item_2.payer_name,
             reference=amount_item_2.reference,
-            specification_text=get_specification_text(specifications),
+            text=text,
         )
 
 
@@ -153,7 +152,7 @@ def get_transactions(records: List[Record]) -> List[Transaction]:
     return [Transaction.from_records(rs) for rs in transactions.values()]
 
 
-def get_specification_text(records: List[Record]) -> str:
+def get_avtalegiro_specification_text(records: List[Record]) -> str:
     MAX_LINES = 42
     MAX_COLUMNS = 2
     MAX_RECORDS = MAX_LINES * MAX_COLUMNS
