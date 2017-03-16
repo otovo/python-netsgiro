@@ -109,9 +109,11 @@ class Transaction(Serializable):
     nets_date = attr.ib()
     amount = attr.ib(convert=Decimal)
     kid = attr.ib()
-    payer_name = attr.ib()
     reference = attr.ib()
     text = attr.ib()
+
+    # Specific to AvtaleGiro
+    payer_name = attr.ib()
 
     @property
     def amount_in_cents(self):
@@ -135,9 +137,11 @@ class Transaction(Serializable):
             nets_date=amount_item_1.nets_date,
             amount=Decimal(amount_item_1.amount) / 100,
             kid=amount_item_1.kid,
-            payer_name=amount_item_2.payer_name,
             reference=amount_item_2.reference,
             text=text,
+
+            # Specific to AvtaleGiro
+            payer_name=amount_item_2.payer_name,
         )
 
 

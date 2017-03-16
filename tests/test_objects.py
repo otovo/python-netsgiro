@@ -48,12 +48,14 @@ def test_parse_payment_request(payment_request_data):
     assert transaction.amount == Decimal('1.00')
     assert transaction.amount_in_cents == 100
     assert transaction.kid == '008000011688373'
-    assert transaction.payer_name == 'NAVN'
     assert transaction.reference is None
     assert transaction.text == (
         ' Gjelder Faktura: 168837  Dato: 19/03/04'
         '                  ForfallsDato: 17/06/04\n'
     )
+
+    # Specific to AvtaleGiro
+    assert transaction.payer_name == 'NAVN'
 
 
 def test_transmission_from_zero_records_fails():
