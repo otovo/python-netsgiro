@@ -42,7 +42,7 @@ def test_parse_payment_request(payment_request_data):
     assert isinstance(transaction, netsgiro.Transaction)
     assert transaction.service_code == netsgiro.ServiceCode.AVTALEGIRO
     assert transaction.type == (
-        netsgiro.TransactionType.AVTALEGIRO_NOTIFICATION_FROM_BANK)
+        netsgiro.TransactionType.AVTALEGIRO_WITH_BANK_NOTIFICATION)
     assert transaction.number == '0000001'
     assert transaction.nets_date == date(2004, 6, 17)
     assert transaction.amount == Decimal('1.00')
@@ -75,7 +75,7 @@ def make_specification_records(num_lines, num_columns=2):
         netsgiro.TransactionSpecification(
             service_code=netsgiro.ServiceCode.AVTALEGIRO,
             transaction_type=(
-                netsgiro.TransactionType.AVTALEGIRO_NOTIFICATION_FROM_BANK),
+                netsgiro.TransactionType.AVTALEGIRO_WITH_BANK_NOTIFICATION),
             record_type=netsgiro.RecordType.TRANSACTION_SPECIFICATION,
             transaction_number='0000001',
             line_number=line,

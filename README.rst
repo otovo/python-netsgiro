@@ -63,8 +63,8 @@ netsgiro's low level API parses OCR files into a list of records::
     TransactionAmountItem2(service_code=<ServiceCode.AVTALEGIRO: 21>, record_type=<RecordType.TRANSACTION_AMOUNT_2: 31>, transaction_type=<TransactionType.PURCHASE_WITH_TEXT: 21>, transaction_number='0000005', reference=None, form_number=None, bank_date=None, debit_account=None, payer_name='NAVN'),
     TransactionSpecification(service_code=<ServiceCode.AVTALEGIRO: 21>, record_type=<RecordType.TRANSACTION_SPECIFICATION: 49>, transaction_type=<TransactionType.PURCHASE_WITH_TEXT: 21>, transaction_number='0000005', line_number=1, column_number=1, text=' Gjelder Faktura: 168841  Dato: 19/03/04'),
     TransactionSpecification(service_code=<ServiceCode.AVTALEGIRO: 21>, record_type=<RecordType.TRANSACTION_SPECIFICATION: 49>, transaction_type=<TransactionType.PURCHASE_WITH_TEXT: 21>, transaction_number='0000005', line_number=1, column_number=2, text='                  ForfallsDato: 17/06/04'),
-    TransactionAmountItem1(service_code=<ServiceCode.AVTALEGIRO: 21>, record_type=<RecordType.TRANSACTION_AMOUNT_1: 30>, transaction_type=<TransactionType.AVTALEGIRO_NO_NOTIFICATION_FROM_BANK: 2>, transaction_number='0000006', nets_date=datetime.date(2004, 6, 17), amount=100, kid='008000061688422', centre_id=None, day_code=None, partial_settlement_number=None, partial_settlement_serial_number=None, sign=None),
-    TransactionAmountItem2(service_code=<ServiceCode.AVTALEGIRO: 21>, record_type=<RecordType.TRANSACTION_AMOUNT_2: 31>, transaction_type=<TransactionType.AVTALEGIRO_NO_NOTIFICATION_FROM_BANK: 2>, transaction_number='0000006', reference=None, form_number=None, bank_date=None, debit_account=None, payer_name='NAVN'),
+    TransactionAmountItem1(service_code=<ServiceCode.AVTALEGIRO: 21>, record_type=<RecordType.TRANSACTION_AMOUNT_1: 30>, transaction_type=<TransactionType.AVTALEGIRO_WITH_PAYEE_NOTIFICATION: 2>, transaction_number='0000006', nets_date=datetime.date(2004, 6, 17), amount=100, kid='008000061688422', centre_id=None, day_code=None, partial_settlement_number=None, partial_settlement_serial_number=None, sign=None),
+    TransactionAmountItem2(service_code=<ServiceCode.AVTALEGIRO: 21>, record_type=<RecordType.TRANSACTION_AMOUNT_2: 31>, transaction_type=<TransactionType.AVTALEGIRO_WITH_PAYEE_NOTIFICATION: 2>, transaction_number='0000006', reference=None, form_number=None, bank_date=None, debit_account=None, payer_name='NAVN'),
     AssignmentEnd(service_code=<ServiceCode.AVTALEGIRO: 21>, record_type=<RecordType.ASSIGNMENT_END: 88>, assignment_type=<AssignmentType.TRANSACTIONS: 0>, num_transactions=6, num_records=20, total_amount=600, nets_date=datetime.date(2004, 6, 17), nets_date_earliest=datetime.date(2004, 6, 17), nets_date_latest=None),
     TransmissionEnd(service_code=<ServiceCode.NONE: 0>, record_type=<RecordType.TRANSMISSION_END: 89>, transmission_type=0, num_transactions=6, num_records=22, total_amount=600, nets_date=datetime.date(2004, 6, 17))]
 
@@ -134,7 +134,7 @@ netsgiro's high level API parses OCR files into a tree of objects::
          'reference': None,
          'service_code': <ServiceCode.AVTALEGIRO: 21>,
          'specification_text': '',
-         'type': <TransactionType.AVTALEGIRO_NO_NOTIFICATION_FROM_BANK: 2>}],
+         'type': <TransactionType.AVTALEGIRO_WITH_PAYEE_NOTIFICATION: 2>}],
        'type': <AssignmentType.TRANSACTIONS: 0>}],
      'data_recipient': '00008080',
      'data_transmitter': '55555555',

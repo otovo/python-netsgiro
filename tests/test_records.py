@@ -204,7 +204,7 @@ def test_transaction_amount_item_1_for_avtalegiro_payment_request():
     assert record.record_type == netsgiro.RecordType.TRANSACTION_AMOUNT_1
 
     assert record.transaction_type == (
-        netsgiro.TransactionType.AVTALEGIRO_NOTIFICATION_FROM_BANK)
+        netsgiro.TransactionType.AVTALEGIRO_WITH_BANK_NOTIFICATION)
     assert record.transaction_number == '0000001'
 
     assert record.nets_date == date(2004, 6, 17)
@@ -265,7 +265,7 @@ def test_transaction_amount_item_2_for_avtalegiro_payment_request():
     assert record.record_type == netsgiro.RecordType.TRANSACTION_AMOUNT_2
 
     assert record.transaction_type == (
-        netsgiro.TransactionType.AVTALEGIRO_NOTIFICATION_FROM_BANK)
+        netsgiro.TransactionType.AVTALEGIRO_WITH_BANK_NOTIFICATION)
     assert record.transaction_number == '0000001'
 
     assert record.payer_name == 'NAVN'
@@ -318,7 +318,7 @@ def test_transaction_specification_for_avtalegiro_payment_request():
     assert record.record_type == netsgiro.RecordType.TRANSACTION_SPECIFICATION
 
     assert record.transaction_type == (
-        netsgiro.TransactionType.AVTALEGIRO_NOTIFICATION_FROM_BANK)
+        netsgiro.TransactionType.AVTALEGIRO_WITH_BANK_NOTIFICATION)
     assert record.transaction_number == '0000001'
 
     assert record.line_number == 1
