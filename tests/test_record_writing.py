@@ -71,3 +71,86 @@ def test_transmission_end_with_invalid_data(
             total_amount=total_amount,
             nets_date=nets_date,
         )
+
+
+def test_assignment_start_for_avtalegiro_payment_requests():
+    record = netsgiro.AssignmentStart(
+        service_code=netsgiro.ServiceCode.AVTALEGIRO,
+        assignment_type=netsgiro.AssignmentType.TRANSACTIONS,
+        assignment_number='4000086',
+        assignment_account='88888888888',
+        agreement_id='000000111',
+    )
+
+    assert record.to_ocr() == (
+        'NY21002000000011140000868888888888800000'
+        '0000000000000000000000000000000000000000'
+    )
+
+
+def test_assignment_start_for_avtalegiro_agreements():
+    record = netsgiro.AssignmentStart(
+        service_code=netsgiro.ServiceCode.AVTALEGIRO,
+        assignment_type=netsgiro.AssignmentType.AVTALEGIRO_AGREEMENTS,
+        assignment_number='4000086',
+        assignment_account='88888888888',
+        agreement_id=None,
+    )
+
+    assert record.to_ocr() == (
+        'NY21242000000000040000868888888888800000'
+        '0000000000000000000000000000000000000000'
+    )
+
+
+@pytest.mark.parametrize(
+    'number, account, agreement_id, exc', [
+        (4000086, '88888888888', '123456789', TypeError),
+        ('86', '88888888888', '123456789', ValueError),
+        ('4000086', 88888888888, '123456789', TypeError),
+        ('4000086', '88', '123456789', ValueError),
+        ('4000086', '88888888888', 123456789, TypeError),
+        ('4000086', '88888888888', '6789', ValueError),
+    ])
+def test_assignment_start_with_invalid_data(
+        number, account, agreement_id, exc):
+    with pytest.raises(exc):
+        netsgiro.AssignmentStart(
+            service_code=netsgiro.ServiceCode.AVTALEGIRO,
+            assignment_type=netsgiro.AssignmentType.TRANSACTIONS,
+            assignment_number=number,
+            assignment_account=account,
+            agreement_id=agreement_id,
+        )
+
+
+def test_assignment_end_for_avtalegiro_payment_requests():
+    record = netsgiro.AssignmentEnd(
+        service_code=netsgiro.ServiceCode.AVTALEGIRO,
+        assignment_type=netsgiro.AssignmentType.TRANSACTIONS,
+        num_transactions=6,
+        num_records=20,
+        total_amount=600,
+        nets_date=date(2004, 6, 17),
+        nets_date_earliest=date(2004, 6, 17),
+        nets_date_latest=None,
+    )
+
+    assert record.to_ocr() == (
+        'NY21008800000006000000200000000000000060'
+        '0170604170604000000000000000000000000000'
+    )
+
+
+def test_assignment_end_for_avtalegiro_agreements():
+    record = netsgiro.AssignmentEnd(
+        service_code=netsgiro.ServiceCode.AVTALEGIRO,
+        assignment_type=netsgiro.AssignmentType.AVTALEGIRO_AGREEMENTS,
+        num_transactions=6,
+        num_records=20,
+    )
+
+    assert record.to_ocr() == (
+        'NY21248800000006000000200000000000000000'
+        '0000000000000000000000000000000000000000'
+    )

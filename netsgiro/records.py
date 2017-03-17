@@ -3,6 +3,7 @@ import re
 from typing import List, Optional, Union
 
 import attr
+from attr.validators import optional
 
 import netsgiro
 
@@ -106,7 +107,7 @@ class Record:
             '{!r} did not match {} record formats'
             .format(line, cls.__name__))
 
-    def to_ocr(self):
+    def to_ocr(self) -> str:
         raise NotImplementedError
 
 
@@ -136,7 +137,7 @@ class TransmissionStart(Record):
         ''', re.VERBOSE),
     ]
 
-    def to_ocr(self):
+    def to_ocr(self) -> str:
         return (
             'NY000010'
             '{self.data_transmitter:8}'
@@ -174,7 +175,7 @@ class TransmissionEnd(Record):
         ''', re.VERBOSE),
     ]
 
-    def to_ocr(self):
+    def to_ocr(self) -> str:
         return (
             'NY000089'
             '{self.num_transactions:08d}'
@@ -188,11 +189,11 @@ class TransmissionEnd(Record):
 @attr.s
 class AssignmentStart(Record):
     assignment_type = attr.ib(convert=to_assignment_type)
-    assignment_number = attr.ib()
-    assignment_account = attr.ib()
+    assignment_number = attr.ib(validator=str_of_length(7))
+    assignment_account = attr.ib(validator=str_of_length(11))
 
-    # Only for assignment_type == 0
-    agreement_id = attr.ib(default=None)
+    # Only for assignment_type == AssignmentType.TRANSACTIONS
+    agreement_id = attr.ib(default=None, validator=optional(str_of_length(9)))
 
     _RECORD_TYPE = netsgiro.RecordType.ASSIGNMENT_START
     record_type = attr.ib(default=_RECORD_TYPE, convert=to_record_type)
@@ -244,6 +245,18 @@ class AssignmentStart(Record):
         ''', re.VERBOSE),
     ]
 
+    def to_ocr(self) -> str:
+        return (
+            'NY'
+            '{self.service_code:02d}'
+            '{self.assignment_type:02d}'
+            '20'
+            + (self.agreement_id and '{self.agreement_id:9}' or ('0' * 9)) +
+            '{self.assignment_number:7}'
+            '{self.assignment_account:11}'
+            + ('0' * 45)
+        ).format(self=self)
+
 
 @attr.s
 class AssignmentEnd(Record):
@@ -251,7 +264,7 @@ class AssignmentEnd(Record):
     num_transactions = attr.ib(convert=int)
     num_records = attr.ib(convert=int)
 
-    # Only for assignment_type == 0
+    # Only for assignment_type == AssignmentType.TRANSACTIONS
     total_amount = attr.ib(default=None, convert=optional_int)
     nets_date = attr.ib(default=None, convert=to_date)
     nets_date_earliest = attr.ib(default=None, convert=to_date)
@@ -309,6 +322,25 @@ class AssignmentEnd(Record):
             $
         ''', re.VERBOSE),
     ]
+
+    def to_ocr(self) -> str:
+        return (
+            'NY'
+            '{self.service_code:02d}'
+            '{self.assignment_type:02d}'
+            '88'
+            '{self.num_transactions:08d}'
+            '{self.num_records:08d}'
+            + (self.total_amount and '{self.total_amount:017d}' or ('0' * 17))
+            + (self.nets_date and '{self.nets_date:%d%m%y}' or ('0' * 6))
+            + (
+                self.nets_date_earliest and
+                '{self.nets_date_earliest:%d%m%y}' or ('0' * 6))
+            + (
+                self.nets_date_latest and
+                '{self.nets_date_latest:%d%m%y}' or ('0' * 6))
+            + ('0' * 21)
+        ).format(self=self)
 
 
 @attr.s
