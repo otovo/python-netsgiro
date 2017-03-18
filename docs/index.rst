@@ -6,3 +6,10 @@
     :caption: Usage
 
     records
+
+
+.. toctree::
+    :maxdepth: 2
+    :caption: About
+
+    changelog
