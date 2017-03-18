@@ -18,6 +18,7 @@ setup(
     long_description=long_description,
     url='https://github.com/otovo/python-netsgiro',
     author='Otovo AS',
+    author_email='jodal+netsgiro@otovo.no',
     license='Apache License, Version 2.0',
     classifiers=[
         'Development Status :: 3 - Alpha',
