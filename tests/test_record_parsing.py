@@ -197,7 +197,7 @@ def test_transaction_amount_item_1_for_avtalegiro_payment_request():
     )
 
     assert record.service_code == netsgiro.ServiceCode.AVTALEGIRO
-    assert record.record_type == netsgiro.RecordType.TRANSACTION_AMOUNT_1
+    assert record.record_type == netsgiro.RecordType.TRANSACTION_AMOUNT_ITEM_1
 
     assert record.transaction_type == (
         netsgiro.TransactionType.AVTALEGIRO_WITH_BANK_NOTIFICATION)
@@ -215,7 +215,7 @@ def test_transaction_amount_item_1_for_avtalegiro_cancellation():
     )
 
     assert record.service_code == netsgiro.ServiceCode.AVTALEGIRO
-    assert record.record_type == netsgiro.RecordType.TRANSACTION_AMOUNT_1
+    assert record.record_type == netsgiro.RecordType.TRANSACTION_AMOUNT_ITEM_1
 
     assert record.transaction_type == (
         netsgiro.TransactionType.AVTALEGIRO_CANCELLATION)
@@ -233,7 +233,7 @@ def test_transaction_amount_item_1_for_ocr_giro_transactions():
     )
 
     assert record.service_code == netsgiro.ServiceCode.OCR_GIRO
-    assert record.record_type == netsgiro.RecordType.TRANSACTION_AMOUNT_1
+    assert record.record_type == netsgiro.RecordType.TRANSACTION_AMOUNT_ITEM_1
 
     assert record.transaction_type == (
         netsgiro.TransactionType.FROM_GIRO_DEBITED_ACCOUNT)
@@ -258,7 +258,7 @@ def test_transaction_amount_item_2_for_avtalegiro_payment_request():
     )
 
     assert record.service_code == netsgiro.ServiceCode.AVTALEGIRO
-    assert record.record_type == netsgiro.RecordType.TRANSACTION_AMOUNT_2
+    assert record.record_type == netsgiro.RecordType.TRANSACTION_AMOUNT_ITEM_2
 
     assert record.transaction_type == (
         netsgiro.TransactionType.AVTALEGIRO_WITH_BANK_NOTIFICATION)
@@ -275,7 +275,7 @@ def test_transaction_amount_item_2_for_ocr_giro_transactions():
     )
 
     assert record.service_code == netsgiro.ServiceCode.OCR_GIRO
-    assert record.record_type == netsgiro.RecordType.TRANSACTION_AMOUNT_2
+    assert record.record_type == netsgiro.RecordType.TRANSACTION_AMOUNT_ITEM_2
 
     assert record.transaction_type == (
         netsgiro.TransactionType.FROM_GIRO_DEBITED_ACCOUNT)
@@ -295,7 +295,7 @@ def test_transaction_amount_item_3_for_ocr_giro_transactions():
     )
 
     assert record.service_code == netsgiro.ServiceCode.OCR_GIRO
-    assert record.record_type == netsgiro.RecordType.TRANSACTION_AMOUNT_3
+    assert record.record_type == netsgiro.RecordType.TRANSACTION_AMOUNT_ITEM_3
 
     assert record.transaction_type == (
         netsgiro.TransactionType.PURCHASE_WITH_TEXT)

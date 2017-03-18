@@ -362,7 +362,7 @@ class TransactionAmountItem1(TransactionRecord):
     partial_settlement_serial_number = attr.ib(default=None)
     sign = attr.ib(default=None)
 
-    _RECORD_TYPE = netsgiro.RecordType.TRANSACTION_AMOUNT_1
+    _RECORD_TYPE = netsgiro.RecordType.TRANSACTION_AMOUNT_ITEM_1
     record_type = attr.ib(default=_RECORD_TYPE, convert=to_record_type)
 
     _PATTERNS = [
@@ -423,7 +423,7 @@ class TransactionAmountItem2(TransactionRecord):
 
     # TODO Add accessors to parts of reference depending on transaction_type
 
-    _RECORD_TYPE = netsgiro.RecordType.TRANSACTION_AMOUNT_2
+    _RECORD_TYPE = netsgiro.RecordType.TRANSACTION_AMOUNT_ITEM_2
     record_type = attr.ib(default=_RECORD_TYPE, convert=to_record_type)
 
     _PATTERNS = [
@@ -470,7 +470,7 @@ class TransactionAmountItem2(TransactionRecord):
 class TransactionAmountItem3(TransactionRecord):
     text = attr.ib(convert=optional_str)
 
-    _RECORD_TYPE = netsgiro.RecordType.TRANSACTION_AMOUNT_3
+    _RECORD_TYPE = netsgiro.RecordType.TRANSACTION_AMOUNT_ITEM_3
     record_type = attr.ib(default=_RECORD_TYPE, convert=to_record_type)
 
     _PATTERNS = [
