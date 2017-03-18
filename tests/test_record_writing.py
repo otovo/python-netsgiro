@@ -154,3 +154,128 @@ def test_assignment_end_for_avtalegiro_agreements():
         'NY21248800000006000000200000000000000000'
         '0000000000000000000000000000000000000000'
     )
+
+
+def test_transaction_amount_item_1_for_ocr_giro_transactions():
+    record = netsgiro.TransactionAmountItem1(
+        service_code=netsgiro.ServiceCode.OCR_GIRO,
+        transaction_type=netsgiro.TransactionType.FROM_GIRO_DEBITED_ACCOUNT,
+        transaction_number='0000001',
+        nets_date=date(1992, 1, 20),
+        amount=102000,
+        kid='0000531',
+
+        centre_id='13',
+        day_code=20,
+        partial_settlement_number=1,
+        partial_settlement_serial_number='01464',
+        sign='0',
+    )
+
+    assert record.to_ocr() == (
+        'NY09103000000012001921320101464000000000'
+        '000102000                  0000531000000'
+    )
+
+
+def test_transaction_amount_item_1_for_avtalegiro_payment_requests():
+    record = netsgiro.TransactionAmountItem1(
+        service_code=netsgiro.ServiceCode.AVTALEGIRO,
+        transaction_type=(
+            netsgiro.TransactionType.AVTALEGIRO_WITH_BANK_NOTIFICATION),
+        transaction_number='0000001',
+        nets_date=date(2004, 6, 17),
+        amount=100,
+        kid='008000011688373',
+    )
+
+    assert record.to_ocr() == (
+        'NY2121300000001170604           00000000'
+        '000000100          008000011688373000000'
+    )
+
+
+def test_transaction_amount_item_2_for_avtalegiro_payment_request():
+    record = netsgiro.TransactionAmountItem2(
+        service_code=netsgiro.ServiceCode.AVTALEGIRO,
+        transaction_type=(
+            netsgiro.TransactionType.AVTALEGIRO_WITH_BANK_NOTIFICATION),
+        transaction_number='0000001',
+        reference=None,
+
+        payer_name='NAVN',
+    )
+
+    assert record.to_ocr() == (
+        'NY2121310000001NAVN                     '
+        '                                   00000'
+    )
+
+
+def test_transaction_amount_item_2_for_ocr_giro_transactions():
+    record = netsgiro.TransactionAmountItem2(
+        service_code=netsgiro.ServiceCode.OCR_GIRO,
+        transaction_type=(
+            netsgiro.TransactionType.FROM_GIRO_DEBITED_ACCOUNT),
+        transaction_number='0000001',
+        reference='099038562',
+
+        form_number='9636827194',
+        bank_date=date(1992, 1, 16),
+        debit_account='99990512341',
+    )
+
+    assert record.to_ocr() == (
+        'NY09103100000019636827194099038562000000'
+        '0160192999905123410000000000000000000000'
+    )
+
+
+def test_transaction_amount_item_3_for_ocr_giro_transactions():
+    record = netsgiro.TransactionAmountItem3(
+        service_code=netsgiro.ServiceCode.OCR_GIRO,
+        transaction_type=(
+            netsgiro.TransactionType.PURCHASE_WITH_TEXT),
+        transaction_number='0000001',
+        text='Foo bar baz',
+    )
+
+    assert record.to_ocr() == (
+        'NY0921320000001Foo bar baz              '
+        '               0000000000000000000000000'
+    )
+
+
+def test_transaction_specification_for_avtalegiro_payment_request():
+    record = netsgiro.TransactionSpecification(
+        service_code=netsgiro.ServiceCode.AVTALEGIRO,
+        transaction_type=(
+            netsgiro.TransactionType.AVTALEGIRO_WITH_BANK_NOTIFICATION),
+        transaction_number='0000001',
+        line_number=1,
+        column_number=1,
+        text=' Gjelder Faktura: 168837  Dato: 19/03/04',
+    )
+
+    assert record.to_ocr() == (
+        'NY212149000000140011 Gjelder Faktura: 16'
+        '8837  Dato: 19/03/0400000000000000000000'
+    )
+
+
+def test_avtalegiro_agreements():
+    record = netsgiro.AvtaleGiroAgreement(
+        service_code=netsgiro.ServiceCode.AVTALEGIRO,
+        transaction_type=(
+            netsgiro.TransactionType.AVTALEGIRO_AGREEMENTS),
+        transaction_number='0000001',
+        registration_type=(
+            netsgiro.AvtaleGiroRegistrationType.NEW_OR_UPDATED_AGREEMENTS),
+        kid='008000011688373',
+        notify=False,
+    )
+
+    assert record.to_ocr() == (
+        'NY21947000000011          00800001168837'
+        '3N00000000000000000000000000000000000000'
+    )

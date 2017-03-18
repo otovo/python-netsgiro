@@ -3,7 +3,7 @@ import re
 from typing import List, Optional, Union
 
 import attr
-from attr.validators import optional
+from attr.validators import instance_of, optional
 
 import netsgiro
 
@@ -82,7 +82,7 @@ def optional_str(value: Optional[str]) -> Optional[str]:
 
 def str_of_length(length):
     def validator(instance, attribute, value):
-        attr.validators.instance_of(str)(instance, attribute, value)
+        instance_of(str)(instance, attribute, value)
         if len(value) != length:
             raise ValueError(
                 '{0.name} must be exactly {1} chars, got {2!r}'
@@ -356,11 +356,12 @@ class TransactionAmountItem1(TransactionRecord):
     kid = attr.ib(convert=optional_str)
 
     # Only OCR Giro
-    centre_id = attr.ib(default=None)
+    centre_id = attr.ib(default=None, validator=optional(str_of_length(2)))
     day_code = attr.ib(default=None, convert=optional_int)
     partial_settlement_number = attr.ib(default=None, convert=optional_int)
-    partial_settlement_serial_number = attr.ib(default=None)
-    sign = attr.ib(default=None)
+    partial_settlement_serial_number = attr.ib(
+        default=None, validator=optional(str_of_length(5)))
+    sign = attr.ib(default=None, validator=optional(str_of_length(1)))
 
     _RECORD_TYPE = netsgiro.RecordType.TRANSACTION_AMOUNT_ITEM_1
     record_type = attr.ib(default=_RECORD_TYPE, convert=to_record_type)
@@ -408,15 +409,41 @@ class TransactionAmountItem1(TransactionRecord):
         ''', re.VERBOSE),
     ]
 
+    def to_ocr(self) -> str:
+        if self.service_code == netsgiro.ServiceCode.OCR_GIRO:
+            ocr_giro_fields = (
+                '{self.centre_id:2}'
+                '{self.day_code:02d}'
+                '{self.partial_settlement_number:01d}'
+                '{self.partial_settlement_serial_number:5}'  # TODO int?
+                '{self.sign:1}'
+            ).format(self=self)
+        else:
+            ocr_giro_fields = ' ' * 11
+
+        return (
+            'NY'
+            '{self.service_code:02d}'
+            '{self.transaction_type:02d}'
+            '30'
+            '{self.transaction_number:7}'
+            '{self.nets_date:%d%m%y}'
+            + ocr_giro_fields +
+            '{self.amount:017d}'
+            '{self.kid:>25}'
+            + ('0' * 6)
+        ).format(self=self)
+
 
 @attr.s
 class TransactionAmountItem2(TransactionRecord):
     reference = attr.ib(convert=optional_str)
 
     # Only OCR Giro
-    form_number = attr.ib(default=None)
+    form_number = attr.ib(default=None, validator=optional(str_of_length(10)))
     bank_date = attr.ib(default=None, convert=to_date)
-    debit_account = attr.ib(default=None)
+    debit_account = attr.ib(
+        default=None, validator=optional(str_of_length(11)))
 
     # Only AvtaleGiro
     payer_name = attr.ib(default=None, convert=optional_str)
@@ -465,6 +492,36 @@ class TransactionAmountItem2(TransactionRecord):
         ''', re.VERBOSE),
     ]
 
+    def to_ocr(self) -> str:
+        common_fields = (
+            'NY'
+            '{self.service_code:02d}'
+            '{self.transaction_type:02d}'
+            '31'
+            '{self.transaction_number:7}'
+        ).format(self=self)
+
+        if self.service_code == netsgiro.ServiceCode.OCR_GIRO:
+            service_fields = (
+                '{self.form_number:10}'
+                + (self.reference and '{self.reference:9}' or (' ' * 9))
+                + ('0' * 7) +
+                '{self.bank_date:%d%m%y}'
+                '{self.debit_account:11}'
+                + ('0' * 22)
+            ).format(self=self)
+        elif self.service_code == netsgiro.ServiceCode.AVTALEGIRO:
+            service_fields = (
+                '{self.payer_name:10}'
+                + (' ' * 25)
+                + (self.reference and '{self.reference:25}' or (' ' * 25))
+                + ('0' * 5)
+            ).format(self=self)
+        else:
+            service_fields = ' ' * 35
+
+        return common_fields + service_fields
+
 
 @attr.s
 class TransactionAmountItem3(TransactionRecord):
@@ -489,12 +546,22 @@ class TransactionAmountItem3(TransactionRecord):
         ''', re.VERBOSE),
     ]
 
+    def to_ocr(self) -> str:
+        return (
+            'NY09'
+            '{self.transaction_type:02d}'
+            '32'
+            '{self.transaction_number:7}'
+            '{self.text:40}'
+            + ('0' * 25)
+        ).format(self=self)
+
 
 @attr.s
 class TransactionSpecification(TransactionRecord):
     line_number = attr.ib(convert=int)
     column_number = attr.ib(convert=int)
-    text = attr.ib()
+    text = attr.ib(validator=instance_of(str))
 
     _RECORD_TYPE = netsgiro.RecordType.TRANSACTION_SPECIFICATION
     record_type = attr.ib(default=_RECORD_TYPE, convert=to_record_type)
@@ -517,6 +584,17 @@ class TransactionSpecification(TransactionRecord):
             $
         ''', re.VERBOSE),
     ]
+
+    def to_ocr(self) -> str:
+        return (
+            'NY212149'
+            '{self.transaction_number:7}'
+            '4'
+            '{self.line_number:03d}'
+            '{self.column_number:01d}'
+            '{self.text:40}'
+            + ('0' * 20)
+        ).format(self=self)
 
 
 @attr.s
@@ -545,6 +623,16 @@ class AvtaleGiroAgreement(TransactionRecord):
             $
         ''', re.VERBOSE),
     ]
+
+    def to_ocr(self) -> str:
+        return (
+            'NY219470'
+            '{self.transaction_number:7}'
+            '{self.registration_type:01d}'
+            '{self.kid:>25}'
+            + (self.notify and 'J' or 'N')
+            + ('0' * 38)
+        ).format(self=self)
 
 
 def get_records(data: str) -> List[Record]:
