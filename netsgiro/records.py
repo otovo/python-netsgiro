@@ -415,7 +415,7 @@ class TransactionAmountItem1(TransactionRecord):
                 '{self.centre_id:2}'
                 '{self.day_code:02d}'
                 '{self.partial_settlement_number:01d}'
-                '{self.partial_settlement_serial_number:5}'  # TODO int?
+                '{self.partial_settlement_serial_number:5}'
                 '{self.sign:1}'
             ).format(self=self)
         else:
@@ -465,7 +465,7 @@ class TransactionAmountItem2(TransactionRecord):
             (?P<form_number>\d{10})
             (?P<reference>\d{9})
 
-            .{7} # Filler   # TODO Not always zero in test data
+            .{7} # Filler   # XXX Not always filled with zero in test data
 
             (?P<bank_date>\d{6})
             (?P<debit_account>\d{11})

@@ -245,7 +245,7 @@ def test_transaction_amount_item_1_for_ocr_giro_transactions():
     assert record.day_code == 20
     assert record.partial_settlement_number == 1
     assert record.partial_settlement_serial_number == '01464'
-    assert record.sign == '0'  # TODO Change type?
+    assert record.sign == '0'
 
     assert record.amount == 102000
     assert record.kid == '0000531'
