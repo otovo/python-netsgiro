@@ -98,6 +98,8 @@ class Record:
 
     @classmethod
     def from_string(cls, line: str) -> 'Record':
+        """Parse OCR string into a record object."""
+
         for pattern in cls._PATTERNS:
             matches = pattern.match(line)
             if matches is not None:
@@ -108,6 +110,7 @@ class Record:
             .format(line, cls.__name__))
 
     def to_ocr(self) -> str:
+        """Get record as OCR string."""
         raise NotImplementedError
 
 
@@ -139,6 +142,7 @@ class TransmissionStart(Record):
     ]
 
     def to_ocr(self) -> str:
+        """Get record as OCR string."""
         return (
             'NY000010'
             '{self.data_transmitter:8}'
@@ -178,6 +182,7 @@ class TransmissionEnd(Record):
     ]
 
     def to_ocr(self) -> str:
+        """Get record as OCR string."""
         return (
             'NY000089'
             '{self.num_transactions:08d}'
@@ -249,6 +254,7 @@ class AssignmentStart(Record):
     ]
 
     def to_ocr(self) -> str:
+        """Get record as OCR string."""
         return (
             'NY'
             '{self.service_code:02d}'
@@ -328,6 +334,7 @@ class AssignmentEnd(Record):
     ]
 
     def to_ocr(self) -> str:
+        """Get record as OCR string."""
         return (
             'NY'
             '{self.service_code:02d}'
@@ -415,6 +422,7 @@ class TransactionAmountItem1(TransactionRecord):
     ]
 
     def to_ocr(self) -> str:
+        """Get record as OCR string."""
         if self.service_code == netsgiro.ServiceCode.OCR_GIRO:
             ocr_giro_fields = (
                 '{self.centre_id:2}'
@@ -499,6 +507,7 @@ class TransactionAmountItem2(TransactionRecord):
     ]
 
     def to_ocr(self) -> str:
+        """Get record as OCR string."""
         common_fields = (
             'NY'
             '{self.service_code:02d}'
@@ -554,6 +563,7 @@ class TransactionAmountItem3(TransactionRecord):
     ]
 
     def to_ocr(self) -> str:
+        """Get record as OCR string."""
         return (
             'NY09'
             '{self.transaction_type:02d}'
@@ -594,6 +604,7 @@ class TransactionSpecification(TransactionRecord):
     ]
 
     def to_ocr(self) -> str:
+        """Get record as OCR string."""
         return (
             'NY212149'
             '{self.transaction_number:7}'
@@ -634,6 +645,7 @@ class AvtaleGiroAgreement(TransactionRecord):
     ]
 
     def to_ocr(self) -> str:
+        """Get record as OCR string."""
         return (
             'NY219470'
             '{self.transaction_number:7}'
@@ -645,6 +657,36 @@ class AvtaleGiroAgreement(TransactionRecord):
 
 
 def get_records(data: str) -> List[Record]:
+    """Parses an OCR file into a list of record objects.
+
+    Example::
+
+        >>> netsgiro.get_records(data)
+        [
+            TransmissionStart(service_code=<ServiceCode.NONE: 0>,
+                record_type=<RecordType.TRANSMISSION_START: 10>,
+                data_transmitter='55555555', transmission_number='1000081',
+                data_recipient='00008080'),
+            AssignmentStart(service_code=<ServiceCode.AVTALEGIRO: 21>,
+                record_type=<RecordType.ASSIGNMENT_START:20>,
+                assignment_type=<AssignmentType.TRANSACTIONS: 0>,
+                assignment_number='4000086', assignment_account='88888888888',
+                agreement_id='000000000'),
+            TransactionAmountItem1(service_code=<ServiceCode.AVTALEGIRO: 21>,
+                record_type=<RecordType.TRANSACTION_AMOUNT_ITEM_1: 30>,
+                transaction_type=<TransactionType.PURCHASE_WITH_TEXT: 21>,
+                transaction_number='0000001', nets_date=datetime.date(2004, 6,
+                17), amount=100, kid='008000011688373', centre_id=None,
+                day_code=None, partial_settlement_number=None,
+                partial_settlement_serial_number=None, sign=None),
+            ...
+            TransmissionEnd(service_code=<ServiceCode.NONE: 0>,
+                record_type=<RecordType.TRANSMISSION_END: 89>,
+                num_transactions=6, num_records=22, total_amount=600,
+                nets_date=datetime.date(2004, 6, 17))
+        ]
+    """
+
     def all_subclasses(cls):
         return cls.__subclasses__() + [
             subsubcls
