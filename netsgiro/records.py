@@ -118,7 +118,8 @@ class TransmissionStart(Record):
     data_recipient = attr.ib(validator=str_of_length(8))
 
     _RECORD_TYPE = netsgiro.RecordType.TRANSMISSION_START
-    record_type = attr.ib(default=_RECORD_TYPE, convert=to_record_type)
+    record_type = attr.ib(
+        init=False, default=_RECORD_TYPE, convert=to_record_type)
 
     _PATTERNS = [
         re.compile(r'''
@@ -126,7 +127,7 @@ class TransmissionStart(Record):
             NY      # Format code
             (?P<service_code>00)
             00      # Transmission type, always 00
-            (?P<record_type>10)
+            10      # Record type
 
             (?P<data_transmitter>\d{8})
             (?P<transmission_number>\d{7})
@@ -155,7 +156,8 @@ class TransmissionEnd(Record):
     nets_date = attr.ib(convert=to_date)
 
     _RECORD_TYPE = netsgiro.RecordType.TRANSMISSION_END
-    record_type = attr.ib(default=_RECORD_TYPE, convert=to_record_type)
+    record_type = attr.ib(
+        init=False, default=_RECORD_TYPE, convert=to_record_type)
 
     _PATTERNS = [
         re.compile(r'''
@@ -163,7 +165,7 @@ class TransmissionEnd(Record):
             NY      # Format code
             (?P<service_code>00)
             00      # Transmission type, always 00
-            (?P<record_type>89)
+            89      # Record type
 
             (?P<num_transactions>\d{8})
             (?P<num_records>\d{8})
@@ -196,7 +198,8 @@ class AssignmentStart(Record):
     agreement_id = attr.ib(default=None, validator=optional(str_of_length(9)))
 
     _RECORD_TYPE = netsgiro.RecordType.ASSIGNMENT_START
-    record_type = attr.ib(default=_RECORD_TYPE, convert=to_record_type)
+    record_type = attr.ib(
+        init=False, default=_RECORD_TYPE, convert=to_record_type)
 
     _PATTERNS = [
         re.compile(r'''
@@ -204,7 +207,7 @@ class AssignmentStart(Record):
             NY      # Format code
             (?P<service_code>(09|21))
             (?P<assignment_type>00)
-            (?P<record_type>20)
+            20      # Record type
 
             (?P<agreement_id>\d{9})
             (?P<assignment_number>\d{7})
@@ -218,7 +221,7 @@ class AssignmentStart(Record):
             NY      # Format code
             (?P<service_code>21)
             (?P<assignment_type>24)
-            (?P<record_type>20)
+            20      # Record type
 
             0{9}    # Filler
 
@@ -233,7 +236,7 @@ class AssignmentStart(Record):
             NY      # Format code
             (?P<service_code>21)
             (?P<assignment_type>36)
-            (?P<record_type>20)
+            20      # Record type
 
             0{9}    # Filler
 
@@ -271,7 +274,8 @@ class AssignmentEnd(Record):
     nets_date_latest = attr.ib(default=None, convert=to_date)
 
     _RECORD_TYPE = netsgiro.RecordType.ASSIGNMENT_END
-    record_type = attr.ib(default=_RECORD_TYPE, convert=to_record_type)
+    record_type = attr.ib(
+        init=False, default=_RECORD_TYPE, convert=to_record_type)
 
     _PATTERNS = [
         re.compile(r'''
@@ -279,7 +283,7 @@ class AssignmentEnd(Record):
             NY      # Format code
             (?P<service_code>(09|21))
             (?P<assignment_type>00)     # Payment requests
-            (?P<record_type>88)
+            88      # Record type
 
             (?P<num_transactions>\d{8})
             (?P<num_records>\d{8})
@@ -296,7 +300,7 @@ class AssignmentEnd(Record):
             NY      # Format code
             (?P<service_code>21)
             (?P<assignment_type>24)     # Agreements
-            (?P<record_type>88)
+            88      # Record type
 
             (?P<num_transactions>\d{8})
             (?P<num_records>\d{8})
@@ -309,7 +313,7 @@ class AssignmentEnd(Record):
             NY      # Format code
             (?P<service_code>21)
             (?P<assignment_type>36)     # Cancellations
-            (?P<record_type>88)
+            88      # Record type
 
             (?P<num_transactions>\d{8})
             (?P<num_records>\d{8})
@@ -364,7 +368,8 @@ class TransactionAmountItem1(TransactionRecord):
     sign = attr.ib(default=None, validator=optional(str_of_length(1)))
 
     _RECORD_TYPE = netsgiro.RecordType.TRANSACTION_AMOUNT_ITEM_1
-    record_type = attr.ib(default=_RECORD_TYPE, convert=to_record_type)
+    record_type = attr.ib(
+        init=False, default=_RECORD_TYPE, convert=to_record_type)
 
     _PATTERNS = [
         re.compile(r'''
@@ -372,7 +377,7 @@ class TransactionAmountItem1(TransactionRecord):
             NY      # Format code
             (?P<service_code>09)
             (?P<transaction_type>\d{2})  # 10-21
-            (?P<record_type>30)
+            30      # Record type
 
             (?P<transaction_number>\d{7})
             (?P<nets_date>\d{6})
@@ -394,7 +399,7 @@ class TransactionAmountItem1(TransactionRecord):
             NY      # Format code
             (?P<service_code>21)
             (?P<transaction_type>\d{2})  # 02, 21, or 93
-            (?P<record_type>30)
+            30      # Record type
 
             (?P<transaction_number>\d{7})
             (?P<nets_date>\d{6})
@@ -451,7 +456,8 @@ class TransactionAmountItem2(TransactionRecord):
     # TODO Add accessors to parts of reference depending on transaction_type
 
     _RECORD_TYPE = netsgiro.RecordType.TRANSACTION_AMOUNT_ITEM_2
-    record_type = attr.ib(default=_RECORD_TYPE, convert=to_record_type)
+    record_type = attr.ib(
+        init=False, default=_RECORD_TYPE, convert=to_record_type)
 
     _PATTERNS = [
         re.compile(r'''
@@ -459,7 +465,7 @@ class TransactionAmountItem2(TransactionRecord):
             NY      # Format code
             (?P<service_code>09)
             (?P<transaction_type>\d{2})  # 10-21
-            (?P<record_type>31)
+            31      # Record type
 
             (?P<transaction_number>\d{7})
             (?P<form_number>\d{10})
@@ -478,7 +484,7 @@ class TransactionAmountItem2(TransactionRecord):
             NY      # Format code
             (?P<service_code>21)
             (?P<transaction_type>\d{2})  # 02, 21, or 93
-            (?P<record_type>31)
+            31      # Record type
 
             (?P<transaction_number>\d{7})
             (?P<payer_name>.{10})
@@ -528,7 +534,8 @@ class TransactionAmountItem3(TransactionRecord):
     text = attr.ib(convert=optional_str)
 
     _RECORD_TYPE = netsgiro.RecordType.TRANSACTION_AMOUNT_ITEM_3
-    record_type = attr.ib(default=_RECORD_TYPE, convert=to_record_type)
+    record_type = attr.ib(
+        init=False, default=_RECORD_TYPE, convert=to_record_type)
 
     _PATTERNS = [
         re.compile(r'''
@@ -536,7 +543,7 @@ class TransactionAmountItem3(TransactionRecord):
             NY      # Format code
             (?P<service_code>09)
             (?P<transaction_type>\d{2})  # 20-21
-            (?P<record_type>32)
+            32      # Record type
 
             (?P<transaction_number>\d{7})
             (?P<text>.{40})
@@ -564,7 +571,8 @@ class TransactionSpecification(TransactionRecord):
     text = attr.ib(validator=instance_of(str))
 
     _RECORD_TYPE = netsgiro.RecordType.TRANSACTION_SPECIFICATION
-    record_type = attr.ib(default=_RECORD_TYPE, convert=to_record_type)
+    record_type = attr.ib(
+        init=False, default=_RECORD_TYPE, convert=to_record_type)
 
     _PATTERNS = [
         re.compile(r'''
@@ -572,7 +580,7 @@ class TransactionSpecification(TransactionRecord):
             NY      # Format code
             (?P<service_code>21)
             (?P<transaction_type>21)
-            (?P<record_type>49)
+            49      # Record type
 
             (?P<transaction_number>\d{7})
             4       # Payment notification
@@ -604,7 +612,8 @@ class AvtaleGiroAgreement(TransactionRecord):
     notify = attr.ib(convert=to_bool)
 
     _RECORD_TYPE = netsgiro.RecordType.TRANSACTION_AGREEMENTS
-    record_type = attr.ib(default=_RECORD_TYPE, convert=to_record_type)
+    record_type = attr.ib(
+        init=False, default=_RECORD_TYPE, convert=to_record_type)
 
     _PATTERNS = [
         re.compile(r'''
@@ -612,7 +621,7 @@ class AvtaleGiroAgreement(TransactionRecord):
             NY      # Format code
             (?P<service_code>21)
             (?P<transaction_type>94)
-            (?P<record_type>70)
+            70      # Record type
 
             (?P<transaction_number>\d{7})
             (?P<registration_type>\d{1})

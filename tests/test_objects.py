@@ -123,7 +123,6 @@ def make_specification_records(num_lines, num_columns=2):
             service_code=netsgiro.ServiceCode.AVTALEGIRO,
             transaction_type=(
                 netsgiro.TransactionType.AVTALEGIRO_WITH_BANK_NOTIFICATION),
-            record_type=netsgiro.RecordType.TRANSACTION_SPECIFICATION,
             transaction_number='0000001',
             line_number=line,
             column_number=column,
