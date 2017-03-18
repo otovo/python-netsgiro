@@ -43,6 +43,8 @@ setup(
             'mypy',
             'pytest',
             'pytest-xdist',
+            'sphinx',
+            'sphinx_rtd_theme',
             'tox',
         ],
     },
