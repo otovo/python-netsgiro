@@ -6,6 +6,7 @@
     :caption: Usage
 
     records
+    constants
 
 
 .. toctree::
