@@ -698,7 +698,7 @@ def get_records(data: str) -> List[Record]:
             TransactionAmountItem1(service_code=<ServiceCode.AVTALEGIRO: 21>,
                 record_type=<RecordType.TRANSACTION_AMOUNT_ITEM_1: 30>,
                 transaction_type=<TransactionType.PURCHASE_WITH_TEXT: 21>,
-                transaction_number='0000001', nets_date=datetime.date(2004, 6,
+                transaction_number=1, nets_date=datetime.date(2004, 6,
                 17), amount=100, kid='008000011688373', centre_id=None,
                 day_code=None, partial_settlement_number=None,
                 partial_settlement_serial_number=None, sign=None),
