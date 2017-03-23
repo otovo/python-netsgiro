@@ -357,7 +357,7 @@ class AssignmentEnd(Record):
 @attr.s
 class TransactionRecord(Record):
     transaction_type = attr.ib(convert=to_transaction_type)
-    transaction_number = attr.ib()
+    transaction_number = attr.ib(convert=int)
 
 
 @attr.s
@@ -439,7 +439,7 @@ class TransactionAmountItem1(TransactionRecord):
             '{self.service_code:02d}'
             '{self.transaction_type:02d}'
             '30'
-            '{self.transaction_number:7}'
+            '{self.transaction_number:07d}'
             '{self.nets_date:%d%m%y}'
             + ocr_giro_fields +
             '{self.amount:017d}'
@@ -513,7 +513,7 @@ class TransactionAmountItem2(TransactionRecord):
             '{self.service_code:02d}'
             '{self.transaction_type:02d}'
             '31'
-            '{self.transaction_number:7}'
+            '{self.transaction_number:07d}'
         ).format(self=self)
 
         if self.service_code == netsgiro.ServiceCode.OCR_GIRO:
@@ -568,7 +568,7 @@ class TransactionAmountItem3(TransactionRecord):
             'NY09'
             '{self.transaction_type:02d}'
             '32'
-            '{self.transaction_number:7}'
+            '{self.transaction_number:07d}'
             '{self.text:40}'
             + ('0' * 25)
         ).format(self=self)
@@ -607,7 +607,7 @@ class TransactionSpecification(TransactionRecord):
         """Get record as OCR string."""
         return (
             'NY212149'
-            '{self.transaction_number:7}'
+            '{self.transaction_number:07d}'
             '4'
             '{self.line_number:03d}'
             '{self.column_number:01d}'
@@ -648,7 +648,7 @@ class AvtaleGiroAgreement(TransactionRecord):
         """Get record as OCR string."""
         return (
             'NY219470'
-            '{self.transaction_number:7}'
+            '{self.transaction_number:07d}'
             '{self.registration_type:01d}'
             '{self.kid:>25}'
             + (self.notify and 'J' or 'N')

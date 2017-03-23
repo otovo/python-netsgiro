@@ -43,7 +43,7 @@ def test_parse_payment_request(payment_request_data):
     assert transaction.service_code == netsgiro.ServiceCode.AVTALEGIRO
     assert transaction.type == (
         netsgiro.TransactionType.AVTALEGIRO_WITH_BANK_NOTIFICATION)
-    assert transaction.number == '0000001'
+    assert transaction.number == 1
     assert transaction.nets_date == date(2004, 6, 17)
     assert transaction.amount == Decimal('1.00')
     assert transaction.amount_in_cents == 100
@@ -84,7 +84,7 @@ def test_parse_ocr_giro_transactions(ocr_giro_transactions_data):
     assert transaction.service_code == netsgiro.ServiceCode.OCR_GIRO
     assert transaction.type == (
         netsgiro.TransactionType.FROM_GIRO_DEBITED_ACCOUNT)
-    assert transaction.number == '0000001'
+    assert transaction.number == 1
     assert transaction.nets_date == date(1992, 1, 20)
     assert transaction.amount == Decimal('1020')
     assert transaction.amount_in_cents == 102000
@@ -123,7 +123,7 @@ def make_specification_records(num_lines, num_columns=2):
             service_code=netsgiro.ServiceCode.AVTALEGIRO,
             transaction_type=(
                 netsgiro.TransactionType.AVTALEGIRO_WITH_BANK_NOTIFICATION),
-            transaction_number='0000001',
+            transaction_number=1,
             line_number=line,
             column_number=column,
             text='Line {}, column {}'.format(line, column),

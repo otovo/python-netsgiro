@@ -160,7 +160,7 @@ def test_transaction_amount_item_1_for_ocr_giro_transactions():
     record = netsgiro.TransactionAmountItem1(
         service_code=netsgiro.ServiceCode.OCR_GIRO,
         transaction_type=netsgiro.TransactionType.FROM_GIRO_DEBITED_ACCOUNT,
-        transaction_number='0000001',
+        transaction_number=1,
         nets_date=date(1992, 1, 20),
         amount=102000,
         kid='0000531',
@@ -183,7 +183,7 @@ def test_transaction_amount_item_1_for_avtalegiro_payment_requests():
         service_code=netsgiro.ServiceCode.AVTALEGIRO,
         transaction_type=(
             netsgiro.TransactionType.AVTALEGIRO_WITH_BANK_NOTIFICATION),
-        transaction_number='0000001',
+        transaction_number=1,
         nets_date=date(2004, 6, 17),
         amount=100,
         kid='008000011688373',
@@ -200,7 +200,7 @@ def test_transaction_amount_item_2_for_avtalegiro_payment_request():
         service_code=netsgiro.ServiceCode.AVTALEGIRO,
         transaction_type=(
             netsgiro.TransactionType.AVTALEGIRO_WITH_BANK_NOTIFICATION),
-        transaction_number='0000001',
+        transaction_number=1,
         reference=None,
 
         payer_name='NAVN',
@@ -217,7 +217,7 @@ def test_transaction_amount_item_2_for_ocr_giro_transactions():
         service_code=netsgiro.ServiceCode.OCR_GIRO,
         transaction_type=(
             netsgiro.TransactionType.FROM_GIRO_DEBITED_ACCOUNT),
-        transaction_number='0000001',
+        transaction_number=1,
         reference='099038562',
 
         form_number='9636827194',
@@ -236,7 +236,7 @@ def test_transaction_amount_item_3_for_ocr_giro_transactions():
         service_code=netsgiro.ServiceCode.OCR_GIRO,
         transaction_type=(
             netsgiro.TransactionType.PURCHASE_WITH_TEXT),
-        transaction_number='0000001',
+        transaction_number=1,
         text='Foo bar baz',
     )
 
@@ -251,7 +251,7 @@ def test_transaction_specification_for_avtalegiro_payment_request():
         service_code=netsgiro.ServiceCode.AVTALEGIRO,
         transaction_type=(
             netsgiro.TransactionType.AVTALEGIRO_WITH_BANK_NOTIFICATION),
-        transaction_number='0000001',
+        transaction_number=1,
         line_number=1,
         column_number=1,
         text=' Gjelder Faktura: 168837  Dato: 19/03/04',
@@ -268,7 +268,7 @@ def test_avtalegiro_agreements():
         service_code=netsgiro.ServiceCode.AVTALEGIRO,
         transaction_type=(
             netsgiro.TransactionType.AVTALEGIRO_AGREEMENTS),
-        transaction_number='0000001',
+        transaction_number=1,
         registration_type=(
             netsgiro.AvtaleGiroRegistrationType.NEW_OR_UPDATED_AGREEMENTS),
         kid='008000011688373',
