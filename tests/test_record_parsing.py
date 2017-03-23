@@ -126,9 +126,8 @@ def test_assignment_end_for_avtalegiro_payment_requests():
     assert record.num_transactions == 6
     assert record.num_records == 20
     assert record.total_amount == 600
-    assert record.nets_date == date(2004, 6, 17)
     assert record.nets_date_earliest == date(2004, 6, 17)
-    assert record.nets_date_latest is None
+    assert record.nets_date_latest == date(2004, 6, 17)
 
 
 def test_assignment_end_for_avtalegiro_agreements():
@@ -146,7 +145,6 @@ def test_assignment_end_for_avtalegiro_agreements():
     assert record.num_transactions == 6
     assert record.num_records == 20
     assert record.total_amount is None
-    assert record.nets_date is None
     assert record.nets_date_earliest is None
     assert record.nets_date_latest is None
 
@@ -166,9 +164,8 @@ def test_assignment_end_for_avtalegiro_cancellations():
     assert record.num_transactions == 6
     assert record.num_records == 20
     assert record.total_amount == 600
-    assert record.nets_date == date(2004, 6, 17)
+    assert record.nets_date_latest == date(2004, 6, 17)
     assert record.nets_date_earliest == date(2004, 6, 17)
-    assert record.nets_date_latest is None
 
 
 def test_assignment_end_for_ocr_giro_transactions():

@@ -72,9 +72,8 @@ def test_get_records_with_avtalegiro_data(payment_request_data):
     assert assignment_end.num_transactions == 6
     assert assignment_end.num_records == 20
     assert assignment_end.total_amount == 600
-    assert assignment_end.nets_date == date(2004, 6, 17)
     assert assignment_end.nets_date_earliest == date(2004, 6, 17)
-    assert assignment_end.nets_date_latest is None
+    assert assignment_end.nets_date_latest == date(2004, 6, 17)
 
     assert isinstance(transmission_end, records.TransmissionEnd)
     assert transmission_end.num_transactions == 6

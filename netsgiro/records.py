@@ -273,11 +273,11 @@ class AssignmentEnd(Record):
     num_transactions = attr.ib(convert=int)
     num_records = attr.ib(convert=int)
 
-    # Only for assignment_type == AssignmentType.TRANSACTIONS
+    # Only for transactions and cancellations
     total_amount = attr.ib(default=None, convert=optional_int)
-    nets_date = attr.ib(default=None, convert=to_date)
-    nets_date_earliest = attr.ib(default=None, convert=to_date)
-    nets_date_latest = attr.ib(default=None, convert=to_date)
+    nets_date_1 = attr.ib(default=None, convert=to_date)
+    nets_date_2 = attr.ib(default=None, convert=to_date)
+    nets_date_3 = attr.ib(default=None, convert=to_date)
 
     _RECORD_TYPE = netsgiro.RecordType.ASSIGNMENT_END
     record_type = attr.ib(
@@ -288,15 +288,15 @@ class AssignmentEnd(Record):
             ^
             NY      # Format code
             (?P<service_code>(09|21))
-            (?P<assignment_type>00)     # Payment requests
+            (?P<assignment_type>00)     # Transactions / payment requests
             88      # Record type
 
             (?P<num_transactions>\d{8})
             (?P<num_records>\d{8})
             (?P<total_amount>\d{17})
-            (?P<nets_date>\d{6})
-            (?P<nets_date_earliest>\d{6})
-            (?P<nets_date_latest>\d{6})
+            (?P<nets_date_1>\d{6})
+            (?P<nets_date_2>\d{6})
+            (?P<nets_date_3>\d{6})
 
             0{21}   # Filler
             $
@@ -305,7 +305,7 @@ class AssignmentEnd(Record):
             ^
             NY      # Format code
             (?P<service_code>21)
-            (?P<assignment_type>24)     # Agreements
+            (?P<assignment_type>24)     # AvtaleGiro agreements
             88      # Record type
 
             (?P<num_transactions>\d{8})
@@ -318,20 +318,47 @@ class AssignmentEnd(Record):
             ^
             NY      # Format code
             (?P<service_code>21)
-            (?P<assignment_type>36)     # Cancellations
+            (?P<assignment_type>36)     # AvtaleGiro cancellations
             88      # Record type
 
             (?P<num_transactions>\d{8})
             (?P<num_records>\d{8})
             (?P<total_amount>\d{17})
-            (?P<nets_date>\d{6})
-            (?P<nets_date_earliest>\d{6})
-            (?P<nets_date_latest>\d{6})
+            (?P<nets_date_1>\d{6})
+            (?P<nets_date_2>\d{6})
 
-            0{21}   # Filler
+            0{27}   # Filler
             $
         ''', re.VERBOSE),
     ]
+
+    @property
+    def nets_date(self):
+        if self.service_code == netsgiro.ServiceCode.OCR_GIRO:
+            return self.nets_date_1
+        else:
+            raise ValueError(
+                'Unhandled service code: {}'.format(self.service_code))
+
+    @property
+    def nets_date_earliest(self):
+        if self.service_code == netsgiro.ServiceCode.OCR_GIRO:
+            return self.nets_date_2
+        elif self.service_code == netsgiro.ServiceCode.AVTALEGIRO:
+            return self.nets_date_1
+        else:
+            raise ValueError(
+                'Unhandled service code: {}'.format(self.service_code))
+
+    @property
+    def nets_date_latest(self):
+        if self.service_code == netsgiro.ServiceCode.OCR_GIRO:
+            return self.nets_date_3
+        elif self.service_code == netsgiro.ServiceCode.AVTALEGIRO:
+            return self.nets_date_2
+        else:
+            raise ValueError(
+                'Unhandled service code: {}'.format(self.service_code))
 
     def to_ocr(self) -> str:
         """Get record as OCR string."""
@@ -343,13 +370,9 @@ class AssignmentEnd(Record):
             '{self.num_transactions:08d}'
             '{self.num_records:08d}'
             + (self.total_amount and '{self.total_amount:017d}' or ('0' * 17))
-            + (self.nets_date and '{self.nets_date:%d%m%y}' or ('0' * 6))
-            + (
-                self.nets_date_earliest and
-                '{self.nets_date_earliest:%d%m%y}' or ('0' * 6))
-            + (
-                self.nets_date_latest and
-                '{self.nets_date_latest:%d%m%y}' or ('0' * 6))
+            + (self.nets_date_1 and '{self.nets_date_1:%d%m%y}' or ('0' * 6))
+            + (self.nets_date_2 and '{self.nets_date_2:%d%m%y}' or ('0' * 6))
+            + (self.nets_date_3 and '{self.nets_date_3:%d%m%y}' or ('0' * 6))
             + ('0' * 21)
         ).format(self=self)
 

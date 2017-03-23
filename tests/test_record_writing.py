@@ -131,9 +131,8 @@ def test_assignment_end_for_avtalegiro_payment_requests():
         num_transactions=6,
         num_records=20,
         total_amount=600,
-        nets_date=date(2004, 6, 17),
-        nets_date_earliest=date(2004, 6, 17),
-        nets_date_latest=None,
+        nets_date_1=date(2004, 6, 17),
+        nets_date_2=date(2004, 6, 17),
     )
 
     assert record.to_ocr() == (
