@@ -3,7 +3,7 @@ Changelog
 =========
 
 
-v0.1 (UNRELEASED)
-=================
+v1.0.0a1 (2017-04-17)
+=====================
 
-Initial release.
+Initial alpha release. No promises about backwards compatibility.
