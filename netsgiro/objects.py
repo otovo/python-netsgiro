@@ -30,7 +30,7 @@ class Transmission(Serializable):
     # TODO For AvtaleGiro payment request, this should be the earliest due date
     nets_date = attr.ib()
 
-    assignments = attr.ib(default=[])
+    assignments = attr.ib(default=attr.Factory(list))
 
     @classmethod
     def from_records(cls, records: List[Record]) -> 'Transmission':
@@ -60,7 +60,7 @@ class Assignment(Serializable):
     number = attr.ib()
     account = attr.ib()
 
-    transactions = attr.ib(default=[])
+    transactions = attr.ib(default=attr.Factory(list))
 
     @classmethod
     def from_records(cls, records: List[Record]) -> 'Assignment':
