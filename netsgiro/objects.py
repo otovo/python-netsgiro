@@ -139,7 +139,7 @@ class Transaction(Serializable):
         if amount_item_1.service_code == netsgiro.ServiceCode.OCR_GIRO:
             text = get_ocr_giro_text(records)
         elif amount_item_1.service_code == netsgiro.ServiceCode.AVTALEGIRO:
-            text = get_avtalegiro_specification_text(records)
+            text = netsgiro.TransactionSpecification.to_text(records)
         else:
             text = None
 
@@ -185,30 +185,6 @@ def get_ocr_giro_text(records: List[Record]) -> str:
             len(records) == 1 and
             isinstance(records[0], netsgiro.TransactionAmountItem3)):
         return records[0].text
-
-
-def get_avtalegiro_specification_text(records: List[Record]) -> str:
-    MAX_LINES = 42
-    MAX_COLUMNS = 2
-    MAX_RECORDS = MAX_LINES * MAX_COLUMNS
-
-    if len(records) > MAX_RECORDS:
-        raise ValueError(
-            'Max {} specification records allowed, got {}'
-            .format(MAX_RECORDS, len(records)))
-
-    tuples = sorted([
-        (r.line_number, r.column_number, r)
-        for r in records
-    ])
-
-    text = ''
-    for _, column, specification in tuples:
-        text += specification.text
-        if column == MAX_COLUMNS:
-            text += '\n'
-
-    return text
 
 
 def parse(data: str) -> Transmission:

@@ -319,6 +319,41 @@ def test_transaction_specification_for_avtalegiro_payment_request():
     assert record.text == ' Gjelder Faktura: 168837  Dato: 19/03/04'
 
 
+def make_specification_records(num_lines, num_columns=2):
+    return [
+        netsgiro.TransactionSpecification(
+            service_code=netsgiro.ServiceCode.AVTALEGIRO,
+            transaction_type=(
+                netsgiro.TransactionType.AVTALEGIRO_WITH_BANK_NOTIFICATION),
+            transaction_number=1,
+            line_number=line,
+            column_number=column,
+            text='Line {}, column {}'.format(line, column),
+        )
+        for line in range(1, num_lines + 1)
+        for column in range(1, num_columns + 1)
+    ]
+
+
+def test_transaction_specification_to_text_with_max_number_of_records():
+    records = make_specification_records(42)
+
+    result = netsgiro.TransactionSpecification.to_text(records)
+
+    assert len(result.splitlines()) == 42
+    assert 'Line 1, column 1' in result
+    assert 'Line 42, column 2' in result
+
+
+def test_transaction_specification_to_text_with_too_many_records():
+    records = make_specification_records(43)
+
+    with pytest.raises(ValueError) as exc_info:
+        netsgiro.TransactionSpecification.to_text(records)
+
+    assert 'Max 84 specification records allowed, got 86' in str(exc_info)
+
+
 def test_avtalegiro_all_agreements():
     record = netsgiro.AvtaleGiroAgreement.from_string(
         'NY21947000000010          00800001168837'

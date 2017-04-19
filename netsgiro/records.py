@@ -1,6 +1,6 @@
 import datetime
 import re
-from typing import List, Optional, Union
+from typing import List, Optional, Sequence, Union
 
 import attr
 from attr.validators import instance_of, optional
@@ -625,6 +625,30 @@ class TransactionSpecification(TransactionRecord):
             $
         ''', re.VERBOSE),
     ]
+
+    _MAX_LINES = 42
+    _MAX_COLUMNS = 2
+    _MAX_RECORDS = _MAX_LINES * _MAX_COLUMNS
+
+    @classmethod
+    def to_text(cls, records: Sequence['TransactionSpecification']) -> str:
+        if len(records) > cls._MAX_RECORDS:
+            raise ValueError(
+                'Max {} specification records allowed, got {}'
+                .format(cls._MAX_RECORDS, len(records)))
+
+        tuples = sorted([
+            (r.line_number, r.column_number, r)
+            for r in records
+        ])
+
+        text = ''
+        for _, column, specification in tuples:
+            text += specification.text
+            if column == cls._MAX_COLUMNS:
+                text += '\n'
+
+        return text
 
     def to_ocr(self) -> str:
         """Get record as OCR string."""
