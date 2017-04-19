@@ -1,6 +1,6 @@
 import collections
 from decimal import Decimal
-from typing import List
+from typing import Iterable, List
 
 import attr
 
@@ -51,6 +51,33 @@ class Transmission(Serializable):
             assignments=get_assignments(body),
         )
 
+    def to_ocr(self) -> str:
+        lines = [record.to_ocr() for record in self.to_records()]
+        return '\n'.join(lines)
+
+    def to_records(self) -> Iterable[Record]:
+        yield self.get_start_record()
+        for assignment in self.assignments:
+            yield from assignment.to_records()
+        yield self.get_end_record()
+
+    def get_start_record(self) -> Record:
+        return netsgiro.TransmissionStart(
+            service_code=netsgiro.ServiceCode.NONE,
+            transmission_number=self.number,
+            data_transmitter=self.data_transmitter,
+            data_recipient=self.data_recipient,
+        )
+
+    def get_end_record(self) -> Record:
+        return netsgiro.TransmissionEnd(
+            service_code=netsgiro.ServiceCode.NONE,
+            num_transactions=self.get_num_transactions(),
+            num_records=self.get_num_records(),
+            total_amount=int(self.get_total_amount() * 100),
+            nets_date=self.nets_date,
+        )
+
     def add_assignment(
             self, *,
             service_code, assignment_type, agreement_id=None, number, account,
@@ -67,6 +94,21 @@ class Transmission(Serializable):
         )
         self.assignments.append(assignment)
         return assignment
+
+    def get_num_transactions(self):
+        return sum(
+            assignment.get_num_transactions()
+            for assignment in self.assignments)
+
+    def get_num_records(self):
+        return 2 + sum(
+            assignment.get_num_records()
+            for assignment in self.assignments)
+
+    def get_total_amount(self):
+        return sum(
+            assignment.get_total_amount()
+            for assignment in self.assignments)
 
 
 @attr.s
@@ -102,6 +144,46 @@ class Assignment(Serializable):
             account=start.assignment_account,
             nets_date=end.nets_date,
             transactions=get_transactions(body)
+        )
+
+    def to_records(self) -> Iterable[Record]:
+        yield self.get_start_record()
+        for transaction in self.transactions:
+            yield from transaction.to_records()
+        yield self.get_end_record()
+
+    def get_start_record(self) -> Record:
+        return netsgiro.AssignmentStart(
+            service_code=self.service_code,
+            assignment_type=self.type,
+            assignment_number=self.number,
+            assignment_account=self.account,
+            agreement_id=self.agreement_id,
+        )
+
+    def get_end_record(self) -> Record:
+        if self.service_code == netsgiro.ServiceCode.OCR_GIRO:
+            dates = {
+                'nets_date_1': self.nets_date,
+                'nets_date_2': self.get_nets_date_earliest(),
+                'nets_date_3': self.get_nets_date_latest(),
+            }
+        elif self.service_code == netsgiro.ServiceCode.AVTALEGIRO:
+            dates = {
+                'nets_date_1': self.get_nets_date_earliest(),
+                'nets_date_2': self.get_nets_date_latest(),
+            }
+        else:
+            raise ValueError(
+                'Unhandled service code: {}'.format(self.service_code))
+
+        return netsgiro.AssignmentEnd(
+            service_code=self.service_code,
+            assignment_type=self.type,
+            num_transactions=self.get_num_transactions(),
+            num_records=self.get_num_records(),
+            total_amount=int(self.get_total_amount() * 100),
+            **dates,
         )
 
     def add_payment_request(
@@ -154,6 +236,33 @@ class Assignment(Serializable):
         )
         self.transactions.append(transaction)
         return transaction
+
+    def get_num_transactions(self):
+        return len(self.transactions)
+
+    def get_num_records(self):
+        return 2 + sum(
+            len(list(transaction.to_records()))
+            for transaction in self.transactions)
+
+    def get_total_amount(self):
+        return sum(
+            transaction.amount
+            for transaction in self.transactions)
+
+    def get_nets_date_earliest(self):
+        if not self.transactions:
+            return None
+        return min(
+            transaction.nets_date
+            for transaction in self.transactions)
+
+    def get_nets_date_latest(self):
+        if not self.transactions:
+            return None
+        return max(
+            transaction.nets_date
+            for transaction in self.transactions)
 
 
 def get_assignments(records: List[Record]) -> List[Assignment]:
@@ -242,6 +351,69 @@ class Transaction(Serializable):
             # Specific to AvtaleGiro
             payer_name=amount_item_2.payer_name,
         )
+
+    def to_records(self) -> Iterable[Record]:
+        yield netsgiro.TransactionAmountItem1(
+            service_code=self.service_code,
+            transaction_type=self.type,
+            transaction_number=self.number,
+
+            nets_date=self.nets_date,
+            amount=int(self.amount * 100),
+            kid=self.kid,
+
+            # Only OCR Giro
+            centre_id=self.centre_id,
+            day_code=self.day_code,
+            partial_settlement_number=self.partial_settlement_number,
+            partial_settlement_serial_number=(
+                self.partial_settlement_serial_number),
+            sign=self.sign,
+        )
+        yield netsgiro.TransactionAmountItem2(
+            service_code=self.service_code,
+            transaction_type=self.type,
+            transaction_number=self.number,
+
+            reference=self.reference,
+
+            # Only OCR Giro
+            form_number=self.form_number,
+            bank_date=self.bank_date,
+            debit_account=self.debit_account,
+            filler=self._filler,
+
+            # Only AvtaleGiro
+            payer_name=self.payer_name,
+        )
+
+        if (
+                self.service_code == netsgiro.ServiceCode.OCR_GIRO and
+                self.type in (
+                    netsgiro.TransactionType.REVERSING_WITH_TEXT,
+                    netsgiro.TransactionType.PURCHASE_WITH_TEXT)):
+            yield netsgiro.TransactionAmountItem3(
+                service_code=self.service_code,
+                transaction_type=self.type,
+                transaction_number=self.number,
+
+                text=self.text,
+            )
+
+        if (
+                self.service_code == netsgiro.ServiceCode.AVTALEGIRO and
+                self.type == (
+                    netsgiro.TransactionType.AVTALEGIRO_WITH_BANK_NOTIFICATION)
+                ):
+            yield from netsgiro.TransactionSpecification.from_text(
+                service_code=self.service_code,
+                transaction_type=self.type,
+                transaction_number=self.number,
+
+                text=self.text,
+            )
+
+        # TODO Support AvtaleGiroAgreement
 
 
 def get_transactions(records: List[Record]) -> List[Transaction]:
