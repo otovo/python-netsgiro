@@ -1,6 +1,6 @@
 import datetime
 import re
-from typing import List, Optional, Sequence, Union
+from typing import Iterable, List, Optional, Sequence, Tuple, Union
 
 import attr
 from attr.validators import instance_of, optional
@@ -627,8 +627,46 @@ class TransactionSpecification(TransactionRecord):
     ]
 
     _MAX_LINES = 42
+    _MAX_LINE_LENGTH = 80
     _MAX_COLUMNS = 2
     _MAX_RECORDS = _MAX_LINES * _MAX_COLUMNS
+
+    @classmethod
+    def from_text(
+            cls, *,
+            service_code, transaction_type, transaction_number, text
+            ) -> Iterable['TransactionSpecification']:
+        for line, column, text in (
+                cls._split_text_to_lines_and_columns(text)):
+            yield cls(
+                service_code=service_code,
+                transaction_type=transaction_type,
+                transaction_number=transaction_number,
+
+                line_number=line,
+                column_number=column,
+                text=text,
+            )
+
+    @classmethod
+    def _split_text_to_lines_and_columns(
+            cls, text) -> Iterable[Tuple[int, int, str]]:
+        lines = text.splitlines()
+
+        if len(lines) > cls._MAX_LINES:
+            raise ValueError(
+                'Max {} specification lines allowed, got {}'
+                .format(cls._MAX_LINES, len(lines)))
+
+        for line_number, line_text in enumerate(lines, 1):
+            if len(line_text) > cls._MAX_LINE_LENGTH:
+                raise ValueError(
+                    'Specification lines must be max {} chars long, '
+                    'got {}: {!r}'
+                    .format(cls._MAX_LINE_LENGTH, len(line_text), line_text))
+
+            yield (line_number, 1, '{:40}'.format(line_text[0:40]))
+            yield (line_number, 2, '{:40}'.format(line_text[40:80]))
 
     @classmethod
     def to_text(cls, records: Sequence['TransactionSpecification']) -> str:

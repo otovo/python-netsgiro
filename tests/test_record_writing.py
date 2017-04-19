@@ -262,6 +262,34 @@ def test_transaction_specification_for_avtalegiro_payment_request():
     )
 
 
+def test_transaction_specification_from_longer_text():
+    records = list(netsgiro.TransactionSpecification.from_text(
+        service_code=netsgiro.ServiceCode.AVTALEGIRO,
+        transaction_type=(
+            netsgiro.TransactionType.AVTALEGIRO_WITH_BANK_NOTIFICATION),
+        transaction_number=1,
+        text=' Gjelder Faktura: 168837  Dato: 19/03/04\nFoo bar baz quux',
+    ))
+
+    assert len(records) == 4
+    assert records[0].to_ocr() == (
+        'NY212149000000140011 Gjelder Faktura: 16'
+        '8837  Dato: 19/03/0400000000000000000000'
+    )
+    assert records[1].to_ocr() == (
+        'NY212149000000140012                    '
+        '                    00000000000000000000'
+    )
+    assert records[2].to_ocr() == (
+        'NY212149000000140021Foo bar baz quux    '
+        '                    00000000000000000000'
+    )
+    assert records[3].to_ocr() == (
+        'NY212149000000140022                    '
+        '                    00000000000000000000'
+    )
+
+
 def test_avtalegiro_agreements():
     record = netsgiro.AvtaleGiroAgreement(
         service_code=netsgiro.ServiceCode.AVTALEGIRO,
