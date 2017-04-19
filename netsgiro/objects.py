@@ -28,7 +28,7 @@ class Transmission(Serializable):
     data_recipient = attr.ib()
 
     # TODO For AvtaleGiro payment request, this should be the earliest due date
-    nets_date = attr.ib()
+    nets_date = attr.ib(default=None)
 
     assignments = attr.ib(default=attr.Factory(list))
 
@@ -51,6 +51,23 @@ class Transmission(Serializable):
             assignments=get_assignments(body),
         )
 
+    def add_assignment(
+            self, *,
+            service_code, assignment_type, agreement_id=None, number, account,
+            nets_date=None
+            ) -> 'Assignment':
+
+        assignment = Assignment(
+            service_code=service_code,
+            type=assignment_type,
+            agreement_id=agreement_id,
+            number=number,
+            account=account,
+            nets_date=nets_date,
+        )
+        self.assignments.append(assignment)
+        return assignment
+
 
 @attr.s
 class Assignment(Serializable):
@@ -60,7 +77,11 @@ class Assignment(Serializable):
     number = attr.ib()
     account = attr.ib()
 
+    nets_date = attr.ib(default=None)
+
     transactions = attr.ib(default=attr.Factory(list))
+
+    _next_transaction_number = 1
 
     @classmethod
     def from_records(cls, records: List[Record]) -> 'Assignment':
@@ -79,8 +100,60 @@ class Assignment(Serializable):
             agreement_id=start.agreement_id,
             number=start.assignment_number,
             account=start.assignment_account,
+            nets_date=end.nets_date,
             transactions=get_transactions(body)
         )
+
+    def add_payment_request(
+            self, *,
+            kid, due_date, amount,
+            reference=None, payer_name=None, bank_notification=None
+            ) -> 'Transaction':
+
+        assert self.service_code == netsgiro.ServiceCode.AVTALEGIRO, (
+            'Can only add payment requests to AvtaleGiro assignments')
+        assert self.type == netsgiro.AssignmentType.TRANSACTIONS, (
+            'Can only add payment requests to transaction assignments')
+
+        if bank_notification:
+            transaction_type = (
+                netsgiro.TransactionType.AVTALEGIRO_WITH_BANK_NOTIFICATION)
+        else:
+            transaction_type = (
+                netsgiro.TransactionType.AVTALEGIRO_WITH_PAYEE_NOTIFICATION)
+
+        if isinstance(bank_notification, str):
+            text = bank_notification
+        else:
+            text = ''
+
+        number = self._next_transaction_number
+        self._next_transaction_number += 1
+
+        transaction = Transaction(
+            service_code=self.service_code,
+            type=transaction_type,
+            number=number,
+            nets_date=due_date,
+            amount=amount,
+            kid=kid,
+            reference=reference,
+            text=text,
+
+            centre_id=None,
+            day_code=None,
+            partial_settlement_number=None,
+            partial_settlement_serial_number=None,
+            sign=None,
+            form_number=None,
+            bank_date=None,
+            debit_account=None,
+            filler=None,
+
+            payer_name=payer_name,
+        )
+        self.transactions.append(transaction)
+        return transaction
 
 
 def get_assignments(records: List[Record]) -> List[Assignment]:
@@ -121,6 +194,7 @@ class Transaction(Serializable):
     form_number = attr.ib()
     bank_date = attr.ib()
     debit_account = attr.ib()
+    _filler = attr.ib()
 
     # Specific to AvtaleGiro
     payer_name = attr.ib()
@@ -163,6 +237,7 @@ class Transaction(Serializable):
             form_number=amount_item_2.form_number,
             bank_date=amount_item_2.bank_date,
             debit_account=amount_item_2.debit_account,
+            filler=amount_item_2._filler,
 
             # Specific to AvtaleGiro
             payer_name=amount_item_2.payer_name,

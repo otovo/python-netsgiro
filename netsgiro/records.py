@@ -337,8 +337,7 @@ class AssignmentEnd(Record):
         if self.service_code == netsgiro.ServiceCode.OCR_GIRO:
             return self.nets_date_1
         else:
-            raise ValueError(
-                'Unhandled service code: {}'.format(self.service_code))
+            return None
 
     @property
     def nets_date_earliest(self):
