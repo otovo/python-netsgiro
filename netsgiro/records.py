@@ -480,6 +480,9 @@ class TransactionAmountItem2(TransactionRecord):
     bank_date = attr.ib(default=None, convert=to_date)
     debit_account = attr.ib(
         default=None, validator=optional(str_of_length(11)))
+    # XXX In use in OCR Giro "from giro debited account" transactions in test
+    # data, but documented as a filler field.
+    _filler = attr.ib(default=None)
 
     # Only AvtaleGiro
     payer_name = attr.ib(default=None, convert=optional_str)
@@ -502,7 +505,7 @@ class TransactionAmountItem2(TransactionRecord):
             (?P<form_number>\d{10})
             (?P<reference>\d{9})
 
-            .{7} # Filler   # XXX Not always filled with zero in test data
+            (?P<filler>.{7})  # XXX Documented as filler, in use in test data
 
             (?P<bank_date>\d{6})
             (?P<debit_account>\d{11})
@@ -543,7 +546,7 @@ class TransactionAmountItem2(TransactionRecord):
             service_fields = (
                 '{self.form_number:10}'
                 + (self.reference and '{self.reference:9}' or (' ' * 9))
-                + ('0' * 7)
+                + (self._filler and '{self._filler:7}' or ('0' * 7))
                 + (self.bank_date and '{self.bank_date:%d%m%y}' or '0' * 6) +
                 '{self.debit_account:11}'
                 + ('0' * 22)

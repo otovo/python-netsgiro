@@ -285,6 +285,27 @@ def test_transaction_amount_item_2_for_ocr_giro_transactions():
     assert record.debit_account == '99990512341'
 
 
+def test_transaction_amount_item_2_for_ocr_giro_with_data_in_filler_field():
+    record = netsgiro.TransactionAmountItem2.from_string(
+        'NY09103100000029797596016097596016188320'
+        '6160192999910055240000000000000000000000'
+    )
+
+    assert record.service_code == netsgiro.ServiceCode.OCR_GIRO
+    assert record.record_type == netsgiro.RecordType.TRANSACTION_AMOUNT_ITEM_2
+
+    assert record.transaction_type == (
+        netsgiro.TransactionType.FROM_GIRO_DEBITED_ACCOUNT)
+    assert record.transaction_number == 2
+
+    assert record.form_number == '9797596016'
+    assert record.payer_name is None
+    assert record.reference == '097596016'
+    assert record.bank_date == date(1992, 1, 16)
+    assert record.debit_account == '99991005524'
+    assert record._filler == '1883206'
+
+
 def test_transaction_amount_item_3_for_ocr_giro_transactions():
     record = netsgiro.TransactionAmountItem3.from_string(
         'NY0921320000001Foo bar baz              '
