@@ -116,6 +116,13 @@ class Record:
 
 @attr.s
 class TransmissionStart(Record):
+    """TransmissionStart is the first record in every OCR file.
+
+    A file can only contain a single transmission.
+
+    Each transmission can contain any number of assignments.
+    """
+
     transmission_number = attr.ib(validator=str_of_length(7))
     data_transmitter = attr.ib(validator=str_of_length(8))
     data_recipient = attr.ib(validator=str_of_length(8))
@@ -154,6 +161,8 @@ class TransmissionStart(Record):
 
 @attr.s
 class TransmissionEnd(Record):
+    """TransmissionEnd is the first record in every OCR file."""
+
     num_transactions = attr.ib(convert=int)
     num_records = attr.ib(convert=int)
     total_amount = attr.ib(convert=int)
@@ -195,6 +204,11 @@ class TransmissionEnd(Record):
 
 @attr.s
 class AssignmentStart(Record):
+    """AssignmentStart is the first record of an assignment.
+
+    Each assignment can contain any number of transactions.
+    """
+
     assignment_type = attr.ib(convert=to_assignment_type)
     assignment_number = attr.ib(validator=str_of_length(7))
     assignment_account = attr.ib(validator=str_of_length(11))
@@ -269,6 +283,8 @@ class AssignmentStart(Record):
 
 @attr.s
 class AssignmentEnd(Record):
+    """AssignmentEnd is the last record of an assignment."""
+
     assignment_type = attr.ib(convert=to_assignment_type)
     num_transactions = attr.ib(convert=int)
     num_records = attr.ib(convert=int)
@@ -334,6 +350,10 @@ class AssignmentEnd(Record):
 
     @property
     def nets_date(self):
+        """Nets' processing date.
+
+        Only used for OCR Giro.
+        """
         if self.service_code == netsgiro.ServiceCode.OCR_GIRO:
             return self.nets_date_1
         else:
@@ -341,6 +361,8 @@ class AssignmentEnd(Record):
 
     @property
     def nets_date_earliest(self):
+        """The earliest date from the contained transactions."""
+
         if self.service_code == netsgiro.ServiceCode.OCR_GIRO:
             return self.nets_date_2
         elif self.service_code == netsgiro.ServiceCode.AVTALEGIRO:
@@ -351,6 +373,8 @@ class AssignmentEnd(Record):
 
     @property
     def nets_date_latest(self):
+        """The latest date from the contained transactions."""
+
         if self.service_code == netsgiro.ServiceCode.OCR_GIRO:
             return self.nets_date_3
         elif self.service_code == netsgiro.ServiceCode.AVTALEGIRO:
@@ -384,6 +408,11 @@ class TransactionRecord(Record):
 
 @attr.s
 class TransactionAmountItem1(TransactionRecord):
+    """TransactionAmountItem1 is the first record of a transaction.
+
+    The record is used both for AvtaleGiro and for OCR Giro.
+    """
+
     nets_date = attr.ib(convert=to_date)
     amount = attr.ib(convert=int)
     kid = attr.ib(convert=optional_str)
@@ -472,6 +501,11 @@ class TransactionAmountItem1(TransactionRecord):
 
 @attr.s
 class TransactionAmountItem2(TransactionRecord):
+    """TransactionAmountItem2 is the second record of a transaction.
+
+    The record is used both for AvtaleGiro and for OCR Giro.
+    """
+
     reference = attr.ib(convert=optional_str)
 
     # Only OCR Giro
@@ -563,6 +597,11 @@ class TransactionAmountItem2(TransactionRecord):
 
 @attr.s
 class TransactionAmountItem3(TransactionRecord):
+    """TransactionAmountItem3 is the third record of a transaction.
+
+    The record is only used for some OCR Giro transaction types.
+    """
+
     text = attr.ib(convert=optional_str)
 
     _RECORD_TYPE = netsgiro.RecordType.TRANSACTION_AMOUNT_ITEM_3
@@ -599,6 +638,16 @@ class TransactionAmountItem3(TransactionRecord):
 
 @attr.s
 class TransactionSpecification(TransactionRecord):
+    """TransactionSpecification is used for AvtaleGiro transaction
+    specification.
+
+    The record is only used when bank notification is used to notify the payer.
+
+    Each record contains half of an 80 char long line of text and can be
+    repeated up to 84 times for a single transaction for a total of 42 lines of
+    specification text.
+    """
+
     line_number = attr.ib(convert=int)
     column_number = attr.ib(convert=int)
     text = attr.ib(validator=instance_of(str))
@@ -703,6 +752,10 @@ class TransactionSpecification(TransactionRecord):
 
 @attr.s
 class AvtaleGiroAgreement(TransactionRecord):
+    """AvtaleGiroAgreement is used by Nets to notify about changes to your
+    customers' AvtaleGiro preferences.
+    """
+
     registration_type = attr.ib(convert=to_avtalegiro_registration_type)
     kid = attr.ib(convert=optional_str)
     notify = attr.ib(convert=to_bool)
@@ -742,35 +795,7 @@ class AvtaleGiroAgreement(TransactionRecord):
 
 
 def get_records(data: str) -> List[Record]:
-    """Parses an OCR file into a list of record objects.
-
-    Example::
-
-        >>> netsgiro.get_records(data)
-        [
-            TransmissionStart(service_code=<ServiceCode.NONE: 0>,
-                record_type=<RecordType.TRANSMISSION_START: 10>,
-                data_transmitter='55555555', transmission_number='1000081',
-                data_recipient='00008080'),
-            AssignmentStart(service_code=<ServiceCode.AVTALEGIRO: 21>,
-                record_type=<RecordType.ASSIGNMENT_START:20>,
-                assignment_type=<AssignmentType.TRANSACTIONS: 0>,
-                assignment_number='4000086', assignment_account='88888888888',
-                agreement_id='000000000'),
-            TransactionAmountItem1(service_code=<ServiceCode.AVTALEGIRO: 21>,
-                record_type=<RecordType.TRANSACTION_AMOUNT_ITEM_1: 30>,
-                transaction_type=<TransactionType.PURCHASE_WITH_TEXT: 21>,
-                transaction_number=1, nets_date=datetime.date(2004, 6,
-                17), amount=100, kid='008000011688373', centre_id=None,
-                day_code=None, partial_settlement_number=None,
-                partial_settlement_serial_number=None, sign=None),
-            ...
-            TransmissionEnd(service_code=<ServiceCode.NONE: 0>,
-                record_type=<RecordType.TRANSMISSION_END: 89>,
-                num_transactions=6, num_records=22, total_amount=600,
-                nets_date=datetime.date(2004, 6, 17))
-        ]
-    """
+    """Parses an OCR file into a list of record objects."""
 
     def all_subclasses(cls):
         return cls.__subclasses__() + [
