@@ -14,6 +14,7 @@ import netsgiro  # noqa
 
 extensions = [
     'sphinx.ext.autodoc',
+    'sphinx.ext.doctest',
     'sphinx.ext.viewcode',
 ]
 
@@ -69,3 +70,17 @@ latex_documents = [
         'manual',
     ),
 ]
+
+
+# -- Options for doctest builder ------------------------------------------
+
+doctest_path = [
+    os.path.abspath('..'),
+]
+
+doctest_global_setup = """
+from pprint import pprint
+import netsgiro
+"""
+
+doctest_test_doctest_blocks = 'default'

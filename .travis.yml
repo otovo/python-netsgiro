@@ -18,6 +18,8 @@ matrix:
       env: TOX_ENV=check-manifest
     - python: 3.6
       env: TOX_ENV=docs
+    - python: 3.6
+      env: TOX_ENV=doctest
   allow_failures:
     - python: 3.6
       env: TOX_ENV=mypy
