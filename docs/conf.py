@@ -72,6 +72,11 @@ latex_documents = [
 ]
 
 
+# -- Options for doctest extension ----------------------------------------
+
+autodoc_member_order = 'groupwise'
+
+
 # -- Options for doctest builder ------------------------------------------
 
 doctest_path = [
