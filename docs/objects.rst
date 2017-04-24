@@ -79,6 +79,59 @@ Each assignment can contain any number of transactions:
  Transaction(service_code=<ServiceCode.AVTALEGIRO: 21>, type=<TransactionType.AVTALEGIRO_WITH_PAYEE_NOTIFICATION: 2>, number=6, nets_date=datetime.date(2004, 6, 17), amount=Decimal('1'), kid='008000061688422', reference=None, text='', centre_id=None, day_code=None, partial_settlement_number=None, partial_settlement_serial_number=None, sign=None, form_number=None, bank_date=None, debit_account=None, _filler=None, payer_name='NAVN')]
 
 
+Payment request
+===============
+
+To build an AvtaleGiro payment request, you start with a
+:class:`~netsgiro.Transmission`:
+
+>>> from datetime import date
+>>> from decimal import Decimal
+>>> transmission = netsgiro.Transmission(
+... 	number='1703231',
+...	data_transmitter='01234567',
+...	data_recipient=netsgiro.NETS_ID)
+
+Add a AvtaleGiro transaction assignment to the transmission using
+:meth:`~netsgiro.Transmission.add_assignment`:
+
+>>> assignment = transmission.add_assignment(
+... 	service_code=netsgiro.ServiceCode.AVTALEGIRO,
+...	assignment_type=netsgiro.AssignmentType.TRANSACTIONS,
+...	number='0323001',
+...	account='99998877777')
+
+Add one or more payment requests to the assignment using
+:meth:`~netsgiro.Assignment.add_payment_request`:
+
+>>> transaction = assignment.add_payment_request(
+...     kid='000133700501645',
+...     due_date=date(2017, 4, 6),
+...     amount=Decimal('5244.63'),
+...     reference='ACME invoice #50164',
+...     payer_name='Wonderland',
+...     bank_notification=None)
+
+Finally, you can write out the OCR data using
+:meth:`~netsgiro.Transmission.to_ocr()`:
+
+>>> data = transmission.to_ocr()
+>>> print(data)
+NY000010012345671703231000080800000000000000000000000000000000000000000000000000
+NY210020000000000032300199998877777000000000000000000000000000000000000000000000
+NY2102300000001060417           00000000000524463          000133700501645000000
+NY2102310000001Wonderland                         ACME invoice #50164      00000
+NY210088000000010000000400000000000524463060417060417000000000000000000000000000
+NY000089000000010000000600000000000524463060417000000000000000000000000000000000
+
+Before saving it to a file or transmitting it over the network, remember to
+encode it using the ISO-8859-1 encoding to correctly preserve Norwegian
+letters::
+
+    with open('my-ocr-file.txt', 'wt', encoding='iso-8859-1') as fh:
+	fh.write(data)
+
+
 Transmission
 ============
 
