@@ -70,7 +70,7 @@ def test_parse_ocr_giro_transactions(ocr_giro_transactions_data):
     assert isinstance(transaction, netsgiro.Transaction)
     assert transaction.service_code == netsgiro.ServiceCode.OCR_GIRO
     assert transaction.type == (
-        netsgiro.TransactionType.FROM_GIRO_DEBITED_ACCOUNT)
+        netsgiro.TransactionType.PURCHASE_WITH_TEXT)
     assert transaction.number == 1
     assert transaction.nets_date == date(1992, 1, 20)
     assert transaction.amount == Decimal('1020')

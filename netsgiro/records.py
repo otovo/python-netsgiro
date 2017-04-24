@@ -543,8 +543,8 @@ class TransactionAmountItem2(TransactionRecord):
             service_fields = (
                 '{self.form_number:10}'
                 + (self.reference and '{self.reference:9}' or (' ' * 9))
-                + ('0' * 7) +
-                '{self.bank_date:%d%m%y}'
+                + ('0' * 7)
+                + (self.bank_date and '{self.bank_date:%d%m%y}' or '0' * 6) +
                 '{self.debit_account:11}'
                 + ('0' * 22)
             ).format(self=self)

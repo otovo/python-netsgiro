@@ -230,6 +230,25 @@ def test_transaction_amount_item_2_for_ocr_giro_transactions():
     )
 
 
+def test_transaction_amount_item_2_for_ocr_giro_without_bank_date():
+    record = netsgiro.TransactionAmountItem2(
+        service_code=netsgiro.ServiceCode.OCR_GIRO,
+        transaction_type=(
+            netsgiro.TransactionType.FROM_GIRO_DEBITED_ACCOUNT),
+        transaction_number=1,
+        reference='099038562',
+
+        form_number='9636827194',
+        bank_date=None,
+        debit_account='99990512341',
+    )
+
+    assert record.to_ocr() == (
+        'NY09103100000019636827194099038562000000'
+        '0000000999905123410000000000000000000000'
+    )
+
+
 def test_transaction_amount_item_3_for_ocr_giro_transactions():
     record = netsgiro.TransactionAmountItem3(
         service_code=netsgiro.ServiceCode.OCR_GIRO,

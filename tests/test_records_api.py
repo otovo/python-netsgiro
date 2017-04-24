@@ -119,7 +119,7 @@ def test_get_records_with_ocr_giro_data(ocr_giro_transactions_data):
 
     assert isinstance(assignment_end, records.AssignmentEnd)
     assert assignment_end.num_transactions == 20
-    assert assignment_end.num_records == 42
+    assert assignment_end.num_records == 43
     assert assignment_end.total_amount == 5144900
     assert assignment_end.nets_date == date(1992, 1, 20)
     assert assignment_end.nets_date_earliest == date(1992, 1, 20)
@@ -127,6 +127,6 @@ def test_get_records_with_ocr_giro_data(ocr_giro_transactions_data):
 
     assert isinstance(transmission_end, records.TransmissionEnd)
     assert transmission_end.num_transactions == 20
-    assert transmission_end.num_records == 44
+    assert transmission_end.num_records == 45
     assert transmission_end.total_amount == 5144900
     assert transmission_end.nets_date == date(1992, 1, 20)
