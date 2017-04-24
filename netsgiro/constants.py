@@ -3,5 +3,5 @@ __all__ = [
 ]
 
 
-#: Nets' data sender/recipient ID
+#: Nets' data sender/recipient ID.
 NETS_ID = '00008080'
