@@ -27,7 +27,7 @@ class Transmission(Serializable):
     data_transmitter = attr.ib()
     data_recipient = attr.ib()
 
-    # TODO For AvtaleGiro payment request, this should be the earliest due date
+    # For AvtaleGiro payment request, the earliest due date is used
     nets_date = attr.ib(default=None)
 
     assignments = attr.ib(default=attr.Factory(list))
@@ -70,12 +70,23 @@ class Transmission(Serializable):
         )
 
     def get_end_record(self) -> Record:
+        avtalegiro_payment_request = all(
+            assignment.service_code == netsgiro.ServiceCode.AVTALEGIRO and
+            assignment.type == netsgiro.AssignmentType.TRANSACTIONS
+            for assignment in self.assignments)
+        if self.assignments and avtalegiro_payment_request:
+            nets_date = min(
+                assignment.get_nets_date_earliest()
+                for assignment in self.assignments)
+        else:
+            nets_date = self.nets_date
+
         return netsgiro.TransmissionEnd(
             service_code=netsgiro.ServiceCode.NONE,
             num_transactions=self.get_num_transactions(),
             num_records=self.get_num_records(),
             total_amount=int(self.get_total_amount() * 100),
-            nets_date=self.nets_date,
+            nets_date=nets_date,
         )
 
     def add_assignment(

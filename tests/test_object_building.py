@@ -51,7 +51,7 @@ def test_transmission_with_single_payment_request_transaction():
     assert transmission_start.transmission_number == '1703231'
     assert transmission_start.data_transmitter == '01234567'
     assert transmission_start.data_recipient == netsgiro.NETS_ID
-    assert transmission_end.nets_date is None
+    assert transmission_end.nets_date == date(2017, 4, 6)
 
     assert assignment_start.assignment_number == '0323001'
     assert assignment_start.assignment_account == '15035382752'
