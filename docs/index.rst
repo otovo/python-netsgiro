@@ -5,6 +5,7 @@
     :maxdepth: 2
     :caption: Usage
 
+    objects
     records
     constants
 
