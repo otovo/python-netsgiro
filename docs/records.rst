@@ -92,7 +92,7 @@ You can also convert the record back to an OCR string:
 'NY210088000000060000002000000000000000600170604170604000000000000000000000000000'
 
 For details on the semantics of each field, please refer to Nets'
-documentations. The :file:`reference` directory of the netsgiro Git repo
+documentation. The :file:`reference` directory of the netsgiro Git repo
 contains the file format specifications, which is a good place to start.
 
 
