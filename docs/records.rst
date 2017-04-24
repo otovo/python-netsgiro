@@ -2,7 +2,7 @@
 Records API
 ===========
 
-The records API is the lowest level API. It parses each line of "OCR" text
+The records API is the lower level API. It parses each line of "OCR" text
 input into a record object. A record object also knows about its OCR
 representation.
 
