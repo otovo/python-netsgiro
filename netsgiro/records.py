@@ -486,8 +486,6 @@ class TransactionAmountItem2(TransactionRecord):
     # Only AvtaleGiro
     payer_name = attr.ib(default=None, convert=optional_str)
 
-    # TODO Add accessors to parts of reference depending on transaction_type
-
     _RECORD_TYPE = netsgiro.RecordType.TRANSACTION_AMOUNT_ITEM_2
     record_type = attr.ib(
         init=False, default=_RECORD_TYPE, convert=to_record_type)
