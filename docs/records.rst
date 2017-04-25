@@ -6,6 +6,9 @@ The records API is the lower level API. It parses each line of "OCR" text
 input into a record object. A record object also knows about its OCR
 representation.
 
+For most use cases, the :doc:`objects API <objects>` is preferable to the
+records API.
+
 
 File parsing
 ============

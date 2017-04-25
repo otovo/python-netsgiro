@@ -2,9 +2,9 @@
 Objects API
 ===========
 
-The object API is the higher level API. It parses the "OCR" file into an object
-structure that for most use cases is more pleasant to work with than the lower
-level :doc:`records API <records>`.
+The objects API is the higher level API. It parses the "OCR" file into an
+object structure that for most use cases is more pleasant to work with than the
+lower level :doc:`records API <records>`.
 
 
 File parsing
