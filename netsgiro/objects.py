@@ -72,7 +72,10 @@ class Transmission(Serializable):
     def get_end_record(self) -> Record:
         avtalegiro_payment_request = all(
             assignment.service_code == netsgiro.ServiceCode.AVTALEGIRO and
-            assignment.type == netsgiro.AssignmentType.TRANSACTIONS
+            assignment.type in (
+                netsgiro.AssignmentType.TRANSACTIONS,
+                netsgiro.AssignmentType.AVTALEGIRO_CANCELLATIONS,
+            )
             for assignment in self.assignments)
         if self.assignments and avtalegiro_payment_request:
             nets_date = min(
@@ -214,6 +217,44 @@ class Assignment(Serializable):
         else:
             transaction_type = (
                 netsgiro.TransactionType.AVTALEGIRO_WITH_PAYEE_NOTIFICATION)
+
+        return self._add_avtalegiro_transaction(
+            transaction_type=transaction_type,
+            kid=kid,
+            due_date=due_date,
+            amount=amount,
+            reference=reference,
+            payer_name=payer_name,
+            bank_notification=bank_notification,
+        )
+
+    def add_payment_cancellation(
+            self, *,
+            kid, due_date, amount,
+            reference=None, payer_name=None, bank_notification=None
+            ) -> 'Transaction':
+
+        assert self.service_code == netsgiro.ServiceCode.AVTALEGIRO, (
+            'Can only add cancellation to AvtaleGiro assignments')
+        assert self.type == netsgiro.AssignmentType.AVTALEGIRO_CANCELLATIONS, (
+            'Can only add cancellation to cancellation assignments')
+
+        return self._add_avtalegiro_transaction(
+            transaction_type=netsgiro.TransactionType.AVTALEGIRO_CANCELLATION,
+            kid=kid,
+            due_date=due_date,
+            amount=amount,
+            reference=reference,
+            payer_name=payer_name,
+            bank_notification=bank_notification,
+        )
+
+    def _add_avtalegiro_transaction(
+            self, *,
+            transaction_type,
+            kid, due_date, amount,
+            reference=None, payer_name=None, bank_notification=None
+            ) -> 'Transaction':
 
         if isinstance(bank_notification, str):
             text = bank_notification
