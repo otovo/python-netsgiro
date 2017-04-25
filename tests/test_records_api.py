@@ -30,7 +30,52 @@ def test_get_records_with_unknown_record_type():
     assert '99 is not a valid RecordType' in str(exc_info)
 
 
-def test_get_records_with_avtalegiro_data(payment_request_data):
+def test_get_records_with_avtalegiro_agreements(agreements_data):
+    result = netsgiro.get_records(agreements_data)
+
+    assert len(result) == 20
+
+    transmission_start = result[0]
+    assignment_start = result[1]
+    agreement_1 = result[2]
+    agreement_2 = result[3]
+    assignment_end = result[-2]
+    transmission_end = result[-1]
+
+    assert isinstance(transmission_start, records.TransmissionStart)
+    assert transmission_start.transmission_number == '1091949'
+    assert transmission_start.data_transmitter == netsgiro.NETS_ID
+
+    assert isinstance(assignment_start, records.AssignmentStart)
+    assert assignment_start.assignment_account == '99991042764'
+
+    assert isinstance(agreement_1, records.AvtaleGiroAgreement)
+    assert agreement_1.registration_type == (
+        netsgiro.AvtaleGiroRegistrationType.NEW_OR_UPDATED_AGREEMENTS)
+    assert agreement_1.kid == '000112000507155'
+    assert agreement_1.notify is True
+
+    assert isinstance(agreement_2, records.AvtaleGiroAgreement)
+    assert agreement_2.registration_type == (
+        netsgiro.AvtaleGiroRegistrationType.NEW_OR_UPDATED_AGREEMENTS)
+    assert agreement_2.kid == '001006300507304'
+    assert agreement_2.notify is False
+
+    assert isinstance(assignment_end, records.AssignmentEnd)
+    assert assignment_end.num_transactions == 16
+    assert assignment_end.num_records == 18
+    assert assignment_end.total_amount is None
+    assert assignment_end.nets_date_earliest is None
+    assert assignment_end.nets_date_latest is None
+
+    assert isinstance(transmission_end, records.TransmissionEnd)
+    assert transmission_end.num_transactions == 16
+    assert transmission_end.num_records == 20
+    assert transmission_end.total_amount == 0
+    assert transmission_end.nets_date == date(2017, 4, 19)
+
+
+def test_get_records_with_avtalegiro_payment_requests(payment_request_data):
     result = netsgiro.get_records(payment_request_data)
 
     assert len(result) == 22
@@ -82,7 +127,7 @@ def test_get_records_with_avtalegiro_data(payment_request_data):
     assert transmission_end.nets_date == date(2004, 6, 17)
 
 
-def test_get_records_with_ocr_giro_data(ocr_giro_transactions_data):
+def test_get_records_with_ocr_giro_transactions(ocr_giro_transactions_data):
     result = netsgiro.get_records(ocr_giro_transactions_data)
 
     assert len(result) == 45
