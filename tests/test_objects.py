@@ -11,7 +11,7 @@ def transmission():
         number='0000001',
         data_transmitter='12341234',
         data_recipient=netsgiro.NETS_ID,
-        nets_date=date(2004, 6, 17),
+        date=date(2004, 6, 17),
     )
 
 

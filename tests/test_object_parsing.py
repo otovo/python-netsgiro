@@ -11,7 +11,7 @@ def test_parse_payment_request(payment_request_data):
     assert transmission.number == '1000081'
     assert transmission.data_transmitter == '55555555'
     assert transmission.data_recipient == netsgiro.NETS_ID
-    assert transmission.nets_date == date(2004, 6, 17)
+    assert transmission.date == date(2004, 6, 17)
     assert len(transmission.assignments) == 1
 
     assignment = transmission.assignments[0]
@@ -31,7 +31,7 @@ def test_parse_payment_request(payment_request_data):
     assert transaction.type == (
         netsgiro.TransactionType.AVTALEGIRO_WITH_BANK_NOTIFICATION)
     assert transaction.number == 1
-    assert transaction.nets_date == date(2004, 6, 17)
+    assert transaction.date == date(2004, 6, 17)
     assert transaction.amount == Decimal('1.00')
     assert transaction.amount_in_cents == 100
     assert transaction.kid == '008000011688373'
@@ -52,7 +52,7 @@ def test_parse_ocr_giro_transactions(ocr_giro_transactions_data):
     assert transmission.number == '0170031'
     assert transmission.data_transmitter == netsgiro.NETS_ID
     assert transmission.data_recipient == '00010200'
-    assert transmission.nets_date == date(1992, 1, 20)
+    assert transmission.date == date(1992, 1, 20)
     assert len(transmission.assignments) == 1
 
     assignment = transmission.assignments[0]
@@ -72,7 +72,7 @@ def test_parse_ocr_giro_transactions(ocr_giro_transactions_data):
     assert transaction.type == (
         netsgiro.TransactionType.PURCHASE_WITH_TEXT)
     assert transaction.number == 1
-    assert transaction.nets_date == date(1992, 1, 20)
+    assert transaction.date == date(1992, 1, 20)
     assert transaction.amount == Decimal('1020')
     assert transaction.amount_in_cents == 102000
     assert transaction.kid == '0000531'
