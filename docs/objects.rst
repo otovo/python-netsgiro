@@ -183,8 +183,8 @@ NY213688000000010000000400000000000524463060417060417000000000000000000000000000
 NY000089000000010000000600000000000524463060417000000000000000000000000000000000
 
 
-Transmission
-============
+Transmission classes
+====================
 
 .. autoclass:: netsgiro.Transmission
    :members:
@@ -193,8 +193,8 @@ Transmission
 
 
 
-Assignment
-==========
+Assignment classes
+==================
 
 .. autoclass:: netsgiro.Assignment
    :members:
@@ -202,8 +202,13 @@ Assignment
    :inherited-members:
 
 
-Transaction
-===========
+Transaction classes
+===================
+
+.. autoclass:: netsgiro.Agreement
+   :members:
+   :undoc-members:
+   :inherited-members:
 
 .. autoclass:: netsgiro.Transaction
    :members:

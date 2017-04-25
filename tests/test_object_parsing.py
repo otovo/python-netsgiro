@@ -4,6 +4,53 @@ from decimal import Decimal
 import netsgiro
 
 
+def test_parse_agreements(agreements_data):
+    transmission = netsgiro.parse(agreements_data)
+
+    assert isinstance(transmission, netsgiro.Transmission)
+    assert transmission.number == '1091949'
+    assert transmission.data_transmitter == netsgiro.NETS_ID
+    assert transmission.data_recipient == '00010200'
+    assert transmission.date == date(2017, 4, 19)
+    assert len(transmission.assignments) == 1
+
+    assignment = transmission.assignments[0]
+
+    assert isinstance(assignment, netsgiro.Assignment)
+    assert assignment.service_code == netsgiro.ServiceCode.AVTALEGIRO
+    assert assignment.type == netsgiro.AssignmentType.AVTALEGIRO_AGREEMENTS
+    assert assignment.agreement_id is None
+    assert assignment.number == '0000002'
+    assert assignment.account == '99991042764'
+    assert len(assignment.transactions) == 16
+
+    agreement_1 = assignment.transactions[0]
+
+    assert isinstance(agreement_1, netsgiro.Agreement)
+    assert agreement_1.service_code == netsgiro.ServiceCode.AVTALEGIRO
+    assert agreement_1.transaction_type == (
+        netsgiro.TransactionType.AVTALEGIRO_AGREEMENTS)
+    assert agreement_1.number == 1
+
+    assert agreement_1.registration_type == (
+        netsgiro.AvtaleGiroRegistrationType.NEW_OR_UPDATED_AGREEMENTS)
+    assert agreement_1.kid == '000112000507155'
+    assert agreement_1.notify is True
+
+    agreement_2 = assignment.transactions[1]
+
+    assert isinstance(agreement_2, netsgiro.Agreement)
+    assert agreement_2.service_code == netsgiro.ServiceCode.AVTALEGIRO
+    assert agreement_2.transaction_type == (
+        netsgiro.TransactionType.AVTALEGIRO_AGREEMENTS)
+    assert agreement_2.number == 2
+
+    assert agreement_2.registration_type == (
+        netsgiro.AvtaleGiroRegistrationType.NEW_OR_UPDATED_AGREEMENTS)
+    assert agreement_2.kid == '001006300507304'
+    assert agreement_2.notify is False
+
+
 def test_parse_payment_request(payment_request_data):
     transmission = netsgiro.parse(payment_request_data)
 

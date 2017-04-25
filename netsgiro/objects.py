@@ -15,6 +15,7 @@ __all__ = [
     'Transmission',
     'Assignment',
     'Transaction',
+    'Agreement',
     'parse',
 ]
 
@@ -191,7 +192,7 @@ class Assignment:
 
     @classmethod
     def from_records(cls, records: List[Record]) -> 'Assignment':
-        """Build a Transmission object from a list of record objects."""
+        """Build an Assignment object from a list of record objects."""
         if len(records) < 2:
             raise ValueError(
                 'At least 2 records required, got {}'.format(len(records)))
@@ -201,6 +202,13 @@ class Assignment:
         assert isinstance(start, netsgiro.AssignmentStart)
         assert isinstance(end, netsgiro.AssignmentEnd)
 
+        if (
+                start.assignment_type ==
+                netsgiro.AssignmentType.AVTALEGIRO_AGREEMENTS):
+            transactions = get_agreements(body)
+        else:
+            transactions = get_transactions(body)
+
         return cls(
             service_code=start.service_code,
             type=start.assignment_type,
@@ -208,7 +216,7 @@ class Assignment:
             number=start.assignment_number,
             account=start.assignment_account,
             date=end.nets_date,
-            transactions=get_transactions(body)
+            transactions=transactions,
         )
 
     def to_records(self) -> Iterable[Record]:
@@ -380,21 +388,33 @@ class Assignment:
 
     def get_total_amount(self) -> Decimal:
         """Get the total amount from all transactions in the assignment."""
-        return sum(
-            transaction.amount
-            for transaction in self.transactions)
+        transactions = [
+            transaction
+            for transaction in self.transactions
+            if hasattr(transaction, 'amount')]
+        if not transactions:
+            return Decimal(0)
+        return sum(transaction.amount for transaction in transactions)
 
     def get_earliest_transaction_date(self) -> Optional[datetime.date]:
         """Get earliest date from the assignment's transactions."""
-        if not self.transactions:
+        transactions = [
+            transaction
+            for transaction in self.transactions
+            if hasattr(transaction, 'date')]
+        if not transactions:
             return None
-        return min(transaction.date for transaction in self.transactions)
+        return min(transaction.date for transaction in transactions)
 
     def get_latest_transaction_date(self) -> Optional[datetime.date]:
         """Get latest date from the assignment's transactions."""
-        if not self.transactions:
+        transactions = [
+            transaction
+            for transaction in self.transactions
+            if hasattr(transaction, 'date')]
+        if not transactions:
             return None
-        return max(transaction.date for transaction in self.transactions)
+        return max(transaction.date for transaction in transactions)
 
 
 def get_assignments(records: List[Record]) -> List[Assignment]:
@@ -413,6 +433,68 @@ def get_assignments(records: List[Record]) -> List[Assignment]:
             current_assignment_number = None
 
     return [Assignment.from_records(rs) for rs in assignments.values()]
+
+
+@attr.s
+class Agreement:
+    """Agreement contains an AvtaleGiro agreement update.
+
+    Agreements are only found in assignments of the
+    :attr:`~netsgiro.AssignmentType.AVTALEGIRO_AGREEMENTS` type, which are only
+    created by Nets.
+    """
+
+    #: The service code. One of :class:`~netsgiro.ServiceCode`.
+    service_code = attr.ib(convert=netsgiro.ServiceCode)
+
+    #: The transaction type. One of :class:`~netsgiro.TransactionType`.
+    transaction_type = attr.ib(convert=netsgiro.TransactionType)
+
+    #: Transaction number. Unique and ordered within an assignment.
+    number = attr.ib(validator=instance_of(int))
+
+    #: Type of agreement registration update.
+    #: One of :class:`~netsgiro.AvtaleGiroRegistrationType`.
+    registration_type = attr.ib(convert=netsgiro.AvtaleGiroRegistrationType)
+
+    #: KID number to identify the customer and invoice.
+    kid = attr.ib(validator=optional(instance_of(str)))
+
+    #: Whether the payer wants notification about payment requests.
+    notify = attr.ib(validator=instance_of(bool))
+
+    @classmethod
+    def from_records(cls, records: List[Record]) -> 'Agreement':
+        """Build an Agreement object from a list of record objects."""
+        assert len(records) == 1
+        record = records[0]
+        assert isinstance(record, netsgiro.AvtaleGiroAgreement)
+
+        return cls(
+            service_code=record.service_code,
+            transaction_type=record.transaction_type,
+            number=record.transaction_number,
+
+            registration_type=record.registration_type,
+            kid=record.kid,
+            notify=record.notify,
+        )
+
+    def to_records(self) -> Iterable[Record]:
+        """Convert the agreement to a list of records."""
+        yield netsgiro.AvtaleGiroAgreement(
+            service_code=self.service_code,
+            transaction_type=self.transaction_type,
+            transaction_number=self.number,
+
+            registration_type=self.registration_type,
+            kid=self.kid,
+            notify=self.notify,
+        )
+
+
+def get_agreements(records: List[Record]) -> List[Agreement]:
+    return [Agreement.from_records([r]) for r in records]
 
 
 @attr.s
@@ -503,6 +585,7 @@ class Transaction:
 
     @classmethod
     def from_records(cls, records: List[Record]) -> 'Transaction':
+        """Build a Transaction object from a list of record objects."""
         amount_item_1 = records.pop(0)
         assert isinstance(amount_item_1, netsgiro.TransactionAmountItem1)
         amount_item_2 = records.pop(0)
@@ -602,8 +685,6 @@ class Transaction:
 
                 text=self.text,
             )
-
-        # TODO Support constructing AvtaleGiroAgreement records
 
 
 def get_transactions(records: List[Record]) -> List[Transaction]:
