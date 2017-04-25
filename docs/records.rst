@@ -53,15 +53,15 @@ each line of input:
 >>> len(records)
 22
 >>> pprint(records)
-[TransmissionStart(service_code=<ServiceCode.NONE: 0>, transmission_number='1000081', data_transmitter='55555555', data_recipient='00008080', record_type=<RecordType.TRANSMISSION_START: 10>),
- AssignmentStart(service_code=<ServiceCode.AVTALEGIRO: 21>, assignment_type=<AssignmentType.TRANSACTIONS: 0>, assignment_number='4000086', assignment_account='88888888888', agreement_id='000000000', record_type=<RecordType.ASSIGNMENT_START: 20>),
- TransactionAmountItem1(service_code=<ServiceCode.AVTALEGIRO: 21>, transaction_type=<TransactionType.PURCHASE_WITH_TEXT: 21>, transaction_number=1, nets_date=datetime.date(2004, 6, 17), amount=100, kid='008000011688373', centre_id=None, day_code=None, partial_settlement_number=None, partial_settlement_serial_number=None, sign=None, record_type=<RecordType.TRANSACTION_AMOUNT_ITEM_1: 30>),
- TransactionAmountItem2(service_code=<ServiceCode.AVTALEGIRO: 21>, transaction_type=<TransactionType.PURCHASE_WITH_TEXT: 21>, transaction_number=1, reference=None, form_number=None, bank_date=None, debit_account=None, _filler=None, payer_name='NAVN', record_type=<RecordType.TRANSACTION_AMOUNT_ITEM_2: 31>),
- TransactionSpecification(service_code=<ServiceCode.AVTALEGIRO: 21>, transaction_type=<TransactionType.PURCHASE_WITH_TEXT: 21>, transaction_number=1, line_number=1, column_number=1, text=' Gjelder Faktura: 168837  Dato: 19/03/04', record_type=<RecordType.TRANSACTION_SPECIFICATION: 49>),
- TransactionSpecification(service_code=<ServiceCode.AVTALEGIRO: 21>, transaction_type=<TransactionType.PURCHASE_WITH_TEXT: 21>, transaction_number=1, line_number=1, column_number=2, text='                  ForfallsDato: 17/06/04', record_type=<RecordType.TRANSACTION_SPECIFICATION: 49>),
+[TransmissionStart(service_code=<ServiceCode.NONE: 0>, transmission_number='1000081', data_transmitter='55555555', data_recipient='00008080'),
+ AssignmentStart(service_code=<ServiceCode.AVTALEGIRO: 21>, assignment_type=<AssignmentType.TRANSACTIONS: 0>, assignment_number='4000086', assignment_account='88888888888', agreement_id='000000000'),
+ TransactionAmountItem1(service_code=<ServiceCode.AVTALEGIRO: 21>, transaction_type=<TransactionType.PURCHASE_WITH_TEXT: 21>, transaction_number=1, nets_date=datetime.date(2004, 6, 17), amount=100, kid='008000011688373', centre_id=None, day_code=None, partial_settlement_number=None, partial_settlement_serial_number=None, sign=None),
+ TransactionAmountItem2(service_code=<ServiceCode.AVTALEGIRO: 21>, transaction_type=<TransactionType.PURCHASE_WITH_TEXT: 21>, transaction_number=1, reference=None, form_number=None, bank_date=None, debit_account=None, _filler=None, payer_name='NAVN'),
+ TransactionSpecification(service_code=<ServiceCode.AVTALEGIRO: 21>, transaction_type=<TransactionType.PURCHASE_WITH_TEXT: 21>, transaction_number=1, line_number=1, column_number=1, text=' Gjelder Faktura: 168837  Dato: 19/03/04'),
+ TransactionSpecification(service_code=<ServiceCode.AVTALEGIRO: 21>, transaction_type=<TransactionType.PURCHASE_WITH_TEXT: 21>, transaction_number=1, line_number=1, column_number=2, text='                  ForfallsDato: 17/06/04'),
  ...
- AssignmentEnd(service_code=<ServiceCode.AVTALEGIRO: 21>, assignment_type=<AssignmentType.TRANSACTIONS: 0>, num_transactions=6, num_records=20, total_amount=600, nets_date_1=datetime.date(2004, 6, 17), nets_date_2=datetime.date(2004, 6, 17), nets_date_3=None, record_type=<RecordType.ASSIGNMENT_END: 88>),
- TransmissionEnd(service_code=<ServiceCode.NONE: 0>, num_transactions=6, num_records=22, total_amount=600, nets_date=datetime.date(2004, 6, 17), record_type=<RecordType.TRANSMISSION_END: 89>)]
+ AssignmentEnd(service_code=<ServiceCode.AVTALEGIRO: 21>, assignment_type=<AssignmentType.TRANSACTIONS: 0>, num_transactions=6, num_records=20, total_amount=600, nets_date_1=datetime.date(2004, 6, 17), nets_date_2=datetime.date(2004, 6, 17), nets_date_3=None),
+ TransmissionEnd(service_code=<ServiceCode.NONE: 0>, num_transactions=6, num_records=22, total_amount=600, nets_date=datetime.date(2004, 6, 17))]
 
 
 .. autofunction:: netsgiro.get_records
@@ -76,6 +76,8 @@ types:
 >>> assignment_end = records[-2]
 >>> assignment_end.service_code
 <ServiceCode.AVTALEGIRO: 21>
+>>> assignment_end.RECORD_TYPE
+<RecordType.ASSIGNMENT_END: 88>
 >>> assignment_end.assignment_type
 <AssignmentType.TRANSACTIONS: 0>
 >>> assignment_end.nets_date_earliest
