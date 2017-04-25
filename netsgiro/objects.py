@@ -1,6 +1,7 @@
 import collections
+import datetime
 from decimal import Decimal
-from typing import Iterable, List
+from typing import Iterable, List, Optional
 
 import attr
 
@@ -124,13 +125,13 @@ class Transmission:
         self.assignments.append(assignment)
         return assignment
 
-    def get_num_transactions(self):
+    def get_num_transactions(self) -> int:
         """Get number of transactions in the transmission."""
         return sum(
             assignment.get_num_transactions()
             for assignment in self.assignments)
 
-    def get_num_records(self):
+    def get_num_records(self) -> int:
         """Get number of records in the transmission.
 
         Includes the transmission's start and end record.
@@ -139,7 +140,7 @@ class Transmission:
             assignment.get_num_records()
             for assignment in self.assignments)
 
-    def get_total_amount(self):
+    def get_total_amount(self) -> Decimal:
         """Get the total amount from all transactions in the transmission."""
         return sum(
             assignment.get_total_amount()
@@ -347,11 +348,11 @@ class Assignment:
         self.transactions.append(transaction)
         return transaction
 
-    def get_num_transactions(self):
+    def get_num_transactions(self) -> int:
         """Get number of transactions in the assignment."""
         return len(self.transactions)
 
-    def get_num_records(self):
+    def get_num_records(self) -> int:
         """Get number of records in the assignment.
 
         Includes the assignment's start and end record.
@@ -361,19 +362,19 @@ class Assignment:
             len(list(transaction.to_records()))
             for transaction in self.transactions)
 
-    def get_total_amount(self):
+    def get_total_amount(self) -> Decimal:
         """Get the total amount from all transactions in the assignment."""
         return sum(
             transaction.amount
             for transaction in self.transactions)
 
-    def get_earliest_transaction_date(self):
+    def get_earliest_transaction_date(self) -> Optional[datetime.date]:
         """Get earliest date from the assignment's transactions."""
         if not self.transactions:
             return None
         return min(transaction.date for transaction in self.transactions)
 
-    def get_latest_transaction_date(self):
+    def get_latest_transaction_date(self) -> Optional[datetime.date]:
         """Get latest date from the assignment's transactions."""
         if not self.transactions:
             return None
@@ -479,7 +480,7 @@ class Transaction:
     payer_name = attr.ib()
 
     @property
-    def amount_in_cents(self):
+    def amount_in_cents(self) -> int:
         """Transaction amount in NOK cents."""
         return int(self.amount * 100)
 
