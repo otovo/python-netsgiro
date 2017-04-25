@@ -58,7 +58,7 @@ Each transmission can contain any number of assignments:
 1
 >>> assignment = transmission.assignments[0]
 >>> assignment
-Assignment(service_code=<ServiceCode.AVTALEGIRO: 21>, type=<AssignmentType.TRANSACTIONS: 0>, agreement_id='000000000', number='4000086', account='88888888888', date=None)
+Assignment(service_code=<ServiceCode.AVTALEGIRO: 21>, type=<AssignmentType.TRANSACTIONS: 0>, number='4000086', account='88888888888', agreement_id='000000000', date=None)
 >>> assignment.number
 '4000086'
 >>> assignment.get_earliest_transaction_date()
