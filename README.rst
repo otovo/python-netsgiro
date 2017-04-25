@@ -18,8 +18,13 @@ The netsgiro library supports:
 - Creating AvtaleGiro payment requests
 - Creating AvtaleGiro cancellations
 
-For details and code examples, see `the documentation
+For details and code examples, see `the netsgiro documentation
 <https://netsgiro.readthedocs.io/>`_.
+
+For details on the file formats and their semantics, please refer to the
+official `AvtaleGiro <https://www.avtalegiro.no/>`_ and
+`OCR Giro <https://www.nets.eu/no-nb/losninger/inn-og-utbetalinger/ocrgiro/Pages/default.aspx>`_
+documentation from Nets.
 
 
 License
