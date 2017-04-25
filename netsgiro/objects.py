@@ -16,13 +16,8 @@ __all__ = [
 ]
 
 
-class Serializable:
-    def to_dict(self):
-        return attr.asdict(self)
-
-
 @attr.s
-class Transmission(Serializable):
+class Transmission:
     """Transmission is the top-level object.
 
     An OCR file contains a single transmission. The transmission can contain
@@ -152,7 +147,7 @@ class Transmission(Serializable):
 
 
 @attr.s
-class Assignment(Serializable):
+class Assignment:
     """An Assignment groups multiple transactions within a transmission.
 
     Use :meth:`netsgiro.Transmission.add_assignment` to create assignments.
@@ -408,7 +403,7 @@ def get_assignments(records: List[Record]) -> List[Assignment]:
 
 
 @attr.s
-class Transaction(Serializable):
+class Transaction:
     """Transaction is the bottom-level object.
 
     To create a transaction, you will normally use the helper methods on

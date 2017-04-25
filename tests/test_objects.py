@@ -27,13 +27,3 @@ def test_assignment_from_zero_records_fails():
         netsgiro.Assignment.from_records([])
 
     assert 'At least 2 records required, got 0' in str(exc_info)
-
-
-def test_to_dict(transmission):
-    assert transmission.to_dict() == {
-        'number': '0000001',
-        'data_transmitter': '12341234',
-        'data_recipient': netsgiro.NETS_ID,
-        'nets_date': date(2004, 6, 17),
-        'assignments': [],
-    }
