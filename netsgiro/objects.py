@@ -1,7 +1,7 @@
 import collections
 import datetime
 from decimal import Decimal
-from typing import Iterable, List, Optional
+from typing import Iterable, List, Optional, Union
 
 import attr
 
@@ -109,8 +109,12 @@ class Transmission:
 
     def add_assignment(
             self, *,
-            service_code, assignment_type, agreement_id=None, number, account,
-            date=None
+            service_code: netsgiro.ServiceCode,
+            assignment_type: netsgiro.AssignmentType,
+            agreement_id: Optional[str]=None,
+            number: str,
+            account: str,
+            date: Optional[datetime.date]=None
             ) -> 'Assignment':
         """Add an assignment to the tranmission."""
 
@@ -246,8 +250,12 @@ class Assignment:
 
     def add_payment_request(
             self, *,
-            kid, due_date, amount,
-            reference=None, payer_name=None, bank_notification=None
+            kid: str,
+            due_date: datetime.date,
+            amount: Decimal,
+            reference: Optional[str]=None,
+            payer_name: Optional[str]=None,
+            bank_notification: Union[bool, str]=False
             ) -> 'Transaction':
         """Add an AvtaleGiro payment request to the assignment.
 
@@ -280,8 +288,12 @@ class Assignment:
 
     def add_payment_cancellation(
             self, *,
-            kid, due_date, amount,
-            reference=None, payer_name=None, bank_notification=None
+            kid: str,
+            due_date: datetime.date,
+            amount: Decimal,
+            reference: Optional[str]=None,
+            payer_name: Optional[str]=None,
+            bank_notification: Union[bool, str]=False
             ) -> 'Transaction':
         """Add an AvtaleGiro cancellation to the assignment.
 
