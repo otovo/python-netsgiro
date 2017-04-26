@@ -85,7 +85,7 @@ agreement updates:
  Agreement(service_code=<ServiceCode.AVTALEGIRO: 21>, number=16, registration_type=<AvtaleGiroRegistrationType.NEW_OR_UPDATED_AGREEMENT: 1>, kid='001186100509492', notify=False)]
 
 As you can see, all updates here are for new or updated agreements. If a payer
-deletes their AvtaleGiro agreemetn the ``registration_type`` field will be
+deletes their AvtaleGiro agreement the ``registration_type`` field will be
 :attr:`~netsgiro.AvtaleGiroRegistrationType.DELETED_AGREEMENT`.
 
 
