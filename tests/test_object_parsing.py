@@ -28,7 +28,7 @@ def test_parse_agreements(agreements_data):
 
     assert isinstance(agreement_1, netsgiro.Agreement)
     assert agreement_1.service_code == netsgiro.ServiceCode.AVTALEGIRO
-    assert agreement_1.transaction_type == (
+    assert agreement_1.TRANSACTION_TYPE == (
         netsgiro.TransactionType.AVTALEGIRO_AGREEMENTS)
     assert agreement_1.number == 1
 
@@ -41,7 +41,7 @@ def test_parse_agreements(agreements_data):
 
     assert isinstance(agreement_2, netsgiro.Agreement)
     assert agreement_2.service_code == netsgiro.ServiceCode.AVTALEGIRO
-    assert agreement_2.transaction_type == (
+    assert agreement_2.TRANSACTION_TYPE == (
         netsgiro.TransactionType.AVTALEGIRO_AGREEMENTS)
     assert agreement_2.number == 2
 

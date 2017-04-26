@@ -474,9 +474,6 @@ class Agreement:
     #: The service code. One of :class:`~netsgiro.ServiceCode`.
     service_code = attr.ib(convert=netsgiro.ServiceCode)
 
-    #: The transaction type. One of :class:`~netsgiro.TransactionType`.
-    transaction_type = attr.ib(convert=netsgiro.TransactionType)
-
     #: Transaction number. Unique and ordered within an assignment.
     number = attr.ib(validator=instance_of(int))
 
@@ -490,16 +487,21 @@ class Agreement:
     #: Whether the payer wants notification about payment requests.
     notify = attr.ib(validator=instance_of(bool))
 
+    TRANSACTION_TYPE = netsgiro.TransactionType.AVTALEGIRO_AGREEMENTS
+
     @classmethod
     def from_records(cls, records: List[Record]) -> 'Agreement':
         """Build an Agreement object from a list of record objects."""
+
         assert len(records) == 1
         record = records[0]
         assert isinstance(record, netsgiro.records.AvtaleGiroAgreement)
+        assert (
+            record.transaction_type ==
+            netsgiro.TransactionType.AVTALEGIRO_AGREEMENTS)
 
         return cls(
             service_code=record.service_code,
-            transaction_type=record.transaction_type,
             number=record.transaction_number,
 
             registration_type=record.registration_type,
@@ -511,7 +513,7 @@ class Agreement:
         """Convert the agreement to a list of records."""
         yield netsgiro.records.AvtaleGiroAgreement(
             service_code=self.service_code,
-            transaction_type=self.transaction_type,
+            transaction_type=self.TRANSACTION_TYPE,
             transaction_number=self.number,
 
             registration_type=self.registration_type,
