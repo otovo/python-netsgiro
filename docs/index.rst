@@ -5,6 +5,7 @@
     :maxdepth: 2
     :caption: Usage
 
+    quickstart
     objects
     records
     constants
