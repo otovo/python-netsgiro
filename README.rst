@@ -6,23 +6,27 @@ netsgiro is a Python library for working with `Nets <https://www.nets.eu/>`_
 AvtaleGiro and OCR Giro files.
 
 AvtaleGiro is a direct debit solution that is in widespread use in Norway, with
-more than 15 000 companies offering to their customers. OCR Giro files are used
-by Nets and Norwegian banks to update payees on recent payments done to their
-accounts.  In combination, AvtaleGiro and OCR Giro allows for a high level of
+more than 15 000 companies offering it to their customers. OCR Giro is used by
+Nets and Norwegian banks to update payees on recent deposits to their bank
+accounts. In combination, AvtaleGiro and OCR Giro allows for a high level of
 automation of invoicing and payment processing.
 
 The netsgiro library supports:
 
-- Parsing OCR Giro transactions
 - Parsing AvtaleGiro agreements
 - Creating AvtaleGiro payment requests
 - Creating AvtaleGiro cancellations
+- Parsing OCR Giro transactions
+
+netsgiro is available from PyPI. To install it, run::
+
+    pip install netsgiro
 
 For details and code examples, see `the netsgiro documentation
 <https://netsgiro.readthedocs.io/>`_.
 
-For details on the file formats and their semantics, please refer to the
-official `AvtaleGiro <https://www.avtalegiro.no/>`_ and
+For further details, please refer to the official
+`AvtaleGiro <https://www.avtalegiro.no/>`_ and
 `OCR Giro <https://www.nets.eu/no-nb/losninger/inn-og-utbetalinger/ocrgiro/Pages/default.aspx>`_
 documentation from Nets.
 
@@ -30,9 +34,8 @@ documentation from Nets.
 License
 =======
 
-Copyright 2017 Otovo AS.
-
-Licensed under the Apache License, Version 2.0. See the ``LICENSE`` file.
+Copyright 2017 `Otovo AS <https://www.otovo.no/>`_. Licensed under the Apache
+License, Version 2.0. See the ``LICENSE`` file for the full license text.
 
 
 Project resources
