@@ -73,7 +73,7 @@ def test_parse_payment_request(payment_request_data):
 
     transaction = assignment.transactions[0]
 
-    assert isinstance(transaction, netsgiro.Transaction)
+    assert isinstance(transaction, netsgiro.PaymentRequest)
     assert transaction.service_code == netsgiro.ServiceCode.AVTALEGIRO
     assert transaction.type == (
         netsgiro.TransactionType.AVTALEGIRO_WITH_BANK_NOTIFICATION)

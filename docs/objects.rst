@@ -71,12 +71,12 @@ Decimal('6')
 Each assignment can contain any number of transactions:
 
 >>> pprint(assignment.transactions)
-[Transaction(service_code=<ServiceCode.AVTALEGIRO: 21>, type=<TransactionType.PURCHASE_WITH_TEXT: 21>, number=1, date=datetime.date(2004, 6, 17), amount=Decimal('1'), kid='008000011688373', reference=None, text=' Gjelder Faktura: 168837  Dato: 19/03/04                  ForfallsDato: 17/06/04\n', centre_id=None, day_code=None, partial_settlement_number=None, partial_settlement_serial_number=None, sign=None, form_number=None, bank_date=None, debit_account=None, _filler=None, payer_name='NAVN'),
- Transaction(service_code=<ServiceCode.AVTALEGIRO: 21>, type=<TransactionType.PURCHASE_WITH_TEXT: 21>, number=2, date=datetime.date(2004, 6, 17), amount=Decimal('1'), kid='008000021688389', reference=None, text=' Gjelder Faktura: 168838  Dato: 19/03/04                  ForfallsDato: 17/06/04\n', centre_id=None, day_code=None, partial_settlement_number=None, partial_settlement_serial_number=None, sign=None, form_number=None, bank_date=None, debit_account=None, _filler=None, payer_name='NAVN'),
- Transaction(service_code=<ServiceCode.AVTALEGIRO: 21>, type=<TransactionType.PURCHASE_WITH_TEXT: 21>, number=3, date=datetime.date(2004, 6, 17), amount=Decimal('1'), kid='008000031688395', reference=None, text='', centre_id=None, day_code=None, partial_settlement_number=None, partial_settlement_serial_number=None, sign=None, form_number=None, bank_date=None, debit_account=None, _filler=None, payer_name='NAVN'),
- Transaction(service_code=<ServiceCode.AVTALEGIRO: 21>, type=<TransactionType.PURCHASE_WITH_TEXT: 21>, number=4, date=datetime.date(2004, 6, 17), amount=Decimal('1'), kid='008000041688401', reference=None, text='', centre_id=None, day_code=None, partial_settlement_number=None, partial_settlement_serial_number=None, sign=None, form_number=None, bank_date=None, debit_account=None, _filler=None, payer_name='NAVN'),
- Transaction(service_code=<ServiceCode.AVTALEGIRO: 21>, type=<TransactionType.PURCHASE_WITH_TEXT: 21>, number=5, date=datetime.date(2004, 6, 17), amount=Decimal('1'), kid='008000051688416', reference=None, text=' Gjelder Faktura: 168841  Dato: 19/03/04                  ForfallsDato: 17/06/04\n', centre_id=None, day_code=None, partial_settlement_number=None, partial_settlement_serial_number=None, sign=None, form_number=None, bank_date=None, debit_account=None, _filler=None, payer_name='NAVN'),
- Transaction(service_code=<ServiceCode.AVTALEGIRO: 21>, type=<TransactionType.AVTALEGIRO_WITH_PAYEE_NOTIFICATION: 2>, number=6, date=datetime.date(2004, 6, 17), amount=Decimal('1'), kid='008000061688422', reference=None, text='', centre_id=None, day_code=None, partial_settlement_number=None, partial_settlement_serial_number=None, sign=None, form_number=None, bank_date=None, debit_account=None, _filler=None, payer_name='NAVN')]
+[PaymentRequest(service_code=<ServiceCode.AVTALEGIRO: 21>, type=<TransactionType.PURCHASE_WITH_TEXT: 21>, number=1, date=datetime.date(2004, 6, 17), amount=Decimal('1'), kid='008000011688373', reference=None, text=' Gjelder Faktura: 168837  Dato: 19/03/04                  ForfallsDato: 17/06/04\n', payer_name='NAVN'),
+ PaymentRequest(service_code=<ServiceCode.AVTALEGIRO: 21>, type=<TransactionType.PURCHASE_WITH_TEXT: 21>, number=2, date=datetime.date(2004, 6, 17), amount=Decimal('1'), kid='008000021688389', reference=None, text=' Gjelder Faktura: 168838  Dato: 19/03/04                  ForfallsDato: 17/06/04\n', payer_name='NAVN'),
+ PaymentRequest(service_code=<ServiceCode.AVTALEGIRO: 21>, type=<TransactionType.PURCHASE_WITH_TEXT: 21>, number=3, date=datetime.date(2004, 6, 17), amount=Decimal('1'), kid='008000031688395', reference=None, text='', payer_name='NAVN'),
+ PaymentRequest(service_code=<ServiceCode.AVTALEGIRO: 21>, type=<TransactionType.PURCHASE_WITH_TEXT: 21>, number=4, date=datetime.date(2004, 6, 17), amount=Decimal('1'), kid='008000041688401', reference=None, text='', payer_name='NAVN'),
+ PaymentRequest(service_code=<ServiceCode.AVTALEGIRO: 21>, type=<TransactionType.PURCHASE_WITH_TEXT: 21>, number=5, date=datetime.date(2004, 6, 17), amount=Decimal('1'), kid='008000051688416', reference=None, text=' Gjelder Faktura: 168841  Dato: 19/03/04                  ForfallsDato: 17/06/04\n', payer_name='NAVN'),
+ PaymentRequest(service_code=<ServiceCode.AVTALEGIRO: 21>, type=<TransactionType.AVTALEGIRO_WITH_PAYEE_NOTIFICATION: 2>, number=6, date=datetime.date(2004, 6, 17), amount=Decimal('1'), kid='008000061688422', reference=None, text='', payer_name='NAVN')]
 
 
 Payment request
@@ -104,7 +104,7 @@ Add a AvtaleGiro transaction assignment to the transmission using
 Add one or more payment requests to the assignment using
 :meth:`~netsgiro.Assignment.add_payment_request`:
 
->>> transaction = assignment.add_payment_request(
+>>> payment_request = assignment.add_payment_request(
 ...     kid='000133700501645',
 ...     due_date=date(2017, 4, 6),
 ...     amount=Decimal('5244.63'),
@@ -206,6 +206,11 @@ Transaction classes
 ===================
 
 .. autoclass:: netsgiro.Agreement
+   :members:
+   :undoc-members:
+   :inherited-members:
+
+.. autoclass:: netsgiro.PaymentRequest
    :members:
    :undoc-members:
    :inherited-members:

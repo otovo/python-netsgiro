@@ -1,7 +1,7 @@
 import collections
 import datetime
 from decimal import Decimal
-from typing import Iterable, List, Optional, Union
+from typing import Iterable, List, Mapping, Optional, Union
 
 import attr
 from attr.validators import instance_of, optional
@@ -14,8 +14,9 @@ from netsgiro.validators import str_of_length
 __all__ = [
     'Transmission',
     'Assignment',
-    'Transaction',
     'Agreement',
+    'PaymentRequest',
+    'Transaction',
     'parse',
 ]
 
@@ -203,7 +204,8 @@ class Assignment:
     date = attr.ib(
         default=None, validator=optional(instance_of(datetime.date)))
 
-    #: List of transactions.
+    #: List of transaction objects, like :class:`~netsgiro.Agreement`,
+    #: :class:`~netsgiro.PaymentRequest`, :class:`~netsgiro.Transaction`.
     transactions = attr.ib(default=attr.Factory(list), repr=False)
 
     _next_transaction_number = 1
@@ -220,12 +222,18 @@ class Assignment:
         assert isinstance(start, netsgiro.AssignmentStart)
         assert isinstance(end, netsgiro.AssignmentEnd)
 
-        if (
-                start.assignment_type ==
-                netsgiro.AssignmentType.AVTALEGIRO_AGREEMENTS):
-            transactions = cls._get_agreements(body)
-        else:
+        if start.service_code == netsgiro.ServiceCode.AVTALEGIRO:
+            if (
+                    start.assignment_type ==
+                    netsgiro.AssignmentType.AVTALEGIRO_AGREEMENTS):
+                transactions = cls._get_agreements(body)
+            else:
+                transactions = cls._get_payment_requests(body)
+        elif start.service_code == netsgiro.ServiceCode.OCR_GIRO:
             transactions = cls._get_transactions(body)
+        else:
+            raise ValueError(
+                'Unknown service code: {}'.format(start.service_code))
 
         return cls(
             service_code=start.service_code,
@@ -241,8 +249,21 @@ class Assignment:
     def _get_agreements(records: List[Record]) -> List['Agreement']:
         return [Agreement.from_records([r]) for r in records]
 
+    @classmethod
+    def _get_payment_requests(
+            cls, records: List[Record]) -> List['PaymentRequest']:
+        transactions = cls._group_by_transaction_number(records)
+        return [
+            PaymentRequest.from_records(rs) for rs in transactions.values()]
+
+    @classmethod
+    def _get_transactions(cls, records: List[Record]) -> List['Transaction']:
+        transactions = cls._group_by_transaction_number(records)
+        return [Transaction.from_records(rs) for rs in transactions.values()]
+
     @staticmethod
-    def _get_transactions(records: List[Record]) -> List['Transaction']:
+    def _group_by_transaction_number(
+            records: List[Record]) -> Mapping[int, List[Record]]:
         transactions = collections.OrderedDict()
 
         for record in records:
@@ -250,7 +271,7 @@ class Assignment:
                 transactions[record.transaction_number] = []
             transactions[record.transaction_number].append(record)
 
-        return [Transaction.from_records(rs) for rs in transactions.values()]
+        return transactions
 
     def to_records(self) -> Iterable[Record]:
         """Convert the assignment to a list of records."""
@@ -380,7 +401,7 @@ class Assignment:
         number = self._next_transaction_number
         self._next_transaction_number += 1
 
-        transaction = Transaction(
+        transaction = PaymentRequest(
             service_code=self.service_code,
             type=transaction_type,
             number=number,
@@ -389,16 +410,6 @@ class Assignment:
             kid=kid,
             reference=reference,
             text=text,
-
-            centre_id=None,
-            day_code=None,
-            partial_settlement_number=None,
-            partial_settlement_serial_number=None,
-            sign=None,
-            form_number=None,
-            bank_date=None,
-            debit_account=None,
-            filler=None,
 
             payer_name=payer_name,
         )
@@ -509,11 +520,11 @@ class Agreement:
 
 
 @attr.s
-class Transaction:
-    """Transaction is the bottom-level object.
+class PaymentRequest:
+    """PaymentRequest contains an AvtaleGiro payment request or cancellation.
 
     To create a transaction, you will normally use the helper methods on
-    :class:`~netsgiro.Assignment`, e.g.
+    :class:`~netsgiro.Assignment`:
     :meth:`~netsgiro.Assignment.add_payment_request` and
     :meth:`~netsgiro.Assignment.add_payment_cancellation`.
     """
@@ -527,8 +538,6 @@ class Transaction:
     #: Transaction number. Unique and ordered within an assignment.
     number = attr.ib(validator=instance_of(int))
 
-    #: For OCR Giro, the value is Nets' processing date.
-    #:
     #: For AvtaleGiro, this is the payment due date.
     date = attr.ib(validator=instance_of(datetime.date))
 
@@ -538,21 +547,110 @@ class Transaction:
     #: KID number to identify the customer and invoice.
     kid = attr.ib(validator=optional(instance_of(str)))
 
-    #: For OCR Giro, the value depends on the payment method.
-    #:
-    #: For AvtaleGiro, this is a specification line that will, if set, be
-    #: displayed on the payers account statement. Alphanumeric, max 25 chars.
+    #: This is a specification line that will, if set, be displayed on the
+    #: payers account statement. Alphanumeric, max 25 chars.
     reference = attr.ib(validator=optional(instance_of(str)))
 
-    #: For OCR Giro, the value is up to 40 chars of free text from the payment
-    #: terminal.
-    #:
-    #: For AvtaleGiro, this is up to 42 lines of 80 chars each of free text
-    #: used by the bank to notify the payer about the payment request. It is
-    #: not used if the payee is responsible for notifying the payer.
+    #: This is up to 42 lines of 80 chars each of free text used by the bank to
+    #: notify the payer about the payment request. It is not used if the payee
+    #: is responsible for notifying the payer.
     text = attr.ib(validator=optional(instance_of(str)))
 
-    # --- Specific to OCR Giro
+    #: The value is only used to help the payee cross-reference reports from
+    #: Nets with their own records. It is not visible to the payer.
+    payer_name = attr.ib(validator=optional(instance_of(str)))
+
+    @property
+    def amount_in_cents(self) -> int:
+        """Transaction amount in NOK cents."""
+        return int(self.amount * 100)
+
+    @classmethod
+    def from_records(cls, records: List[Record]) -> 'Transaction':
+        """Build a Transaction object from a list of record objects."""
+        amount_item_1 = records.pop(0)
+        assert isinstance(amount_item_1, netsgiro.TransactionAmountItem1)
+        amount_item_2 = records.pop(0)
+        assert isinstance(amount_item_2, netsgiro.TransactionAmountItem2)
+
+        text = netsgiro.TransactionSpecification.to_text(records)
+
+        return cls(
+            service_code=amount_item_1.service_code,
+            type=amount_item_1.transaction_type,
+            number=amount_item_1.transaction_number,
+            date=amount_item_1.nets_date,
+            amount=Decimal(amount_item_1.amount) / 100,
+            kid=amount_item_1.kid,
+            reference=amount_item_2.reference,
+            text=text,
+
+            payer_name=amount_item_2.payer_name,
+        )
+
+    def to_records(self) -> Iterable[Record]:
+        """Convert the transaction to a list of records."""
+        yield netsgiro.TransactionAmountItem1(
+            service_code=self.service_code,
+            transaction_type=self.type,
+            transaction_number=self.number,
+
+            nets_date=self.date,
+            amount=self.amount_in_cents,
+            kid=self.kid,
+        )
+        yield netsgiro.TransactionAmountItem2(
+            service_code=self.service_code,
+            transaction_type=self.type,
+            transaction_number=self.number,
+
+            reference=self.reference,
+            payer_name=self.payer_name,
+        )
+
+        if self.type == (
+                netsgiro.TransactionType.AVTALEGIRO_WITH_BANK_NOTIFICATION):
+            yield from netsgiro.TransactionSpecification.from_text(
+                service_code=self.service_code,
+                transaction_type=self.type,
+                transaction_number=self.number,
+
+                text=self.text,
+            )
+
+
+@attr.s
+class Transaction:
+    """Transaction contains an OCR Giro transaction.
+
+    Transactions are found in assignments with the service code
+    :attr:`~netsgiro.ServiceCode.OCR_GIRO` type, which are only
+    created by Nets.
+    """
+
+    #: The service code. One of :class:`~netsgiro.ServiceCode`.
+    service_code = attr.ib(convert=netsgiro.ServiceCode)
+
+    #: The transaction type. One of :class:`~netsgiro.TransactionType`.
+    type = attr.ib(convert=netsgiro.TransactionType)
+
+    #: Transaction number. Unique and ordered within an assignment.
+    number = attr.ib(validator=instance_of(int))
+
+    #: Nets' processing date.
+    date = attr.ib(validator=instance_of(datetime.date))
+
+    #: Transaction amount in NOK with two decimals.
+    amount = attr.ib(convert=Decimal)
+
+    #: KID number to identify the customer and invoice.
+    kid = attr.ib(validator=optional(instance_of(str)))
+
+    #: The value depends on the payment method.
+    reference = attr.ib(validator=optional(instance_of(str)))
+
+    #: Up to 40 chars of free text from the payment terminal.
+    text = attr.ib(validator=optional(instance_of(str)))
 
     #: Used for OCR Giro.
     centre_id = attr.ib(validator=optional(str_of_length(2)))
@@ -581,14 +679,6 @@ class Transaction:
 
     _filler = attr.ib(validator=optional(str_of_length(7)))
 
-    # --- Specific to AvtaleGiro
-
-    #: Used for AvtaleGiro.
-    #:
-    #: The value is only used to help the payee cross-reference reports from
-    #: Nets with their own records. It is not visible to the payer.
-    payer_name = attr.ib(validator=optional(instance_of(str)))
-
     @property
     def amount_in_cents(self) -> int:
         """Transaction amount in NOK cents."""
@@ -602,15 +692,10 @@ class Transaction:
         amount_item_2 = records.pop(0)
         assert isinstance(amount_item_2, netsgiro.TransactionAmountItem2)
 
-        if amount_item_1.service_code == netsgiro.ServiceCode.OCR_GIRO:
-            if (
-                    len(records) == 1 and
-                    isinstance(records[0], netsgiro.TransactionAmountItem3)):
-                text = records[0].text
-            else:
-                text = None
-        elif amount_item_1.service_code == netsgiro.ServiceCode.AVTALEGIRO:
-            text = netsgiro.TransactionSpecification.to_text(records)
+        if (
+                len(records) == 1 and
+                isinstance(records[0], netsgiro.TransactionAmountItem3)):
+            text = records[0].text
         else:
             text = None
 
@@ -624,7 +709,6 @@ class Transaction:
             reference=amount_item_2.reference,
             text=text,
 
-            # Specific to OCR Giro
             centre_id=amount_item_1.centre_id,
             day_code=amount_item_1.day_code,
             partial_settlement_number=amount_item_1.partial_settlement_number,
@@ -635,9 +719,6 @@ class Transaction:
             bank_date=amount_item_2.bank_date,
             debit_account=amount_item_2.debit_account,
             filler=amount_item_2._filler,
-
-            # Specific to AvtaleGiro
-            payer_name=amount_item_2.payer_name,
         )
 
     def to_records(self) -> Iterable[Record]:
@@ -651,7 +732,6 @@ class Transaction:
             amount=self.amount_in_cents,
             kid=self.kid,
 
-            # Only OCR Giro
             centre_id=self.centre_id,
             day_code=self.day_code,
             partial_settlement_number=self.partial_settlement_number,
@@ -665,36 +745,16 @@ class Transaction:
             transaction_number=self.number,
 
             reference=self.reference,
-
-            # Only OCR Giro
             form_number=self.form_number,
             bank_date=self.bank_date,
             debit_account=self.debit_account,
             filler=self._filler,
-
-            # Only AvtaleGiro
-            payer_name=self.payer_name,
         )
 
-        if (
-                self.service_code == netsgiro.ServiceCode.OCR_GIRO and
-                self.type in (
-                    netsgiro.TransactionType.REVERSING_WITH_TEXT,
-                    netsgiro.TransactionType.PURCHASE_WITH_TEXT)):
+        if self.type in (
+                netsgiro.TransactionType.REVERSING_WITH_TEXT,
+                netsgiro.TransactionType.PURCHASE_WITH_TEXT):
             yield netsgiro.TransactionAmountItem3(
-                service_code=self.service_code,
-                transaction_type=self.type,
-                transaction_number=self.number,
-
-                text=self.text,
-            )
-
-        if (
-                self.service_code == netsgiro.ServiceCode.AVTALEGIRO and
-                self.type == (
-                    netsgiro.TransactionType.AVTALEGIRO_WITH_BANK_NOTIFICATION)
-                ):
-            yield from netsgiro.TransactionSpecification.from_text(
                 service_code=self.service_code,
                 transaction_type=self.type,
                 transaction_number=self.number,
