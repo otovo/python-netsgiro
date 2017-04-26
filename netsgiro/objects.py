@@ -65,8 +65,26 @@ class Transmission:
             data_transmitter=start.data_transmitter,
             data_recipient=start.data_recipient,
             date=end.nets_date,
-            assignments=get_assignments(body),
+            assignments=cls._get_assignments(body),
         )
+
+    @staticmethod
+    def _get_assignments(records: List[Record]) -> List['Assignment']:
+        assignments = collections.OrderedDict()
+
+        current_assignment_number = None
+        for record in records:
+            if isinstance(record, netsgiro.AssignmentStart):
+                current_assignment_number = record.assignment_number
+                assignments[current_assignment_number] = []
+            if current_assignment_number is None:
+                raise ValueError(
+                    'Expected AssignmentStart record, got {!r}'.format(record))
+            assignments[current_assignment_number].append(record)
+            if isinstance(record, netsgiro.AssignmentEnd):
+                current_assignment_number = None
+
+        return [Assignment.from_records(rs) for rs in assignments.values()]
 
     def to_ocr(self) -> str:
         """Convert the transmission to an OCR string."""
@@ -205,9 +223,9 @@ class Assignment:
         if (
                 start.assignment_type ==
                 netsgiro.AssignmentType.AVTALEGIRO_AGREEMENTS):
-            transactions = get_agreements(body)
+            transactions = cls._get_agreements(body)
         else:
-            transactions = get_transactions(body)
+            transactions = cls._get_transactions(body)
 
         return cls(
             service_code=start.service_code,
@@ -218,6 +236,21 @@ class Assignment:
             date=end.nets_date,
             transactions=transactions,
         )
+
+    @staticmethod
+    def _get_agreements(records: List[Record]) -> List['Agreement']:
+        return [Agreement.from_records([r]) for r in records]
+
+    @staticmethod
+    def _get_transactions(records: List[Record]) -> List['Transaction']:
+        transactions = collections.OrderedDict()
+
+        for record in records:
+            if record.transaction_number not in transactions:
+                transactions[record.transaction_number] = []
+            transactions[record.transaction_number].append(record)
+
+        return [Transaction.from_records(rs) for rs in transactions.values()]
 
     def to_records(self) -> Iterable[Record]:
         """Convert the assignment to a list of records."""
@@ -417,24 +450,6 @@ class Assignment:
         return max(transaction.date for transaction in transactions)
 
 
-def get_assignments(records: List[Record]) -> List[Assignment]:
-    assignments = collections.OrderedDict()
-
-    current_assignment_number = None
-    for record in records:
-        if isinstance(record, netsgiro.AssignmentStart):
-            current_assignment_number = record.assignment_number
-            assignments[current_assignment_number] = []
-        if current_assignment_number is None:
-            raise ValueError(
-                'Expected AssignmentStart record, got {!r}'.format(record))
-        assignments[current_assignment_number].append(record)
-        if isinstance(record, netsgiro.AssignmentEnd):
-            current_assignment_number = None
-
-    return [Assignment.from_records(rs) for rs in assignments.values()]
-
-
 @attr.s
 class Agreement:
     """Agreement contains an AvtaleGiro agreement update.
@@ -491,10 +506,6 @@ class Agreement:
             kid=self.kid,
             notify=self.notify,
         )
-
-
-def get_agreements(records: List[Record]) -> List[Agreement]:
-    return [Agreement.from_records([r]) for r in records]
 
 
 @attr.s
@@ -592,7 +603,12 @@ class Transaction:
         assert isinstance(amount_item_2, netsgiro.TransactionAmountItem2)
 
         if amount_item_1.service_code == netsgiro.ServiceCode.OCR_GIRO:
-            text = get_ocr_giro_text(records)
+            if (
+                    len(records) == 1 and
+                    isinstance(records[0], netsgiro.TransactionAmountItem3)):
+                text = records[0].text
+            else:
+                text = None
         elif amount_item_1.service_code == netsgiro.ServiceCode.AVTALEGIRO:
             text = netsgiro.TransactionSpecification.to_text(records)
         else:
@@ -685,24 +701,6 @@ class Transaction:
 
                 text=self.text,
             )
-
-
-def get_transactions(records: List[Record]) -> List[Transaction]:
-    transactions = collections.OrderedDict()
-
-    for record in records:
-        if record.transaction_number not in transactions:
-            transactions[record.transaction_number] = []
-        transactions[record.transaction_number].append(record)
-
-    return [Transaction.from_records(rs) for rs in transactions.values()]
-
-
-def get_ocr_giro_text(records: List[Record]) -> str:
-    if (
-            len(records) == 1 and
-            isinstance(records[0], netsgiro.TransactionAmountItem3)):
-        return records[0].text
 
 
 def parse(data: str) -> Transmission:
