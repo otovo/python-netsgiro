@@ -772,5 +772,6 @@ class Transaction:
 
 
 def parse(data: str) -> Transmission:
+    """Parses an OCR file into a Transmission object."""
     records = netsgiro.records.parse(data)
     return Transmission.from_records(records)

@@ -2,6 +2,8 @@
 Objects API
 ===========
 
+.. module:: netsgiro
+
 The objects API is the higher level API. It parses the "OCR" file into an
 object structure that for most use cases is more pleasant to work with than the
 lower level :doc:`records API <records>`.
@@ -10,10 +12,13 @@ See :doc:`the quickstart guide <quickstart>` for an introduction to how to use
 the API.
 
 
+.. autofunction:: parse
+
+
 Transmission class
 ==================
 
-.. autoclass:: netsgiro.Transmission
+.. autoclass:: Transmission
    :members:
    :undoc-members:
    :inherited-members:
@@ -22,7 +27,7 @@ Transmission class
 Assignment class
 ================
 
-.. autoclass:: netsgiro.Assignment
+.. autoclass:: Assignment
    :members:
    :undoc-members:
    :inherited-members:
@@ -31,17 +36,17 @@ Assignment class
 Transaction classes
 ===================
 
-.. autoclass:: netsgiro.Agreement
+.. autoclass:: Agreement
    :members:
    :undoc-members:
    :inherited-members:
 
-.. autoclass:: netsgiro.PaymentRequest
+.. autoclass:: PaymentRequest
    :members:
    :undoc-members:
    :inherited-members:
 
-.. autoclass:: netsgiro.Transaction
+.. autoclass:: Transaction
    :members:
    :undoc-members:
    :inherited-members:
