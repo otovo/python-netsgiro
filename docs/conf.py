@@ -85,8 +85,6 @@ doctest_path = [
 
 doctest_global_setup = """
 from pprint import pprint
-import netsgiro
-import netsgiro.records
 """
 
 doctest_test_doctest_blocks = 'default'

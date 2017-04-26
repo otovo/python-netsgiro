@@ -46,6 +46,7 @@ For the purpose of the following example we use the following input data:
 :meth:`netsgiro.parse` parses the input and returns a
 :class:`netsgiro.Transmission` object:
 
+>>> import netsgiro
 >>> transmission = netsgiro.parse(data)
 >>> transmission
 Transmission(number='1091949', data_transmitter='00008080', data_recipient='00010200', date=datetime.date(2017, 4, 19))
@@ -99,6 +100,7 @@ recipient:
 
 >>> from datetime import date
 >>> from decimal import Decimal
+>>> import netsgiro
 >>> transmission = netsgiro.Transmission(
 ... 	number='1703231',
 ...	data_transmitter='01234567',
@@ -157,6 +159,7 @@ to creating payment requests. You start with a :class:`~netsgiro.Transmission`:
 
 >>> from datetime import date
 >>> from decimal import Decimal
+>>> import netsgiro
 >>> transmission = netsgiro.Transmission(
 ... 	number='1703232',
 ...	data_transmitter='01234567',
@@ -259,6 +262,7 @@ For the purpose of the following example we use the following input data:
 :meth:`netsgiro.parse` parses the input and returns a
 :class:`netsgiro.Transmission` object:
 
+>>> import netsgiro
 >>> transmission = netsgiro.parse(data)
 >>> transmission
 Transmission(number='0170031', data_transmitter='00008080', data_recipient='00010200', date=datetime.date(1992, 1, 20))

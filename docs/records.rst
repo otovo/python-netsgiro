@@ -51,6 +51,7 @@ For the purpose of the following example we use the following input data:
 :meth:`netsgiro.records.parse` parses the input and returns a record object for
 each line of input:
 
+>>> import netsgiro.records
 >>> records = netsgiro.records.parse(data)
 >>> len(records)
 22

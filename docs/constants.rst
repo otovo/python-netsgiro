@@ -7,6 +7,7 @@ Constants
 
     Nets' data sender/recipient ID
 
+    >>> import netsgiro
     >>> netsgiro.NETS_ID
     '00008080'
 
