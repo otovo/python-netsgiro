@@ -5,7 +5,7 @@ Constants
 
 .. data:: netsgiro.NETS_ID
 
-    Nets' data sender/recipient ID
+    Nets' data transmitter/recipient ID
 
     >>> import netsgiro
     >>> netsgiro.NETS_ID
