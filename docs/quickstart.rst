@@ -151,8 +151,8 @@ To save the result a file with the correct encoding::
 	fh.write(data)
 
 
-Payment cancellation
-====================
+Building payment cancellations
+==============================
 
 To cancel one or more AvtaleGiro payment requests, the process is very similar
 to creating payment requests. You start with a :class:`~netsgiro.Transmission`:
