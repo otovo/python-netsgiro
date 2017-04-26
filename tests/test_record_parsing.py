@@ -3,10 +3,11 @@ from datetime import date
 import pytest
 
 import netsgiro
+import netsgiro.records
 
 
 def test_transmission_start():
-    record = netsgiro.TransmissionStart.from_string(
+    record = netsgiro.records.TransmissionStart.from_string(
         'NY00001055555555100008100008080000000000'
         '0000000000000000000000000000000000000000'
     )
@@ -23,7 +24,7 @@ def test_transmission_start_fails_when_invalid_format():
     line = 'XX' + ('0' * 78)
 
     with pytest.raises(ValueError) as exc_info:
-        netsgiro.TransmissionStart.from_string(line)
+        netsgiro.records.TransmissionStart.from_string(line)
 
     assert (
         '{!r} did not match TransmissionStart record format'.format(line)
@@ -32,7 +33,7 @@ def test_transmission_start_fails_when_invalid_format():
 
 
 def test_transmission_end():
-    record = netsgiro.TransmissionEnd.from_string(
+    record = netsgiro.records.TransmissionEnd.from_string(
         'NY00008900000006000000220000000000000060'
         '0170604000000000000000000000000000000000'
     )
@@ -47,7 +48,7 @@ def test_transmission_end():
 
 
 def test_assignment_start_for_avtalegiro_payment_requests():
-    record = netsgiro.AssignmentStart.from_string(
+    record = netsgiro.records.AssignmentStart.from_string(
         'NY21002000000000040000868888888888800000'
         '0000000000000000000000000000000000000000'
     )
@@ -63,7 +64,7 @@ def test_assignment_start_for_avtalegiro_payment_requests():
 
 
 def test_assignment_start_for_avtalegiro_agreements():
-    record = netsgiro.AssignmentStart.from_string(
+    record = netsgiro.records.AssignmentStart.from_string(
         'NY21242000000000040000868888888888800000'
         '0000000000000000000000000000000000000000'
     )
@@ -80,7 +81,7 @@ def test_assignment_start_for_avtalegiro_agreements():
 
 
 def test_assignment_start_for_avtalegiro_cancellation():
-    record = netsgiro.AssignmentStart.from_string(
+    record = netsgiro.records.AssignmentStart.from_string(
         'NY21362000000000040000868888888888800000'
         '0000000000000000000000000000000000000000'
     )
@@ -97,7 +98,7 @@ def test_assignment_start_for_avtalegiro_cancellation():
 
 
 def test_assignment_start_for_ocr_giro_transactions():
-    record = netsgiro.AssignmentStart.from_string(
+    record = netsgiro.records.AssignmentStart.from_string(
         'NY09002000100856600000029999104276400000'
         '0000000000000000000000000000000000000000'
     )
@@ -113,7 +114,7 @@ def test_assignment_start_for_ocr_giro_transactions():
 
 
 def test_assignment_end_for_avtalegiro_payment_requests():
-    record = netsgiro.AssignmentEnd.from_string(
+    record = netsgiro.records.AssignmentEnd.from_string(
         'NY21008800000006000000200000000000000060'
         '0170604170604000000000000000000000000000'
     )
@@ -131,7 +132,7 @@ def test_assignment_end_for_avtalegiro_payment_requests():
 
 
 def test_assignment_end_for_avtalegiro_agreements():
-    record = netsgiro.AssignmentEnd.from_string(
+    record = netsgiro.records.AssignmentEnd.from_string(
         'NY21248800000006000000200000000000000000'
         '0000000000000000000000000000000000000000'
     )
@@ -150,7 +151,7 @@ def test_assignment_end_for_avtalegiro_agreements():
 
 
 def test_assignment_end_for_avtalegiro_cancellations():
-    record = netsgiro.AssignmentEnd.from_string(
+    record = netsgiro.records.AssignmentEnd.from_string(
         'NY21368800000006000000200000000000000060'
         '0170604170604000000000000000000000000000'
     )
@@ -169,7 +170,7 @@ def test_assignment_end_for_avtalegiro_cancellations():
 
 
 def test_assignment_end_for_ocr_giro_transactions():
-    record = netsgiro.AssignmentEnd.from_string(
+    record = netsgiro.records.AssignmentEnd.from_string(
         'NY09008800000020000000420000000000514490'
         '0200192200192200192000000000000000000000'
     )
@@ -188,7 +189,7 @@ def test_assignment_end_for_ocr_giro_transactions():
 
 
 def test_transaction_amount_item_1_for_avtalegiro_payment_request():
-    record = netsgiro.TransactionAmountItem1.from_string(
+    record = netsgiro.records.TransactionAmountItem1.from_string(
         'NY2121300000001170604           00000000'
         '000000100          008000011688373000000'
     )
@@ -206,7 +207,7 @@ def test_transaction_amount_item_1_for_avtalegiro_payment_request():
 
 
 def test_transaction_amount_item_1_for_avtalegiro_cancellation():
-    record = netsgiro.TransactionAmountItem1.from_string(
+    record = netsgiro.records.TransactionAmountItem1.from_string(
         'NY2193300000001170604           00000000'
         '000000100          008000011688373000000'
     )
@@ -224,7 +225,7 @@ def test_transaction_amount_item_1_for_avtalegiro_cancellation():
 
 
 def test_transaction_amount_item_1_for_ocr_giro_transactions():
-    record = netsgiro.TransactionAmountItem1.from_string(
+    record = netsgiro.records.TransactionAmountItem1.from_string(
         'NY09103000000012001921320101464000000000'
         '000102000                  0000531000000'
     )
@@ -249,7 +250,7 @@ def test_transaction_amount_item_1_for_ocr_giro_transactions():
 
 
 def test_transaction_amount_item_2_for_avtalegiro_payment_request():
-    record = netsgiro.TransactionAmountItem2.from_string(
+    record = netsgiro.records.TransactionAmountItem2.from_string(
         'NY2121310000001NAVN                     '
         '                                   00000'
     )
@@ -266,7 +267,7 @@ def test_transaction_amount_item_2_for_avtalegiro_payment_request():
 
 
 def test_transaction_amount_item_2_for_ocr_giro_transactions():
-    record = netsgiro.TransactionAmountItem2.from_string(
+    record = netsgiro.records.TransactionAmountItem2.from_string(
         'NY09103100000019636827194099038562000000'
         '0160192999905123410000000000000000000000'
     )
@@ -286,7 +287,7 @@ def test_transaction_amount_item_2_for_ocr_giro_transactions():
 
 
 def test_transaction_amount_item_2_for_ocr_giro_with_data_in_filler_field():
-    record = netsgiro.TransactionAmountItem2.from_string(
+    record = netsgiro.records.TransactionAmountItem2.from_string(
         'NY09103100000029797596016097596016188320'
         '6160192999910055240000000000000000000000'
     )
@@ -307,7 +308,7 @@ def test_transaction_amount_item_2_for_ocr_giro_with_data_in_filler_field():
 
 
 def test_transaction_amount_item_3_for_ocr_giro_transactions():
-    record = netsgiro.TransactionAmountItem3.from_string(
+    record = netsgiro.records.TransactionAmountItem3.from_string(
         'NY0921320000001Foo bar baz              '
         '               0000000000000000000000000'
     )
@@ -323,7 +324,7 @@ def test_transaction_amount_item_3_for_ocr_giro_transactions():
 
 
 def test_transaction_specification_for_avtalegiro_payment_request():
-    record = netsgiro.TransactionSpecification.from_string(
+    record = netsgiro.records.TransactionSpecification.from_string(
         'NY212149000000140011 Gjelder Faktura: 16'
         '8837  Dato: 19/03/0400000000000000000000'
     )
@@ -342,7 +343,7 @@ def test_transaction_specification_for_avtalegiro_payment_request():
 
 def make_specification_records(num_lines, num_columns=2):
     return [
-        netsgiro.TransactionSpecification(
+        netsgiro.records.TransactionSpecification(
             service_code=netsgiro.ServiceCode.AVTALEGIRO,
             transaction_type=(
                 netsgiro.TransactionType.AVTALEGIRO_WITH_BANK_NOTIFICATION),
@@ -359,7 +360,7 @@ def make_specification_records(num_lines, num_columns=2):
 def test_transaction_specification_to_text_with_max_number_of_records():
     records = make_specification_records(42)
 
-    result = netsgiro.TransactionSpecification.to_text(records)
+    result = netsgiro.records.TransactionSpecification.to_text(records)
 
     assert len(result.splitlines()) == 42
     assert 'Line 1, column 1' in result
@@ -370,13 +371,13 @@ def test_transaction_specification_to_text_with_too_many_records():
     records = make_specification_records(43)
 
     with pytest.raises(ValueError) as exc_info:
-        netsgiro.TransactionSpecification.to_text(records)
+        netsgiro.records.TransactionSpecification.to_text(records)
 
     assert 'Max 84 specification records allowed, got 86' in str(exc_info)
 
 
 def test_avtalegiro_all_agreements():
-    record = netsgiro.AvtaleGiroAgreement.from_string(
+    record = netsgiro.records.AvtaleGiroAgreement.from_string(
         'NY21947000000010          00800001168837'
         '3J00000000000000000000000000000000000000'
     )
@@ -395,7 +396,7 @@ def test_avtalegiro_all_agreements():
 
 
 def test_avtalegiro_new_or_updated_agreements():
-    record = netsgiro.AvtaleGiroAgreement.from_string(
+    record = netsgiro.records.AvtaleGiroAgreement.from_string(
         'NY21947000000011          00800001168837'
         '3N00000000000000000000000000000000000000'
     )

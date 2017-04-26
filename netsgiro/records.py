@@ -19,7 +19,7 @@ __all__ = [
     'TransactionAmountItem3',
     'TransactionSpecification',
     'AvtaleGiroAgreement',
-    'get_records',
+    'parse',
 ]
 
 
@@ -753,7 +753,7 @@ class AvtaleGiroAgreement(TransactionRecord):
         ).format(self=self)
 
 
-def get_records(data: str) -> List[Record]:
+def parse(data: str) -> List[Record]:
     """Parses an OCR file into a list of record objects."""
 
     def all_subclasses(cls):

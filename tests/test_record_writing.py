@@ -3,10 +3,11 @@ from datetime import date
 import pytest
 
 import netsgiro
+import netsgiro.records
 
 
 def test_transmission_start():
-    record = netsgiro.TransmissionStart(
+    record = netsgiro.records.TransmissionStart(
         service_code=netsgiro.ServiceCode.NONE,
         transmission_number='1000081',
         data_transmitter='55555555',
@@ -31,7 +32,7 @@ def test_transmission_start():
 def test_transmission_start_with_invalid_data(
         transmission_number, data_transmitter, data_recipient, exc):
     with pytest.raises(exc):
-        netsgiro.TransmissionStart(
+        netsgiro.records.TransmissionStart(
             service_code=netsgiro.ServiceCode.NONE,
             transmission_number=transmission_number,
             data_transmitter=data_transmitter,
@@ -40,7 +41,7 @@ def test_transmission_start_with_invalid_data(
 
 
 def test_transmission_end():
-    record = netsgiro.TransmissionEnd(
+    record = netsgiro.records.TransmissionEnd(
         service_code=netsgiro.ServiceCode.NONE,
         num_transactions=6,
         num_records=22,
@@ -64,7 +65,7 @@ def test_transmission_end():
 def test_transmission_end_with_invalid_data(
         num_tx, num_records, total_amount, nets_date, exc):
     with pytest.raises(exc):
-        netsgiro.TransmissionEnd(
+        netsgiro.records.TransmissionEnd(
             service_code=netsgiro.ServiceCode.NONE,
             num_transactions=num_tx,
             num_records=num_records,
@@ -74,7 +75,7 @@ def test_transmission_end_with_invalid_data(
 
 
 def test_assignment_start_for_avtalegiro_payment_requests():
-    record = netsgiro.AssignmentStart(
+    record = netsgiro.records.AssignmentStart(
         service_code=netsgiro.ServiceCode.AVTALEGIRO,
         assignment_type=netsgiro.AssignmentType.TRANSACTIONS,
         assignment_number='4000086',
@@ -89,7 +90,7 @@ def test_assignment_start_for_avtalegiro_payment_requests():
 
 
 def test_assignment_start_for_avtalegiro_agreements():
-    record = netsgiro.AssignmentStart(
+    record = netsgiro.records.AssignmentStart(
         service_code=netsgiro.ServiceCode.AVTALEGIRO,
         assignment_type=netsgiro.AssignmentType.AVTALEGIRO_AGREEMENTS,
         assignment_number='4000086',
@@ -115,7 +116,7 @@ def test_assignment_start_for_avtalegiro_agreements():
 def test_assignment_start_with_invalid_data(
         number, account, agreement_id, exc):
     with pytest.raises(exc):
-        netsgiro.AssignmentStart(
+        netsgiro.records.AssignmentStart(
             service_code=netsgiro.ServiceCode.AVTALEGIRO,
             assignment_type=netsgiro.AssignmentType.TRANSACTIONS,
             assignment_number=number,
@@ -125,7 +126,7 @@ def test_assignment_start_with_invalid_data(
 
 
 def test_assignment_end_for_avtalegiro_payment_requests():
-    record = netsgiro.AssignmentEnd(
+    record = netsgiro.records.AssignmentEnd(
         service_code=netsgiro.ServiceCode.AVTALEGIRO,
         assignment_type=netsgiro.AssignmentType.TRANSACTIONS,
         num_transactions=6,
@@ -142,7 +143,7 @@ def test_assignment_end_for_avtalegiro_payment_requests():
 
 
 def test_assignment_end_for_avtalegiro_agreements():
-    record = netsgiro.AssignmentEnd(
+    record = netsgiro.records.AssignmentEnd(
         service_code=netsgiro.ServiceCode.AVTALEGIRO,
         assignment_type=netsgiro.AssignmentType.AVTALEGIRO_AGREEMENTS,
         num_transactions=6,
@@ -156,7 +157,7 @@ def test_assignment_end_for_avtalegiro_agreements():
 
 
 def test_transaction_amount_item_1_for_ocr_giro_transactions():
-    record = netsgiro.TransactionAmountItem1(
+    record = netsgiro.records.TransactionAmountItem1(
         service_code=netsgiro.ServiceCode.OCR_GIRO,
         transaction_type=netsgiro.TransactionType.FROM_GIRO_DEBITED_ACCOUNT,
         transaction_number=1,
@@ -178,7 +179,7 @@ def test_transaction_amount_item_1_for_ocr_giro_transactions():
 
 
 def test_transaction_amount_item_1_for_avtalegiro_payment_requests():
-    record = netsgiro.TransactionAmountItem1(
+    record = netsgiro.records.TransactionAmountItem1(
         service_code=netsgiro.ServiceCode.AVTALEGIRO,
         transaction_type=(
             netsgiro.TransactionType.AVTALEGIRO_WITH_BANK_NOTIFICATION),
@@ -195,7 +196,7 @@ def test_transaction_amount_item_1_for_avtalegiro_payment_requests():
 
 
 def test_transaction_amount_item_2_for_avtalegiro_payment_request():
-    record = netsgiro.TransactionAmountItem2(
+    record = netsgiro.records.TransactionAmountItem2(
         service_code=netsgiro.ServiceCode.AVTALEGIRO,
         transaction_type=(
             netsgiro.TransactionType.AVTALEGIRO_WITH_BANK_NOTIFICATION),
@@ -212,7 +213,7 @@ def test_transaction_amount_item_2_for_avtalegiro_payment_request():
 
 
 def test_transaction_amount_item_2_for_ocr_giro_transactions():
-    record = netsgiro.TransactionAmountItem2(
+    record = netsgiro.records.TransactionAmountItem2(
         service_code=netsgiro.ServiceCode.OCR_GIRO,
         transaction_type=(
             netsgiro.TransactionType.FROM_GIRO_DEBITED_ACCOUNT),
@@ -231,7 +232,7 @@ def test_transaction_amount_item_2_for_ocr_giro_transactions():
 
 
 def test_transaction_amount_item_2_for_ocr_giro_without_bank_date():
-    record = netsgiro.TransactionAmountItem2(
+    record = netsgiro.records.TransactionAmountItem2(
         service_code=netsgiro.ServiceCode.OCR_GIRO,
         transaction_type=(
             netsgiro.TransactionType.FROM_GIRO_DEBITED_ACCOUNT),
@@ -250,7 +251,7 @@ def test_transaction_amount_item_2_for_ocr_giro_without_bank_date():
 
 
 def test_transaction_amount_item_3_for_ocr_giro_transactions():
-    record = netsgiro.TransactionAmountItem3(
+    record = netsgiro.records.TransactionAmountItem3(
         service_code=netsgiro.ServiceCode.OCR_GIRO,
         transaction_type=(
             netsgiro.TransactionType.PURCHASE_WITH_TEXT),
@@ -265,7 +266,7 @@ def test_transaction_amount_item_3_for_ocr_giro_transactions():
 
 
 def test_transaction_specification_for_avtalegiro_payment_request():
-    record = netsgiro.TransactionSpecification(
+    record = netsgiro.records.TransactionSpecification(
         service_code=netsgiro.ServiceCode.AVTALEGIRO,
         transaction_type=(
             netsgiro.TransactionType.AVTALEGIRO_WITH_BANK_NOTIFICATION),
@@ -282,7 +283,7 @@ def test_transaction_specification_for_avtalegiro_payment_request():
 
 
 def test_transaction_specification_from_longer_text():
-    records = list(netsgiro.TransactionSpecification.from_text(
+    records = list(netsgiro.records.TransactionSpecification.from_text(
         service_code=netsgiro.ServiceCode.AVTALEGIRO,
         transaction_type=(
             netsgiro.TransactionType.AVTALEGIRO_WITH_BANK_NOTIFICATION),
@@ -310,7 +311,7 @@ def test_transaction_specification_from_longer_text():
 
 
 def test_avtalegiro_agreements():
-    record = netsgiro.AvtaleGiroAgreement(
+    record = netsgiro.records.AvtaleGiroAgreement(
         service_code=netsgiro.ServiceCode.AVTALEGIRO,
         transaction_type=(
             netsgiro.TransactionType.AVTALEGIRO_AGREEMENTS),

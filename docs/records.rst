@@ -2,6 +2,8 @@
 Records API
 ===========
 
+.. module:: netsgiro.records
+
 The records API is the lower level API. It parses each line of "OCR" text
 input into a record object. A record object also knows about its OCR
 representation.
@@ -46,10 +48,10 @@ For the purpose of the following example we use the following input data:
 ... NY000089000000060000002200000000000000600170604000000000000000000000000000000000
 ... '''.strip()  # noqa
 
-:meth:`netsgiro.get_records` parses the input and returns a record object for
+:meth:`netsgiro.records.parse` parses the input and returns a record object for
 each line of input:
 
->>> records = netsgiro.get_records(data)
+>>> records = netsgiro.records.parse(data)
 >>> len(records)
 22
 >>> pprint(records)
@@ -64,7 +66,7 @@ each line of input:
  TransmissionEnd(service_code=<ServiceCode.NONE: 0>, num_transactions=6, num_records=22, total_amount=600, nets_date=datetime.date(2004, 6, 17))]
 
 
-.. autofunction:: netsgiro.get_records
+.. autofunction:: parse
 
 
 Record types
@@ -101,47 +103,47 @@ documentation. The :file:`reference` directory of the netsgiro Git repo
 contains the file format specifications, which is a good place to start.
 
 
-.. autoclass:: netsgiro.TransmissionStart
+.. autoclass:: TransmissionStart
    :members:
    :undoc-members:
    :inherited-members:
 
-.. autoclass:: netsgiro.TransmissionEnd
+.. autoclass:: TransmissionEnd
    :members:
    :undoc-members:
    :inherited-members:
 
-.. autoclass:: netsgiro.AssignmentStart
+.. autoclass:: AssignmentStart
    :members:
    :undoc-members:
    :inherited-members:
 
-.. autoclass:: netsgiro.AssignmentEnd
+.. autoclass:: AssignmentEnd
    :members:
    :undoc-members:
    :inherited-members:
 
-.. autoclass:: netsgiro.TransactionAmountItem1
+.. autoclass:: TransactionAmountItem1
    :members:
    :undoc-members:
    :inherited-members:
 
-.. autoclass:: netsgiro.TransactionAmountItem2
+.. autoclass:: TransactionAmountItem2
    :members:
    :undoc-members:
    :inherited-members:
 
-.. autoclass:: netsgiro.TransactionAmountItem3
+.. autoclass:: TransactionAmountItem3
    :members:
    :undoc-members:
    :inherited-members:
 
-.. autoclass:: netsgiro.TransactionSpecification
+.. autoclass:: TransactionSpecification
    :members:
    :undoc-members:
    :inherited-members:
 
-.. autoclass:: netsgiro.AvtaleGiroAgreement
+.. autoclass:: AvtaleGiroAgreement
    :members:
    :undoc-members:
    :inherited-members:

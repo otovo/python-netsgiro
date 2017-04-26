@@ -7,6 +7,7 @@ import attr
 from attr.validators import instance_of, optional
 
 import netsgiro
+import netsgiro.records
 from netsgiro.records import Record
 from netsgiro.validators import str_of_length
 
@@ -58,8 +59,8 @@ class Transmission:
 
         start, body, end = records[0], records[1:-1], records[-1]
 
-        assert isinstance(start, netsgiro.TransmissionStart)
-        assert isinstance(end, netsgiro.TransmissionEnd)
+        assert isinstance(start, netsgiro.records.TransmissionStart)
+        assert isinstance(end, netsgiro.records.TransmissionEnd)
 
         return cls(
             number=start.transmission_number,
@@ -75,14 +76,14 @@ class Transmission:
 
         current_assignment_number = None
         for record in records:
-            if isinstance(record, netsgiro.AssignmentStart):
+            if isinstance(record, netsgiro.records.AssignmentStart):
                 current_assignment_number = record.assignment_number
                 assignments[current_assignment_number] = []
             if current_assignment_number is None:
                 raise ValueError(
                     'Expected AssignmentStart record, got {!r}'.format(record))
             assignments[current_assignment_number].append(record)
-            if isinstance(record, netsgiro.AssignmentEnd):
+            if isinstance(record, netsgiro.records.AssignmentEnd):
                 current_assignment_number = None
 
         return [Assignment.from_records(rs) for rs in assignments.values()]
@@ -100,7 +101,7 @@ class Transmission:
         yield self._get_end_record()
 
     def _get_start_record(self) -> Record:
-        return netsgiro.TransmissionStart(
+        return netsgiro.records.TransmissionStart(
             service_code=netsgiro.ServiceCode.NONE,
             transmission_number=self.number,
             data_transmitter=self.data_transmitter,
@@ -122,7 +123,7 @@ class Transmission:
         else:
             date = self.date
 
-        return netsgiro.TransmissionEnd(
+        return netsgiro.records.TransmissionEnd(
             service_code=netsgiro.ServiceCode.NONE,
             num_transactions=self.get_num_transactions(),
             num_records=self.get_num_records(),
@@ -219,8 +220,8 @@ class Assignment:
 
         start, body, end = records[0], records[1:-1], records[-1]
 
-        assert isinstance(start, netsgiro.AssignmentStart)
-        assert isinstance(end, netsgiro.AssignmentEnd)
+        assert isinstance(start, netsgiro.records.AssignmentStart)
+        assert isinstance(end, netsgiro.records.AssignmentEnd)
 
         if start.service_code == netsgiro.ServiceCode.AVTALEGIRO:
             if (
@@ -281,7 +282,7 @@ class Assignment:
         yield self._get_end_record()
 
     def _get_start_record(self) -> Record:
-        return netsgiro.AssignmentStart(
+        return netsgiro.records.AssignmentStart(
             service_code=self.service_code,
             assignment_type=self.type,
             assignment_number=self.number,
@@ -305,7 +306,7 @@ class Assignment:
             raise ValueError(
                 'Unhandled service code: {}'.format(self.service_code))
 
-        return netsgiro.AssignmentEnd(
+        return netsgiro.records.AssignmentEnd(
             service_code=self.service_code,
             assignment_type=self.type,
             num_transactions=self.get_num_transactions(),
@@ -494,7 +495,7 @@ class Agreement:
         """Build an Agreement object from a list of record objects."""
         assert len(records) == 1
         record = records[0]
-        assert isinstance(record, netsgiro.AvtaleGiroAgreement)
+        assert isinstance(record, netsgiro.records.AvtaleGiroAgreement)
 
         return cls(
             service_code=record.service_code,
@@ -508,7 +509,7 @@ class Agreement:
 
     def to_records(self) -> Iterable[Record]:
         """Convert the agreement to a list of records."""
-        yield netsgiro.AvtaleGiroAgreement(
+        yield netsgiro.records.AvtaleGiroAgreement(
             service_code=self.service_code,
             transaction_type=self.transaction_type,
             transaction_number=self.number,
@@ -569,11 +570,13 @@ class PaymentRequest:
     def from_records(cls, records: List[Record]) -> 'Transaction':
         """Build a Transaction object from a list of record objects."""
         amount_item_1 = records.pop(0)
-        assert isinstance(amount_item_1, netsgiro.TransactionAmountItem1)
+        assert isinstance(
+            amount_item_1, netsgiro.records.TransactionAmountItem1)
         amount_item_2 = records.pop(0)
-        assert isinstance(amount_item_2, netsgiro.TransactionAmountItem2)
+        assert isinstance(
+            amount_item_2, netsgiro.records.TransactionAmountItem2)
 
-        text = netsgiro.TransactionSpecification.to_text(records)
+        text = netsgiro.records.TransactionSpecification.to_text(records)
 
         return cls(
             service_code=amount_item_1.service_code,
@@ -590,7 +593,7 @@ class PaymentRequest:
 
     def to_records(self) -> Iterable[Record]:
         """Convert the transaction to a list of records."""
-        yield netsgiro.TransactionAmountItem1(
+        yield netsgiro.records.TransactionAmountItem1(
             service_code=self.service_code,
             transaction_type=self.type,
             transaction_number=self.number,
@@ -599,7 +602,7 @@ class PaymentRequest:
             amount=self.amount_in_cents,
             kid=self.kid,
         )
-        yield netsgiro.TransactionAmountItem2(
+        yield netsgiro.records.TransactionAmountItem2(
             service_code=self.service_code,
             transaction_type=self.type,
             transaction_number=self.number,
@@ -610,7 +613,7 @@ class PaymentRequest:
 
         if self.type == (
                 netsgiro.TransactionType.AVTALEGIRO_WITH_BANK_NOTIFICATION):
-            yield from netsgiro.TransactionSpecification.from_text(
+            yield from netsgiro.records.TransactionSpecification.from_text(
                 service_code=self.service_code,
                 transaction_type=self.type,
                 transaction_number=self.number,
@@ -688,13 +691,16 @@ class Transaction:
     def from_records(cls, records: List[Record]) -> 'Transaction':
         """Build a Transaction object from a list of record objects."""
         amount_item_1 = records.pop(0)
-        assert isinstance(amount_item_1, netsgiro.TransactionAmountItem1)
+        assert isinstance(
+            amount_item_1, netsgiro.records.TransactionAmountItem1)
         amount_item_2 = records.pop(0)
-        assert isinstance(amount_item_2, netsgiro.TransactionAmountItem2)
+        assert isinstance(
+            amount_item_2, netsgiro.records.TransactionAmountItem2)
 
         if (
                 len(records) == 1 and
-                isinstance(records[0], netsgiro.TransactionAmountItem3)):
+                isinstance(
+                    records[0], netsgiro.records.TransactionAmountItem3)):
             text = records[0].text
         else:
             text = None
@@ -723,7 +729,7 @@ class Transaction:
 
     def to_records(self) -> Iterable[Record]:
         """Convert the transaction to a list of records."""
-        yield netsgiro.TransactionAmountItem1(
+        yield netsgiro.records.TransactionAmountItem1(
             service_code=self.service_code,
             transaction_type=self.type,
             transaction_number=self.number,
@@ -739,7 +745,7 @@ class Transaction:
                 self.partial_settlement_serial_number),
             sign=self.sign,
         )
-        yield netsgiro.TransactionAmountItem2(
+        yield netsgiro.records.TransactionAmountItem2(
             service_code=self.service_code,
             transaction_type=self.type,
             transaction_number=self.number,
@@ -754,7 +760,7 @@ class Transaction:
         if self.type in (
                 netsgiro.TransactionType.REVERSING_WITH_TEXT,
                 netsgiro.TransactionType.PURCHASE_WITH_TEXT):
-            yield netsgiro.TransactionAmountItem3(
+            yield netsgiro.records.TransactionAmountItem3(
                 service_code=self.service_code,
                 transaction_type=self.type,
                 transaction_number=self.number,
@@ -764,5 +770,5 @@ class Transaction:
 
 
 def parse(data: str) -> Transmission:
-    records = netsgiro.get_records(data)
+    records = netsgiro.records.parse(data)
     return Transmission.from_records(records)
