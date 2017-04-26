@@ -390,7 +390,7 @@ def test_avtalegiro_all_agreements():
     assert record.transaction_number == 1
 
     assert record.registration_type == (
-        netsgiro.AvtaleGiroRegistrationType.ALL_AGREEMENTS)
+        netsgiro.AvtaleGiroRegistrationType.ACTIVE_AGREEMENT)
     assert record.kid == '008000011688373'
     assert record.notify is True
 
@@ -409,6 +409,6 @@ def test_avtalegiro_new_or_updated_agreements():
     assert record.transaction_number == 1
 
     assert record.registration_type == (
-        netsgiro.AvtaleGiroRegistrationType.NEW_OR_UPDATED_AGREEMENTS)
+        netsgiro.AvtaleGiroRegistrationType.NEW_OR_UPDATED_AGREEMENT)
     assert record.kid == '008000011688373'
     assert record.notify is False

@@ -51,13 +51,13 @@ def test_parse_avtalegiro_agreements(agreements_data):
 
     assert isinstance(agreement_1, netsgiro.records.AvtaleGiroAgreement)
     assert agreement_1.registration_type == (
-        netsgiro.AvtaleGiroRegistrationType.NEW_OR_UPDATED_AGREEMENTS)
+        netsgiro.AvtaleGiroRegistrationType.NEW_OR_UPDATED_AGREEMENT)
     assert agreement_1.kid == '000112000507155'
     assert agreement_1.notify is True
 
     assert isinstance(agreement_2, netsgiro.records.AvtaleGiroAgreement)
     assert agreement_2.registration_type == (
-        netsgiro.AvtaleGiroRegistrationType.NEW_OR_UPDATED_AGREEMENTS)
+        netsgiro.AvtaleGiroRegistrationType.NEW_OR_UPDATED_AGREEMENT)
     assert agreement_2.kid == '001006300507304'
     assert agreement_2.notify is False
 

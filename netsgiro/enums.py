@@ -107,12 +107,12 @@ class TransactionType(IntEnum):
 class AvtaleGiroRegistrationType(IntEnum):
     #: Used when the AvtaleGiro agreement assignment contains all currently
     #: active agreements.
-    ALL_AGREEMENTS = 0
+    ACTIVE_AGREEMENT = 0
 
     #: Used when the AvtaleGiro agreement assignment contains only changes,
     #: and the current agreement is new or updated.
-    NEW_OR_UPDATED_AGREEMENTS = 1
+    NEW_OR_UPDATED_AGREEMENT = 1
 
     #: Used when the AvtaleGiro agreement assignment contains only changes,
     #: and the current agreement has been deleted.
-    DELETED_AGREEMENTS = 2
+    DELETED_AGREEMENT = 2

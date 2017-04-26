@@ -33,7 +33,7 @@ def test_parse_agreements(agreements_data):
     assert agreement_1.number == 1
 
     assert agreement_1.registration_type == (
-        netsgiro.AvtaleGiroRegistrationType.NEW_OR_UPDATED_AGREEMENTS)
+        netsgiro.AvtaleGiroRegistrationType.NEW_OR_UPDATED_AGREEMENT)
     assert agreement_1.kid == '000112000507155'
     assert agreement_1.notify is True
 
@@ -46,7 +46,7 @@ def test_parse_agreements(agreements_data):
     assert agreement_2.number == 2
 
     assert agreement_2.registration_type == (
-        netsgiro.AvtaleGiroRegistrationType.NEW_OR_UPDATED_AGREEMENTS)
+        netsgiro.AvtaleGiroRegistrationType.NEW_OR_UPDATED_AGREEMENT)
     assert agreement_2.kid == '001006300507304'
     assert agreement_2.notify is False
 

@@ -317,7 +317,7 @@ def test_avtalegiro_agreements():
             netsgiro.TransactionType.AVTALEGIRO_AGREEMENTS),
         transaction_number=1,
         registration_type=(
-            netsgiro.AvtaleGiroRegistrationType.NEW_OR_UPDATED_AGREEMENTS),
+            netsgiro.AvtaleGiroRegistrationType.NEW_OR_UPDATED_AGREEMENT),
         kid='008000011688373',
         notify=False,
     )
