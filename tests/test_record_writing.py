@@ -310,11 +310,11 @@ def test_transaction_specification_from_longer_text():
     )
 
 
-def test_avtalegiro_agreements():
+def test_avtalegiro_agreement():
     record = netsgiro.records.AvtaleGiroAgreement(
         service_code=netsgiro.ServiceCode.AVTALEGIRO,
         transaction_type=(
-            netsgiro.TransactionType.AVTALEGIRO_AGREEMENTS),
+            netsgiro.TransactionType.AVTALEGIRO_AGREEMENT),
         transaction_number=1,
         registration_type=(
             netsgiro.AvtaleGiroRegistrationType.NEW_OR_UPDATED_AGREEMENT),

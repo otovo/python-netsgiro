@@ -487,7 +487,7 @@ class Agreement:
     #: Whether the payer wants notification about payment requests.
     notify = attr.ib(validator=instance_of(bool))
 
-    TRANSACTION_TYPE = netsgiro.TransactionType.AVTALEGIRO_AGREEMENTS
+    TRANSACTION_TYPE = netsgiro.TransactionType.AVTALEGIRO_AGREEMENT
 
     @classmethod
     def from_records(cls, records: List[Record]) -> 'Agreement':
@@ -498,7 +498,7 @@ class Agreement:
         assert isinstance(record, netsgiro.records.AvtaleGiroAgreement)
         assert (
             record.transaction_type ==
-            netsgiro.TransactionType.AVTALEGIRO_AGREEMENTS)
+            netsgiro.TransactionType.AVTALEGIRO_AGREEMENT)
 
         return cls(
             service_code=record.service_code,

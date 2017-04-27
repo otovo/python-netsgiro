@@ -101,7 +101,7 @@ class TransactionType(IntEnum):
     #: assignment.
     AVTALEGIRO_CANCELLATION = 93
     #: Used by Nets for updates to AvtaleGiro agreeements.
-    AVTALEGIRO_AGREEMENTS = 94
+    AVTALEGIRO_AGREEMENT = 94
 
 
 class AvtaleGiroRegistrationType(IntEnum):

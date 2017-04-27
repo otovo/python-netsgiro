@@ -376,7 +376,7 @@ def test_transaction_specification_to_text_with_too_many_records():
     assert 'Max 84 specification records allowed, got 86' in str(exc_info)
 
 
-def test_avtalegiro_all_agreements():
+def test_avtalegiro_active_agreement():
     record = netsgiro.records.AvtaleGiroAgreement.from_string(
         'NY21947000000010          00800001168837'
         '3J00000000000000000000000000000000000000'
@@ -386,7 +386,7 @@ def test_avtalegiro_all_agreements():
     assert record.RECORD_TYPE == netsgiro.RecordType.TRANSACTION_AGREEMENTS
 
     assert record.transaction_type == (
-        netsgiro.TransactionType.AVTALEGIRO_AGREEMENTS)
+        netsgiro.TransactionType.AVTALEGIRO_AGREEMENT)
     assert record.transaction_number == 1
 
     assert record.registration_type == (
@@ -395,7 +395,7 @@ def test_avtalegiro_all_agreements():
     assert record.notify is True
 
 
-def test_avtalegiro_new_or_updated_agreements():
+def test_avtalegiro_new_or_updated_agreement():
     record = netsgiro.records.AvtaleGiroAgreement.from_string(
         'NY21947000000011          00800001168837'
         '3N00000000000000000000000000000000000000'
@@ -405,7 +405,7 @@ def test_avtalegiro_new_or_updated_agreements():
     assert record.RECORD_TYPE == netsgiro.RecordType.TRANSACTION_AGREEMENTS
 
     assert record.transaction_type == (
-        netsgiro.TransactionType.AVTALEGIRO_AGREEMENTS)
+        netsgiro.TransactionType.AVTALEGIRO_AGREEMENT)
     assert record.transaction_number == 1
 
     assert record.registration_type == (
