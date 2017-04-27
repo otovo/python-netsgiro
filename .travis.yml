@@ -20,9 +20,13 @@ matrix:
       env: TOX_ENV=docs
     - python: 3.6
       env: TOX_ENV=doctest
+    - python: 3.6
+      env: TOX_ENV=pydocstyle
   allow_failures:
     - python: 3.6
       env: TOX_ENV=mypy
+    - python: 3.6
+      env: TOX_ENV=pydocstyle
 
 install:
   - "pip install tox"
