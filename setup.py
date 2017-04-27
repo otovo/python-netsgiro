@@ -41,6 +41,7 @@ setup(
             'flake8',
             'flake8-import-order',
             'mypy',
+            'pydocstyle',
             'pytest',
             'pytest-xdist',
             'sphinx',
