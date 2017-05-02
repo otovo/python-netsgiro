@@ -543,7 +543,7 @@ class PaymentRequest:
     #: Transaction number. Unique and ordered within an assignment.
     number = attr.ib(validator=instance_of(int))
 
-    #: For AvtaleGiro, this is the payment due date.
+    #: The due date.
     date = attr.ib(validator=instance_of(datetime.date))
 
     #: Transaction amount in NOK with two decimals.
