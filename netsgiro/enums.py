@@ -1,3 +1,5 @@
+"""Enums for all codes used in OCR files."""
+
 from enum import IntEnum
 
 
@@ -11,6 +13,8 @@ __all__ = [
 
 
 class ServiceCode(IntEnum):
+    """Service codes tell whicH Nets service the record applies to."""
+
     #: Used for the transmission start and end record.
     NONE = 0
 
@@ -22,6 +26,8 @@ class ServiceCode(IntEnum):
 
 
 class RecordType(IntEnum):
+    """Record types tell what type of record this is."""
+
     #: See :class:`netsgiro.TransmissionStart`.
     TRANSMISSION_START = 10
 
@@ -51,6 +57,8 @@ class RecordType(IntEnum):
 
 
 class AssignmentType(IntEnum):
+    """Assignment types tell what type of assignment this is."""
+
     #: Used both for AvtaleGiro payment requests and OCR Giro transactions.
     TRANSACTIONS = 0
 
@@ -62,6 +70,8 @@ class AssignmentType(IntEnum):
 
 
 class TransactionType(IntEnum):
+    """Assignment types tell what type of transaction this is."""
+
     #: Used for OCR Giro.
     FROM_GIRO_DEBITED_ACCOUNT = 10
     #: Used for OCR Giro.
@@ -105,6 +115,8 @@ class TransactionType(IntEnum):
 
 
 class AvtaleGiroRegistrationType(IntEnum):
+    """AvtaleGiro registration types tell what kind of update this is."""
+
     #: Used when the AvtaleGiro agreement assignment contains all currently
     #: active agreements.
     ACTIVE_AGREEMENT = 0

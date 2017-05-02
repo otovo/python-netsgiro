@@ -1,3 +1,5 @@
+"""Constants that are useful when working with OCR files."""
+
 __all__ = [
     'NETS_ID'
 ]

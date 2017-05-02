@@ -1,3 +1,5 @@
+"""The lower-level records API."""
+
 import datetime
 import re
 from typing import Iterable, List, Optional, Sequence, Tuple, Union
@@ -335,7 +337,7 @@ class AssignmentEnd(Record):
 
     @property
     def nets_date_earliest(self):
-        """The earliest date from the contained transactions."""
+        """Earliest date from the contained transactions."""
 
         if self.service_code == netsgiro.ServiceCode.OCR_GIRO:
             return self.nets_date_2
@@ -347,7 +349,7 @@ class AssignmentEnd(Record):
 
     @property
     def nets_date_latest(self):
-        """The latest date from the contained transactions."""
+        """Latest date from the contained transactions."""
 
         if self.service_code == netsgiro.ServiceCode.OCR_GIRO:
             return self.nets_date_3
@@ -603,8 +605,7 @@ class TransactionAmountItem3(TransactionRecord):
 
 @attr.s
 class TransactionSpecification(TransactionRecord):
-    """TransactionSpecification is used for AvtaleGiro transaction
-    specification.
+    """TransactionSpecification is used for AvtaleGiro transactions.
 
     The record is only used when bank notification is used to notify the payer.
 
@@ -647,6 +648,8 @@ class TransactionSpecification(TransactionRecord):
             cls, *,
             service_code, transaction_type, transaction_number, text
             ) -> Iterable['TransactionSpecification']:
+        """Create a sequence of specification records from a text string."""
+
         for line, column, text in (
                 cls._split_text_to_lines_and_columns(text)):
             yield cls(
@@ -681,6 +684,8 @@ class TransactionSpecification(TransactionRecord):
 
     @classmethod
     def to_text(cls, records: Sequence['TransactionSpecification']) -> str:
+        """Get a text string from a sequence of specification records."""
+
         if len(records) > cls._MAX_RECORDS:
             raise ValueError(
                 'Max {} specification records allowed, got {}'
@@ -714,8 +719,10 @@ class TransactionSpecification(TransactionRecord):
 
 @attr.s
 class AvtaleGiroAgreement(TransactionRecord):
-    """AvtaleGiroAgreement is used by Nets to notify about changes to your
-    customers' AvtaleGiro preferences.
+    """AvtaleGiroAgreement is used by Nets to notify about agreement changes.
+
+    This includes new or deleted agreements, as well as updates to the payer's
+    notification preferences.
     """
 
     registration_type = attr.ib(convert=to_avtalegiro_registration_type)
@@ -754,7 +761,7 @@ class AvtaleGiroAgreement(TransactionRecord):
 
 
 def parse(data: str) -> List[Record]:
-    """Parses an OCR file into a list of record objects."""
+    """Parse an OCR file into a list of record objects."""
 
     def all_subclasses(cls):
         return cls.__subclasses__() + [

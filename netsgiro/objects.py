@@ -1,3 +1,5 @@
+"""The higher-level objects API."""
+
 import collections
 import datetime
 from decimal import Decimal
@@ -772,6 +774,6 @@ class Transaction:
 
 
 def parse(data: str) -> Transmission:
-    """Parses an OCR file into a Transmission object."""
+    """Parse an OCR file into a Transmission object."""
     records = netsgiro.records.parse(data)
     return Transmission.from_records(records)
