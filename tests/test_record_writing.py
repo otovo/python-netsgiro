@@ -212,6 +212,23 @@ def test_transaction_amount_item_2_for_avtalegiro_payment_request():
     )
 
 
+def test_transaction_amount_item_2_cuts_too_long_payer_name():
+    record = netsgiro.records.TransactionAmountItem2(
+        service_code=netsgiro.ServiceCode.AVTALEGIRO,
+        transaction_type=(
+            netsgiro.TransactionType.AVTALEGIRO_WITH_BANK_NOTIFICATION),
+        transaction_number=1,
+        reference=None,
+
+        payer_name='NAVN123456789',
+    )
+
+    assert record.to_ocr() == (
+        'NY2121310000001NAVN123456               '
+        '                                   00000'
+    )
+
+
 def test_transaction_amount_item_2_for_ocr_giro_transactions():
     record = netsgiro.records.TransactionAmountItem2(
         service_code=netsgiro.ServiceCode.OCR_GIRO,

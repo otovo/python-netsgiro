@@ -9,6 +9,10 @@ v1.0.0a3 (UNRELEASED)
 - Rename :attr:`netsgiro.TransactionType.AVTALEGIRO_AGREEMENTS` (plural)
   to :attr:`netsgiro.TransactionType.AVTALEGIRO_AGREEMENT` (singular).
 
+- When writing record to OCR, cut
+  :attr:`netsgiro.records.TransactionAmountItem2.payer_name` to 10 first chars,
+  as that is all the field has room for.
+
 
 v1.0.0a2 (2017-04-26)
 =====================
