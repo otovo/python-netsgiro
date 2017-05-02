@@ -3,7 +3,7 @@ Changelog
 =========
 
 
-v1.0.0a3 (UNRELEASED)
+v1.0.0a3 (2017-05-03)
 =====================
 
 - Rename :attr:`netsgiro.TransactionType.AVTALEGIRO_AGREEMENTS` (plural)
