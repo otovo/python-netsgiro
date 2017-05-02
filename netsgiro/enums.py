@@ -13,7 +13,7 @@ __all__ = [
 
 
 class ServiceCode(IntEnum):
-    """Service codes tell whicH Nets service the record applies to."""
+    """Service codes tell which Nets service the record applies to."""
 
     #: Used for the transmission start and end record.
     NONE = 0
