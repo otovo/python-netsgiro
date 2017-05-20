@@ -2,6 +2,12 @@
 Changelog
 =========
 
+v1.0.0 (2017-05-20)
+===================
+
+No changes from v1.0.0a3, which has been used in production for a few weeks
+without any issues.
+
 
 v1.0.0a3 (2017-05-03)
 =====================

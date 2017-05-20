@@ -21,7 +21,7 @@ setup(
     author_email='jodal+netsgiro@otovo.no',
     license='Apache License, Version 2.0',
     classifiers=[
-        'Development Status :: 3 - Alpha',
+        'Development Status :: 5 - Production/Stable',
         'Intended Audience :: Developers',
         'License :: OSI Approved :: Apache Software License',
         'Programming Language :: Python :: 3',
