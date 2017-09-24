@@ -41,6 +41,7 @@ setup(
             'check-manifest',
             'flake8',
             'flake8-import-order',
+            'hypothesis',
             'mypy',
             'pydocstyle',
             'pytest',
