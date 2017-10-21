@@ -100,3 +100,50 @@ def test_assignment_start_for_avtalegiro_agreements(an, aa):
     assert record.agreement_id is None
     assert record.assignment_number == an
     assert record.assignment_account == aa
+
+
+@given(
+    nt=st.integers(min_value=0),
+    nr=st.integers(min_value=0),
+    ta=st.integers(min_value=0),
+    nd1=dates(),
+    nd2=dates(),
+)
+def test_assignment_end_for_avtalegiro_payment_requests(nt, nr, ta, nd1, nd2):
+    original = netsgiro.records.AssignmentEnd(
+        service_code=netsgiro.ServiceCode.AVTALEGIRO,
+        assignment_type=netsgiro.AssignmentType.TRANSACTIONS,
+        num_transactions=nt,
+        num_records=nr,
+        total_amount=ta,
+        nets_date_1=nd1,
+        nets_date_2=nd2,
+    )
+
+    ocr = original.to_ocr()
+    record = netsgiro.records.AssignmentEnd.from_string(ocr)
+
+    assert record.num_transactions == nt
+    assert record.num_records == nr
+    assert record.total_amount == ta
+    assert record.nets_date_earliest == nd1
+    assert record.nets_date_latest == nd2
+
+
+@given(
+    nt=st.integers(min_value=0),
+    nr=st.integers(min_value=0),
+)
+def test_assignment_end_for_avtalegiro_agreements(nt, nr):
+    original = netsgiro.records.AssignmentEnd(
+        service_code=netsgiro.ServiceCode.AVTALEGIRO,
+        assignment_type=netsgiro.AssignmentType.AVTALEGIRO_AGREEMENTS,
+        num_transactions=nt,
+        num_records=nr,
+    )
+
+    ocr = original.to_ocr()
+    record = netsgiro.records.AssignmentEnd.from_string(ocr)
+
+    assert record.num_transactions == nt
+    assert record.num_records == nr
