@@ -290,3 +290,31 @@ def test_transaction_amount_item_3_for_ocr_giro_transactions(tn, text):
 
     assert record.transaction_number == tn
     assert record.text == original.text
+
+
+@given(
+    tn=st.integers(min_value=0, max_value=9999999),
+    ln=st.integers(min_value=1, max_value=42),
+    cn=st.integers(min_value=1, max_value=2),
+    text=st.text(min_size=40, max_size=40),
+)
+def test_transaction_specification_for_avtalegiro_payment_request(
+        tn, ln, cn, text):
+    original = netsgiro.records.TransactionSpecification(
+        service_code=netsgiro.ServiceCode.AVTALEGIRO,
+        transaction_type=(
+            netsgiro.TransactionType.AVTALEGIRO_WITH_BANK_NOTIFICATION),
+        transaction_number=tn,
+        line_number=ln,
+        column_number=cn,
+        text=text,
+    )
+
+    ocr = original.to_ocr()
+    record = netsgiro.records.TransactionSpecification.from_string(ocr)
+
+    assert record.transaction_number == tn
+    assert record.line_number == ln
+    assert record.column_number == cn
+    assert len(record.text) == 40
+    assert record.text == original.text
