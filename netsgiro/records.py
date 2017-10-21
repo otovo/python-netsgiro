@@ -606,7 +606,7 @@ class TransactionAmountItem3(TransactionRecord):
             '{self.transaction_type:02d}'
             '32'
             '{self.transaction_number:07d}'
-            '{self.text:40}'
+            + (self.text and '{:40}'.format(self.text) or (' ' * 40))
             + ('0' * 25)
         ).format(self=self)
 

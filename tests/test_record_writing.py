@@ -217,7 +217,7 @@ def test_transaction_amount_item_2_for_avtalegiro_payment_request():
     ('NAVN123456789', 'NAVN123456'),  # Too long payer name is cut
     ('NA\nVN', 'NAVN'),  # Newlines are stripped
 ])
-def test_transaction_amount_item_2_cuts_too_long_payer_name(
+def test_transaction_amount_item_2_payer_name_behavior(
         payer_name, expected):
     original = netsgiro.records.TransactionAmountItem2(
         service_code=netsgiro.ServiceCode.AVTALEGIRO,
@@ -286,6 +286,26 @@ def test_transaction_amount_item_3_for_ocr_giro_transactions():
         'NY0921320000001Foo bar baz              '
         '               0000000000000000000000000'
     )
+
+
+@pytest.mark.parametrize('text,expected', [
+    (None, None),  # Without text
+    ('Foo\nbar', 'Foobar'),  # Newlines are stripped
+])
+def test_transaction_amount_item_3_text_behavior(
+        text, expected):
+    original = netsgiro.records.TransactionAmountItem3(
+        service_code=netsgiro.ServiceCode.OCR_GIRO,
+        transaction_type=(
+            netsgiro.TransactionType.PURCHASE_WITH_TEXT),
+        transaction_number=1,
+        text=text,
+    )
+
+    ocr = original.to_ocr()
+    record = netsgiro.records.TransactionAmountItem3.from_string(ocr)
+
+    assert record.text == expected
 
 
 def test_transaction_specification_for_avtalegiro_payment_request():

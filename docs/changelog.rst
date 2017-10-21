@@ -10,6 +10,10 @@ v1.0.1 (UNRELEASED)
   if :attr:`~netsgiro.records.TransactionAmountItem2.payer_name` was
   :class:`None`.
 
+- Fixed exception in :meth:`netsgiro.records.TransactionAmountItem3.to_ocr()`
+  if :attr:`~netsgiro.records.TransactionAmountItem3.text` was
+  :class:`None`.
+
 - Strip newline characters (``\n`` and ``\r``) from record strings, like
   :attr:`netsgiro.records.TransactionAmountItem2.payer_name`.
 
