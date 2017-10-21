@@ -318,3 +318,28 @@ def test_transaction_specification_for_avtalegiro_payment_request(
     assert record.column_number == cn
     assert len(record.text) == 40
     assert record.text == original.text
+
+
+@given(
+    tn=st.integers(min_value=0, max_value=9999999),
+    kid=digits(25),  # TODO Alternatively shorter with leading space padding
+    n=st.booleans(),
+)
+def test_avtalegiro_agreement(tn, kid, n):
+    original = netsgiro.records.AvtaleGiroAgreement(
+        service_code=netsgiro.ServiceCode.AVTALEGIRO,
+        transaction_type=(
+            netsgiro.TransactionType.AVTALEGIRO_AGREEMENT),
+        transaction_number=tn,
+        registration_type=(
+            netsgiro.AvtaleGiroRegistrationType.NEW_OR_UPDATED_AGREEMENT),
+        kid=kid,
+        notify=n,
+    )
+
+    ocr = original.to_ocr()
+    record = netsgiro.records.AvtaleGiroAgreement.from_string(ocr)
+
+    assert record.transaction_number == tn
+    assert record.kid == kid
+    assert record.notify == n
