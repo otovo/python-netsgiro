@@ -14,6 +14,14 @@ v1.0.1 (UNRELEASED)
   if :attr:`~netsgiro.records.TransactionAmountItem3.text` was
   :class:`None`.
 
+- Raise a :exc:`ValueError` if a too long string is used for any of:
+
+  - :attr:`netsgiro.records.TransactionAmountItem1.kid` (max 25 chars)
+  - :attr:`netsgiro.records.TransactionAmountItem3.text` (max 40 chars)
+  - :attr:`netsgiro.records.AvtaleGiroAgreement.kid` (max 25 chars)
+
+  Previously the string was accepted and the record generated invalid OCR data.
+
 - Strip newline characters (``\n`` and ``\r``) from record strings, like
   :attr:`netsgiro.records.TransactionAmountItem2.payer_name`.
 

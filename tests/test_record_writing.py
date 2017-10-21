@@ -195,6 +195,21 @@ def test_transaction_amount_item_1_for_avtalegiro_payment_requests():
     )
 
 
+def test_transaction_amount_item_1_raises_if_kid_is_too_long():
+    with pytest.raises(ValueError) as exc_info:
+        netsgiro.records.TransactionAmountItem1(
+            service_code=netsgiro.ServiceCode.AVTALEGIRO,
+            transaction_type=(
+                netsgiro.TransactionType.AVTALEGIRO_WITH_BANK_NOTIFICATION),
+            transaction_number=1,
+            nets_date=date(2004, 6, 17),
+            amount=100,
+            kid='008000011688373' * 4,  # Max 25 chars
+        )
+
+    assert 'kid must be at most 25 chars' in str(exc_info)
+
+
 def test_transaction_amount_item_2_for_avtalegiro_payment_request():
     record = netsgiro.records.TransactionAmountItem2(
         service_code=netsgiro.ServiceCode.AVTALEGIRO,
@@ -308,6 +323,19 @@ def test_transaction_amount_item_3_text_behavior(
     assert record.text == expected
 
 
+def test_transaction_amount_item_3_raises_if_text_is_too_long():
+    with pytest.raises(ValueError) as exc_info:
+        netsgiro.records.TransactionAmountItem3(
+            service_code=netsgiro.ServiceCode.OCR_GIRO,
+            transaction_type=(
+                netsgiro.TransactionType.PURCHASE_WITH_TEXT),
+            transaction_number=1,
+            text='Fooo' * 12,  # Max 40 chars
+        )
+
+    assert 'text must be at most 40 chars' in str(exc_info)
+
+
 def test_transaction_specification_for_avtalegiro_payment_request():
     record = netsgiro.records.TransactionSpecification(
         service_code=netsgiro.ServiceCode.AVTALEGIRO,
@@ -369,3 +397,19 @@ def test_avtalegiro_agreement():
         'NY21947000000011          00800001168837'
         '3N00000000000000000000000000000000000000'
     )
+
+
+def test_avtalegiro_agreement_raises_if_kid_is_too_long():
+    with pytest.raises(ValueError) as exc_info:
+        netsgiro.records.AvtaleGiroAgreement(
+            service_code=netsgiro.ServiceCode.AVTALEGIRO,
+            transaction_type=(
+                netsgiro.TransactionType.AVTALEGIRO_AGREEMENT),
+            transaction_number=1,
+            registration_type=(
+                netsgiro.AvtaleGiroRegistrationType.NEW_OR_UPDATED_AGREEMENT),
+            kid='008000011688373' * 4,  # Max 25 chars
+            notify=False,
+        )
+
+    assert 'kid must be at most 25 chars' in str(exc_info)

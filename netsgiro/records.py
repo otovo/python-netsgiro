@@ -8,7 +8,7 @@ import attr
 from attr.validators import instance_of, optional
 
 import netsgiro
-from netsgiro.validators import str_of_length
+from netsgiro.validators import str_of_length, str_of_max_length
 
 
 __all__ = [
@@ -398,7 +398,8 @@ class TransactionAmountItem1(TransactionRecord):
 
     nets_date = attr.ib(convert=to_date)
     amount = attr.ib(convert=int)
-    kid = attr.ib(convert=optional_str)
+    kid = attr.ib(
+        convert=optional_str, validator=optional(str_of_max_length(25)))
 
     # Only OCR Giro
     centre_id = attr.ib(default=None, validator=optional(str_of_length(2)))
@@ -486,6 +487,7 @@ class TransactionAmountItem2(TransactionRecord):
     The record is used both for AvtaleGiro and for OCR Giro.
     """
 
+    # TODO Validate `reference` length, which depends on service code
     reference = attr.ib(convert=optional_str)
 
     # Only OCR Giro
@@ -580,7 +582,8 @@ class TransactionAmountItem3(TransactionRecord):
     The record is only used for some OCR Giro transaction types.
     """
 
-    text = attr.ib(convert=optional_str)
+    text = attr.ib(
+        convert=optional_str, validator=optional(str_of_max_length(40)))
 
     RECORD_TYPE = netsgiro.RecordType.TRANSACTION_AMOUNT_ITEM_3
     _PATTERNS = [
@@ -734,7 +737,8 @@ class AvtaleGiroAgreement(TransactionRecord):
     """
 
     registration_type = attr.ib(convert=to_avtalegiro_registration_type)
-    kid = attr.ib(convert=optional_str)
+    kid = attr.ib(
+        convert=optional_str, validator=optional(str_of_max_length(25)))
     notify = attr.ib(convert=to_bool)
 
     RECORD_TYPE = netsgiro.RecordType.TRANSACTION_AGREEMENTS
