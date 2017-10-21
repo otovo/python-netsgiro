@@ -62,3 +62,41 @@ def test_transmission_end(nt, nr, ta, nd):
     assert record.num_records == nr
     assert record.total_amount == ta
     assert record.nets_date == nd
+
+
+@given(an=digits(7), aa=digits(11), ai=digits(9))
+def test_assignment_start_for_avtalegiro_payment_requests(an, aa, ai):
+    original = netsgiro.records.AssignmentStart(
+        service_code=netsgiro.ServiceCode.AVTALEGIRO,
+        assignment_type=netsgiro.AssignmentType.TRANSACTIONS,
+        assignment_number=an,
+        assignment_account=aa,
+        agreement_id=ai,
+    )
+
+    ocr = original.to_ocr()
+    record = netsgiro.records.AssignmentStart.from_string(ocr)
+
+    assert record.service_code == netsgiro.ServiceCode.AVTALEGIRO
+    assert record.assignment_type == netsgiro.AssignmentType.TRANSACTIONS
+    assert record.agreement_id == ai
+    assert record.assignment_number == an
+    assert record.assignment_account == aa
+
+
+@given(an=digits(7), aa=digits(11))
+def test_assignment_start_for_avtalegiro_agreements(an, aa):
+    original = netsgiro.records.AssignmentStart(
+        service_code=netsgiro.ServiceCode.AVTALEGIRO,
+        assignment_type=netsgiro.AssignmentType.AVTALEGIRO_AGREEMENTS,
+        assignment_number=an,
+        assignment_account=aa,
+        agreement_id=None,
+    )
+
+    ocr = original.to_ocr()
+    record = netsgiro.records.AssignmentStart.from_string(ocr)
+
+    assert record.agreement_id is None
+    assert record.assignment_number == an
+    assert record.assignment_account == aa
