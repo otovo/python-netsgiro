@@ -75,7 +75,14 @@ def optional_int(value: Union[int, str, None]) -> Optional[int]:
 
 
 def optional_str(value: Optional[str]) -> Optional[str]:
-    return value and value.strip() or None
+    value = value and value.strip()
+    if not value:
+        return None
+    return (
+        value
+        .replace('\r', '')
+        .replace('\n', '')
+    )
 
 
 @attr.s

@@ -10,6 +10,12 @@ v1.0.1 (UNRELEASED)
   if :attr:`~netsgiro.records.TransactionAmountItem2.payer_name` was
   :class:`None`.
 
+- Strip newline characters (``\n`` and ``\r``) from record strings, like
+  :attr:`netsgiro.records.TransactionAmountItem2.payer_name`.
+
+  Previously, the newline characters was accepted and the record generated
+  invalid OCR data.
+
 
 v1.0.0 (2017-05-20)
 ===================

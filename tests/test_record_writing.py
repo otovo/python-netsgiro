@@ -215,6 +215,7 @@ def test_transaction_amount_item_2_for_avtalegiro_payment_request():
 @pytest.mark.parametrize('payer_name,expected', [
     (None, None),  # Without payer name
     ('NAVN123456789', 'NAVN123456'),  # Too long payer name is cut
+    ('NA\nVN', 'NAVN'),  # Newlines are stripped
 ])
 def test_transaction_amount_item_2_cuts_too_long_payer_name(
         payer_name, expected):
