@@ -147,3 +147,73 @@ def test_assignment_end_for_avtalegiro_agreements(nt, nr):
 
     assert record.num_transactions == nt
     assert record.num_records == nr
+
+
+@given(
+    tn=st.integers(min_value=0, max_value=9999999),
+    nd=dates(),
+    a=st.integers(min_value=0),
+    kid=digits(25),  # TODO Alternatively shorter with leading space padding
+    cid=digits(2),
+    dc=st.integers(min_value=1, max_value=31),
+    psn=st.integers(min_value=0, max_value=9),
+    pssn=digits(5),
+    sign=st.one_of(st.just('0'), st.just('-')),
+)
+def test_transaction_amount_item_1_for_ocr_giro_transactions(
+        tn, nd, a, kid, cid, dc, psn, pssn, sign):
+    original = netsgiro.records.TransactionAmountItem1(
+        service_code=netsgiro.ServiceCode.OCR_GIRO,
+        transaction_type=netsgiro.TransactionType.FROM_GIRO_DEBITED_ACCOUNT,
+        transaction_number=tn,
+        nets_date=nd,
+        amount=a,
+        kid=kid,
+
+        centre_id=cid,
+        day_code=dc,
+        partial_settlement_number=psn,
+        partial_settlement_serial_number=pssn,
+        sign=sign,
+    )
+
+    ocr = original.to_ocr()
+    record = netsgiro.records.TransactionAmountItem1.from_string(ocr)
+
+    assert record.transaction_number == tn
+    assert record.nets_date == nd
+    assert record.amount == a
+    assert record.kid == kid
+
+    assert record.centre_id == cid
+    assert record.day_code == dc
+    assert record.partial_settlement_number == psn
+    assert record.partial_settlement_serial_number == pssn
+    assert record.sign == sign
+
+
+@given(
+    tn=st.integers(min_value=0, max_value=9999999),
+    nd=dates(),
+    a=st.integers(min_value=0),
+    kid=digits(25),  # TODO Alternatively shorter with leading space padding
+)
+def test_transaction_amount_item_1_for_avtalegiro_payment_requests(
+        tn, nd, a, kid):
+    original = netsgiro.records.TransactionAmountItem1(
+        service_code=netsgiro.ServiceCode.AVTALEGIRO,
+        transaction_type=(
+            netsgiro.TransactionType.AVTALEGIRO_WITH_BANK_NOTIFICATION),
+        transaction_number=tn,
+        nets_date=nd,
+        amount=a,
+        kid=kid,
+    )
+
+    ocr = original.to_ocr()
+    record = netsgiro.records.TransactionAmountItem1.from_string(ocr)
+
+    assert record.transaction_number == tn
+    assert record.nets_date == nd
+    assert record.amount == a
+    assert record.kid == kid
