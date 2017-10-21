@@ -217,3 +217,56 @@ def test_transaction_amount_item_1_for_avtalegiro_payment_requests(
     assert record.nets_date == nd
     assert record.amount == a
     assert record.kid == kid
+
+
+@given(
+    tn=st.integers(min_value=0, max_value=9999999),
+    pn=st.text(max_size=10),
+)
+def test_transaction_amount_item_2_for_avtalegiro_payment_request(tn, pn):
+    original = netsgiro.records.TransactionAmountItem2(
+        service_code=netsgiro.ServiceCode.AVTALEGIRO,
+        transaction_type=(
+            netsgiro.TransactionType.AVTALEGIRO_WITH_BANK_NOTIFICATION),
+        transaction_number=tn,
+        reference=None,
+        payer_name=pn,
+    )
+
+    ocr = original.to_ocr()
+    record = netsgiro.records.TransactionAmountItem2.from_string(ocr)
+
+    assert record.transaction_number == tn
+    assert record.payer_name == original.payer_name
+
+
+@given(
+    tn=st.integers(min_value=0, max_value=9999999),
+    ref=digits(9),
+    fn=digits(10),
+    bd=dates(),
+    da=digits(11),
+)
+def test_transaction_amount_item_2_for_ocr_giro_transactions(
+        tn, ref, fn, bd, da):
+    original = netsgiro.records.TransactionAmountItem2(
+        service_code=netsgiro.ServiceCode.OCR_GIRO,
+        transaction_type=(
+            netsgiro.TransactionType.FROM_GIRO_DEBITED_ACCOUNT),
+        transaction_number=tn,
+        reference=ref,
+
+        form_number=fn,
+        bank_date=bd,
+        debit_account=da,
+    )
+
+    ocr = original.to_ocr()
+    record = netsgiro.records.TransactionAmountItem2.from_string(ocr)
+
+    assert record.transaction_number == tn
+    assert record.form_number == fn
+    assert record.payer_name is None
+    assert record.reference == ref
+    assert record.bank_date == bd
+    assert record.debit_account == da
