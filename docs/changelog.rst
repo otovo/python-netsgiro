@@ -2,6 +2,15 @@
 Changelog
 =========
 
+
+v1.0.1 (UNRELEASED)
+===================
+
+- Fixed exception in :meth:`netsgiro.records.TransactionAmountItem2.to_ocr()`
+  if :attr:`~netsgiro.records.TransactionAmountItem2.payer_name` was
+  :class:`None`.
+
+
 v1.0.0 (2017-05-20)
 ===================
 

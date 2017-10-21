@@ -554,7 +554,8 @@ class TransactionAmountItem2(TransactionRecord):
             ).format(self=self)
         elif self.service_code == netsgiro.ServiceCode.AVTALEGIRO:
             service_fields = (
-                '{:10}'.format(self.payer_name[:10])
+                (self.payer_name and
+                    '{:10}'.format(self.payer_name[:10]) or (' ' * 10))
                 + (' ' * 25)
                 + (self.reference and '{self.reference:25}' or (' ' * 25))
                 + ('0' * 5)
