@@ -270,3 +270,23 @@ def test_transaction_amount_item_2_for_ocr_giro_transactions(
     assert record.reference == ref
     assert record.bank_date == bd
     assert record.debit_account == da
+
+
+@given(
+    tn=st.integers(min_value=0, max_value=9999999),
+    text=st.text(max_size=40),
+)
+def test_transaction_amount_item_3_for_ocr_giro_transactions(tn, text):
+    original = netsgiro.records.TransactionAmountItem3(
+        service_code=netsgiro.ServiceCode.OCR_GIRO,
+        transaction_type=(
+            netsgiro.TransactionType.PURCHASE_WITH_TEXT),
+        transaction_number=tn,
+        text=text,
+    )
+
+    ocr = original.to_ocr()
+    record = netsgiro.records.TransactionAmountItem3.from_string(ocr)
+
+    assert record.transaction_number == tn
+    assert record.text == original.text
