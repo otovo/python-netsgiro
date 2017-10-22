@@ -25,7 +25,7 @@ v1.0.1 (UNRELEASED)
 - Strip newline characters (``\n`` and ``\r``) from record strings, like
   :attr:`netsgiro.records.TransactionAmountItem2.payer_name`.
 
-  Previously, the newline characters was accepted and the record generated
+  Previously the newline characters were accepted and the record generated
   invalid OCR data.
 
 - Automatically pad :attr:`netsgiro.records.TransactionSpecification.text` to
