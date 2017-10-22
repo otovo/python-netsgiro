@@ -8,7 +8,12 @@ import attr
 from attr.validators import instance_of, optional
 
 import netsgiro
-from netsgiro.converters import value_or_none
+from netsgiro.converters import (
+    stripped_newlines,
+    stripped_spaces_around,
+    truthy_or_none,
+    value_or_none,
+)
 from netsgiro.validators import str_of_length, str_of_max_length
 
 
@@ -68,15 +73,8 @@ def to_bool(value: Union[bool, str]) -> bool:
         raise ValueError("Expected 'J' or 'N', got {!r}".format(value))
 
 
-def optional_str(value: Optional[str]) -> Optional[str]:
-    value = value and value.strip()
-    if not value:
-        return None
-    return (
-        value
-        .replace('\r', '')
-        .replace('\n', '')
-    )
+to_safe_str_or_none = value_or_none(
+    stripped_newlines(stripped_spaces_around(truthy_or_none(str))))
 
 
 @attr.s
@@ -394,7 +392,8 @@ class TransactionAmountItem1(TransactionRecord):
     nets_date = attr.ib(convert=to_date)
     amount = attr.ib(convert=int)
     kid = attr.ib(
-        convert=optional_str, validator=optional(str_of_max_length(25)))
+        convert=to_safe_str_or_none,
+        validator=optional(str_of_max_length(25)))
 
     # Only OCR Giro
     centre_id = attr.ib(default=None, validator=optional(str_of_length(2)))
@@ -484,7 +483,7 @@ class TransactionAmountItem2(TransactionRecord):
     """
 
     # TODO Validate `reference` length, which depends on service code
-    reference = attr.ib(convert=optional_str)
+    reference = attr.ib(convert=to_safe_str_or_none)
 
     # Only OCR Giro
     form_number = attr.ib(default=None, validator=optional(str_of_length(10)))
@@ -496,7 +495,7 @@ class TransactionAmountItem2(TransactionRecord):
     _filler = attr.ib(default=None)
 
     # Only AvtaleGiro
-    payer_name = attr.ib(default=None, convert=optional_str)
+    payer_name = attr.ib(default=None, convert=to_safe_str_or_none)
 
     RECORD_TYPE = netsgiro.RecordType.TRANSACTION_AMOUNT_ITEM_2
     _PATTERNS = [
@@ -579,7 +578,8 @@ class TransactionAmountItem3(TransactionRecord):
     """
 
     text = attr.ib(
-        convert=optional_str, validator=optional(str_of_max_length(40)))
+        convert=to_safe_str_or_none,
+        validator=optional(str_of_max_length(40)))
 
     RECORD_TYPE = netsgiro.RecordType.TRANSACTION_AMOUNT_ITEM_3
     _PATTERNS = [
@@ -734,7 +734,8 @@ class AvtaleGiroAgreement(TransactionRecord):
 
     registration_type = attr.ib(convert=to_avtalegiro_registration_type)
     kid = attr.ib(
-        convert=optional_str, validator=optional(str_of_max_length(25)))
+        convert=to_safe_str_or_none,
+        validator=optional(str_of_max_length(25)))
     notify = attr.ib(convert=to_bool)
 
     RECORD_TYPE = netsgiro.RecordType.TRANSACTION_AGREEMENTS
