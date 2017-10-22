@@ -409,6 +409,21 @@ def test_transaction_specification_text_behavior(text, expected):
     assert record.text == expected
 
 
+def test_transaction_specification_raises_if_text_is_too_long():
+    with pytest.raises(ValueError) as exc_info:
+        netsgiro.records.TransactionSpecification(
+            service_code=netsgiro.ServiceCode.AVTALEGIRO,
+            transaction_type=(
+                netsgiro.TransactionType.AVTALEGIRO_WITH_BANK_NOTIFICATION),
+            transaction_number=1,
+            line_number=1,
+            column_number=1,
+            text='Fooo' * 12, # Max 40 chars
+        )
+
+    assert 'text must be at most 40 chars' in str(exc_info)
+
+
 def test_avtalegiro_agreement():
     record = netsgiro.records.AvtaleGiroAgreement(
         service_code=netsgiro.ServiceCode.AVTALEGIRO,

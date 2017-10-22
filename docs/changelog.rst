@@ -18,6 +18,7 @@ v1.0.1 (UNRELEASED)
 
   - :attr:`netsgiro.records.TransactionAmountItem1.kid` (max 25 chars)
   - :attr:`netsgiro.records.TransactionAmountItem3.text` (max 40 chars)
+  - :attr:`netsgiro.records.TransactionSpecification.text` (max 40 chars)
   - :attr:`netsgiro.records.AvtaleGiroAgreement.kid` (max 25 chars)
 
   Previously the string was accepted and the record generated invalid OCR data.

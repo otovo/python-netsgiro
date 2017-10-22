@@ -5,7 +5,7 @@ import re
 from typing import Iterable, List, Optional, Sequence, Tuple, Union
 
 import attr
-from attr.validators import instance_of, optional
+from attr.validators import optional
 
 import netsgiro
 from netsgiro.converters import (
@@ -626,7 +626,7 @@ class TransactionSpecification(TransactionRecord):
     column_number = attr.ib(convert=int)
     text = attr.ib(
         convert=stripped_newlines(fixed_len_str(40, str)),
-        validator=instance_of(str))
+        validator=optional(str_of_max_length(40)))
 
     RECORD_TYPE = netsgiro.RecordType.TRANSACTION_SPECIFICATION
     _PATTERNS = [
