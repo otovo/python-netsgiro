@@ -418,7 +418,7 @@ def test_transaction_specification_raises_if_text_is_too_long():
             transaction_number=1,
             line_number=1,
             column_number=1,
-            text='Fooo' * 12, # Max 40 chars
+            text='Fooo' * 12,  # Max 40 chars
         )
 
     assert 'text must be at most 40 chars' in str(exc_info)
