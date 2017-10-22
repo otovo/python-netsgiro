@@ -56,3 +56,17 @@ def stripped_newlines(converter):
         return converter(value.replace('\r', '').replace('\n', ''))
 
     return single_line_converter
+
+
+def fixed_len_str(length, converter):
+    """Converter that pads a string to the given ``length`` or ``None``.
+
+    ``converter`` is called to further converti non-``None`` values.
+    """
+
+    def fixed_len_str_converter(value):
+        if value is None:
+            return None
+        return converter('{value:{length}}'.format(value=value, length=length))
+
+    return fixed_len_str_converter

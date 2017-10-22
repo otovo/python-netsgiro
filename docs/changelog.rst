@@ -28,6 +28,10 @@ v1.0.1 (UNRELEASED)
   Previously, the newline characters was accepted and the record generated
   invalid OCR data.
 
+- Automatically pad :attr:`netsgiro.records.TransactionSpecification.text` to
+  40 chars, so that a manually created record and a record parsed from OCR are
+  identical.
+
 
 v1.0.0 (2017-05-20)
 ===================

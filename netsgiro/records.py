@@ -9,6 +9,7 @@ from attr.validators import instance_of, optional
 
 import netsgiro
 from netsgiro.converters import (
+    fixed_len_str,
     stripped_newlines,
     stripped_spaces_around,
     truthy_or_none,
@@ -71,9 +72,6 @@ def to_bool(value: Union[bool, str]) -> bool:
         return False
     else:
         raise ValueError("Expected 'J' or 'N', got {!r}".format(value))
-
-
-to_safe_str = stripped_newlines(str)
 
 
 to_safe_str_or_none = value_or_none(
@@ -626,7 +624,9 @@ class TransactionSpecification(TransactionRecord):
 
     line_number = attr.ib(convert=int)
     column_number = attr.ib(convert=int)
-    text = attr.ib(convert=to_safe_str, validator=instance_of(str))
+    text = attr.ib(
+        convert=stripped_newlines(fixed_len_str(40, str)),
+        validator=instance_of(str))
 
     RECORD_TYPE = netsgiro.RecordType.TRANSACTION_SPECIFICATION
     _PATTERNS = [
