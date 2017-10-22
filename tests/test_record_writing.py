@@ -381,6 +381,29 @@ def test_transaction_specification_from_longer_text():
     )
 
 
+@pytest.mark.parametrize('text,expected', [
+    ('', ''),  # No text remains a str, not None
+    ('Foo\nbar', 'Foobar'),  # Newlines are stripped
+    (' Foobar ', ' Foobar '),  # Spaces around are preserved
+])
+def test_transaction_specification_text_behavior(text, expected):
+    original = netsgiro.records.TransactionSpecification(
+        service_code=netsgiro.ServiceCode.AVTALEGIRO,
+        transaction_type=(
+            netsgiro.TransactionType.AVTALEGIRO_WITH_BANK_NOTIFICATION),
+        transaction_number=1,
+        line_number=1,
+        column_number=1,
+        text=text,
+    )
+
+    ocr = original.to_ocr()
+    record = netsgiro.records.TransactionSpecification.from_string(ocr)
+
+    assert len(record.text) == 40
+    assert record.text[:len(expected)] == expected
+
+
 def test_avtalegiro_agreement():
     record = netsgiro.records.AvtaleGiroAgreement(
         service_code=netsgiro.ServiceCode.AVTALEGIRO,

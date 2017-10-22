@@ -73,6 +73,9 @@ def to_bool(value: Union[bool, str]) -> bool:
         raise ValueError("Expected 'J' or 'N', got {!r}".format(value))
 
 
+to_safe_str = stripped_newlines(str)
+
+
 to_safe_str_or_none = value_or_none(
     stripped_newlines(stripped_spaces_around(truthy_or_none(str))))
 
@@ -623,7 +626,7 @@ class TransactionSpecification(TransactionRecord):
 
     line_number = attr.ib(convert=int)
     column_number = attr.ib(convert=int)
-    text = attr.ib(validator=instance_of(str))
+    text = attr.ib(convert=to_safe_str, validator=instance_of(str))
 
     RECORD_TYPE = netsgiro.RecordType.TRANSACTION_SPECIFICATION
     _PATTERNS = [
