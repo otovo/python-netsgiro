@@ -1,3 +1,4 @@
+import string
 from datetime import date
 
 from hypothesis import given
@@ -13,12 +14,9 @@ def dates(min_value=date(1969, 1, 1), max_value=date(2068, 12, 31)):
     return st.dates(min_value=min_value, max_value=max_value)
 
 
-def digits(num_digits=10):
-    max_value = 10**num_digits - 1
-    return (
-        st.integers(min_value=0, max_value=max_value)
-        .map(lambda v: '{value:0{num_digits}}'.format(
-            num_digits=num_digits, value=v)))
+def digits(min_size=10, max_size=None):
+    max_size = max_size or min_size
+    return st.text(string.digits, min_size=min_size, max_size=max_size)
 
 
 @given(tn=digits(7), dt=digits(8), dr=digits(8))
@@ -153,7 +151,7 @@ def test_assignment_end_for_avtalegiro_agreements(nt, nr):
     tn=st.integers(min_value=0, max_value=9999999),
     nd=dates(),
     a=st.integers(min_value=0),
-    kid=digits(25),  # TODO Alternatively shorter with leading space padding
+    kid=digits(min_size=4, max_size=25),
     cid=digits(2),
     dc=st.integers(min_value=1, max_value=31),
     psn=st.integers(min_value=0, max_value=9),
@@ -196,7 +194,7 @@ def test_transaction_amount_item_1_for_ocr_giro_transactions(
     tn=st.integers(min_value=0, max_value=9999999),
     nd=dates(),
     a=st.integers(min_value=0),
-    kid=digits(25),  # TODO Alternatively shorter with leading space padding
+    kid=digits(min_size=4, max_size=25),
 )
 def test_transaction_amount_item_1_for_avtalegiro_payment_requests(
         tn, nd, a, kid):
@@ -322,7 +320,7 @@ def test_transaction_specification_for_avtalegiro_payment_request(
 
 @given(
     tn=st.integers(min_value=0, max_value=9999999),
-    kid=digits(25),  # TODO Alternatively shorter with leading space padding
+    kid=digits(min_size=4, max_size=25),
     n=st.booleans(),
 )
 def test_avtalegiro_agreement(tn, kid, n):
