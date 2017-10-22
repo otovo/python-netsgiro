@@ -8,6 +8,7 @@ import attr
 from attr.validators import instance_of, optional
 
 import netsgiro
+from netsgiro.converters import value_or_none
 from netsgiro.validators import str_of_length, str_of_max_length
 
 
@@ -65,13 +66,6 @@ def to_bool(value: Union[bool, str]) -> bool:
         return False
     else:
         raise ValueError("Expected 'J' or 'N', got {!r}".format(value))
-
-
-def optional_int(value: Union[int, str, None]) -> Optional[int]:
-    if value is None:
-        return None
-    else:
-        return int(value)
 
 
 def optional_str(value: Optional[str]) -> Optional[str]:
@@ -276,7 +270,8 @@ class AssignmentEnd(Record):
     num_records = attr.ib(convert=int)
 
     # Only for transactions and cancellations
-    total_amount = attr.ib(default=None, convert=optional_int)
+    total_amount = attr.ib(
+        default=None, convert=value_or_none(int))
     nets_date_1 = attr.ib(default=None, convert=to_date)
     nets_date_2 = attr.ib(default=None, convert=to_date)
     nets_date_3 = attr.ib(default=None, convert=to_date)
@@ -403,8 +398,9 @@ class TransactionAmountItem1(TransactionRecord):
 
     # Only OCR Giro
     centre_id = attr.ib(default=None, validator=optional(str_of_length(2)))
-    day_code = attr.ib(default=None, convert=optional_int)
-    partial_settlement_number = attr.ib(default=None, convert=optional_int)
+    day_code = attr.ib(default=None, convert=value_or_none(int))
+    partial_settlement_number = attr.ib(
+        default=None, convert=value_or_none(int))
     partial_settlement_serial_number = attr.ib(
         default=None, validator=optional(str_of_length(5)))
     sign = attr.ib(default=None, validator=optional(str_of_length(1)))
