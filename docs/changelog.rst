@@ -3,12 +3,12 @@ Changelog
 =========
 
 
-v1.0.1 (UNRELEASED)
+v1.1.0 (2017-10-23)
 ===================
 
-- Record parsing and writing are now tested with an additional suite of
-  property based tests, using the Hypothesis library. This testing effort
-  identified a number of issues, all of which are fixed by this release.
+Record parsing and writing are now tested with an additional suite of property
+based tests, using the Hypothesis library. This testing effort identified a
+number of issues, all of which are fixed by this release.
 
 - Fixed exception in :meth:`netsgiro.records.TransactionAmountItem2.to_ocr()`
   if :attr:`~netsgiro.records.TransactionAmountItem2.payer_name` was
