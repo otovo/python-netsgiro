@@ -1,5 +1,8 @@
+"""Custom converters for :mod:`attrs`."""
+
+
 def value_or_none(converter):
-    """Converter that returns value or ``None``.
+    """Make converter that returns value or ``None``.
 
     ``converter`` is called to further convert non-``None`` values.
 
@@ -16,7 +19,7 @@ def value_or_none(converter):
 
 
 def truthy_or_none(converter):
-    """Converter that returns a truthy value or ``None``.
+    """Make converter that returns a truthy value or ``None``.
 
     ``converter`` is called to further convert non-``None`` values.
     """
@@ -30,8 +33,7 @@ def truthy_or_none(converter):
 
 
 def stripped_spaces_around(converter):
-    """Converter that returns a string stripped of leading and trailing spaces or
-    ``None`` if the value isn't .
+    """Make converter that strippes leading and trailing spaces.
 
     ``converter`` is called to further convert non-``None`` values.
     """
@@ -45,7 +47,7 @@ def stripped_spaces_around(converter):
 
 
 def stripped_newlines(converter):
-    """Converter that returns a string stripped of newlines or ``None``.
+    """Make converter that returns a string stripped of newlines or ``None``.
 
     ``converter`` is called to further convert non-``None`` values.
     """
@@ -59,7 +61,7 @@ def stripped_newlines(converter):
 
 
 def fixed_len_str(length, converter):
-    """Converter that pads a string to the given ``length`` or ``None``.
+    """Make converter that pads a string to the given ``length`` or ``None``.
 
     ``converter`` is called to further converti non-``None`` values.
     """
