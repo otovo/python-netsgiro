@@ -1,3 +1,6 @@
+"""File parsers for Nets AvtaleGiro and OCR Giro files."""
+
+
 __version__ = '1.1.0'
 
 
