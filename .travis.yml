@@ -10,22 +10,24 @@ matrix:
       env: TOX_ENV=py35
     - python: 3.6
       env: TOX_ENV=py36
-    - python: 3.6
+    - python: 3.7
+      env: TOX_ENV=py37
+    - python: 3.7
       env: TOX_ENV=flake8
-    - python: 3.6
+    - python: 3.7
       env: TOX_ENV=mypy
-    - python: 3.6
+    - python: 3.7
       env: TOX_ENV=check-manifest
-    - python: 3.6
+    - python: 3.7
       env: TOX_ENV=docs
-    - python: 3.6
+    - python: 3.7
       env: TOX_ENV=doctest
-    - python: 3.6
+    - python: 3.7
       env: TOX_ENV=pydocstyle
   allow_failures:
-    - python: 3.6
+    - python: 3.7
       env: TOX_ENV=mypy
-    - python: 3.6
+    - python: 3.7
       env: TOX_ENV=pydocstyle
 
 install:
@@ -35,4 +37,4 @@ script:
   - "tox -e $TOX_ENV"
 
 after_success:
-  - "if [ $TOX_ENV == 'py36' ]; then pip install coveralls; coveralls; fi"
+  - "if [ $TOX_ENV == 'py37' ]; then pip install coveralls; coveralls; fi"

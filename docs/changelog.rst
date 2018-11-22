@@ -3,6 +3,13 @@ Changelog
 =========
 
 
+v1.2.0 (UNRELEASED)
+===================
+
+- Python 3.7 is now explicitly supported. No changes was required to the
+  library, but the test suite now runs on Python 3.4, 3.5, 3.6, and 3.7.
+
+
 v1.1.0 (2017-10-23)
 ===================
 
