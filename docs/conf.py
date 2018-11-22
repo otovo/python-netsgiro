@@ -12,11 +12,7 @@ import netsgiro  # noqa
 
 # needs_sphinx = '1.0'
 
-extensions = [
-    'sphinx.ext.autodoc',
-    'sphinx.ext.doctest',
-    'sphinx.ext.viewcode',
-]
+extensions = ['sphinx.ext.autodoc', 'sphinx.ext.doctest', 'sphinx.ext.viewcode']
 
 templates_path = ['_templates']
 source_suffix = '.rst'
@@ -41,8 +37,9 @@ todo_include_todos = False
 
 html_theme = 'sphinx_rtd_theme'
 html_theme_options = {}
-html_theme_options['canonical_url'] = (
-    'https://netsgiro.readthedocs.io/en/latest/')
+html_theme_options[
+    'canonical_url'
+] = 'https://netsgiro.readthedocs.io/en/latest/'
 html_theme_path = [sphinx_rtd_theme.get_html_theme_path()]
 html_static_path = ['_static']
 
@@ -62,13 +59,7 @@ latex_elements = {
 }
 
 latex_documents = [
-    (
-        master_doc,
-        'netsgiro.tex',
-        'netsgiro documentation',
-        'Otovo AS',
-        'manual',
-    ),
+    (master_doc, 'netsgiro.tex', 'netsgiro documentation', 'Otovo AS', 'manual')
 ]
 
 
@@ -79,9 +70,7 @@ autodoc_member_order = 'groupwise'
 
 # -- Options for doctest builder ------------------------------------------
 
-doctest_path = [
-    os.path.abspath('..'),
-]
+doctest_path = [os.path.abspath('..')]
 
 doctest_global_setup = """
 from pprint import pprint

@@ -33,25 +33,26 @@ __all__ = [
 
 
 def to_service_code(
-        value: Union[netsgiro.ServiceCode, int, str]) -> netsgiro.ServiceCode:
+    value: Union[netsgiro.ServiceCode, int, str]
+) -> netsgiro.ServiceCode:
     return netsgiro.ServiceCode(int(value))
 
 
 def to_assignment_type(
-        value: Union[netsgiro.AssignmentType, int, str]
-        ) -> netsgiro.AssignmentType:
+    value: Union[netsgiro.AssignmentType, int, str]
+) -> netsgiro.AssignmentType:
     return netsgiro.AssignmentType(int(value))
 
 
 def to_transaction_type(
-        value: Union[netsgiro.TransactionType, int, str]
-        ) -> netsgiro.TransactionType:
+    value: Union[netsgiro.TransactionType, int, str]
+) -> netsgiro.TransactionType:
     return netsgiro.TransactionType(int(value))
 
 
 def to_avtalegiro_registration_type(
-        value: Union[netsgiro.AvtaleGiroRegistrationType, int, str]
-        ) -> netsgiro.AvtaleGiroRegistrationType:
+    value: Union[netsgiro.AvtaleGiroRegistrationType, int, str]
+) -> netsgiro.AvtaleGiroRegistrationType:
     return netsgiro.AvtaleGiroRegistrationType(int(value))
 
 
@@ -75,7 +76,8 @@ def to_bool(value: Union[bool, str]) -> bool:
 
 
 to_safe_str_or_none = value_or_none(
-    stripped_newlines(stripped_spaces_around(truthy_or_none(str))))
+    stripped_newlines(stripped_spaces_around(truthy_or_none(str)))
+)
 
 
 @attr.s
@@ -94,8 +96,8 @@ class Record:
                 return cls(**matches.groupdict())
 
         raise ValueError(
-            '{!r} did not match {} record formats'
-            .format(line, cls.__name__))
+            '{!r} did not match {} record formats'.format(line, cls.__name__)
+        )
 
     def to_ocr(self) -> str:
         """Get record as OCR string."""
@@ -117,7 +119,8 @@ class TransmissionStart(Record):
 
     RECORD_TYPE = netsgiro.RecordType.TRANSMISSION_START
     _PATTERNS = [
-        re.compile(r'''
+        re.compile(
+            r'''
             ^
             NY      # Format code
             (?P<service_code>00)
@@ -130,7 +133,9 @@ class TransmissionStart(Record):
 
             0{49}   # Padding
             $
-        ''', re.VERBOSE),
+            ''',
+            re.VERBOSE,
+        )
     ]
 
     def to_ocr(self) -> str:
@@ -139,8 +144,7 @@ class TransmissionStart(Record):
             'NY000010'
             '{self.data_transmitter:8}'
             '{self.transmission_number:7}'
-            '{self.data_recipient:8}'
-            + ('0' * 49)
+            '{self.data_recipient:8}' + ('0' * 49)
         ).format(self=self)
 
 
@@ -155,7 +159,8 @@ class TransmissionEnd(Record):
 
     RECORD_TYPE = netsgiro.RecordType.TRANSMISSION_END
     _PATTERNS = [
-        re.compile(r'''
+        re.compile(
+            r'''
             ^
             NY      # Format code
             (?P<service_code>00)
@@ -169,7 +174,9 @@ class TransmissionEnd(Record):
 
             0{33}   # Filler
             $
-        ''', re.VERBOSE),
+            ''',
+            re.VERBOSE,
+        )
     ]
 
     def to_ocr(self) -> str:
@@ -179,8 +186,7 @@ class TransmissionEnd(Record):
             '{self.num_transactions:08d}'
             '{self.num_records:08d}'
             '{self.total_amount:017d}'
-            '{self.nets_date:%d%m%y}'
-            + ('0' * 33)
+            '{self.nets_date:%d%m%y}' + ('0' * 33)
         ).format(self=self)
 
 
@@ -200,7 +206,8 @@ class AssignmentStart(Record):
 
     RECORD_TYPE = netsgiro.RecordType.ASSIGNMENT_START
     _PATTERNS = [
-        re.compile(r'''
+        re.compile(
+            r'''
             ^
             NY      # Format code
             (?P<service_code>(09|21))
@@ -213,8 +220,11 @@ class AssignmentStart(Record):
 
             0{45}   # Filler
             $
-        ''', re.VERBOSE),
-        re.compile(r'''
+            ''',
+            re.VERBOSE,
+        ),
+        re.compile(
+            r'''
             ^
             NY      # Format code
             (?P<service_code>21)
@@ -228,8 +238,11 @@ class AssignmentStart(Record):
 
             0{45}   # Filler
             $
-        ''', re.VERBOSE),
-        re.compile(r'''
+            ''',
+            re.VERBOSE,
+        ),
+        re.compile(
+            r'''
             ^
             NY      # Format code
             (?P<service_code>21)
@@ -243,7 +256,9 @@ class AssignmentStart(Record):
 
             0{45}   # Filler
             $
-        ''', re.VERBOSE),
+            ''',
+            re.VERBOSE,
+        ),
     ]
 
     def to_ocr(self) -> str:
@@ -253,10 +268,9 @@ class AssignmentStart(Record):
             '{self.service_code:02d}'
             '{self.assignment_type:02d}'
             '20'
-            + (self.agreement_id and '{self.agreement_id:9}' or ('0' * 9)) +
-            '{self.assignment_number:7}'
-            '{self.assignment_account:11}'
-            + ('0' * 45)
+            + (self.agreement_id and '{self.agreement_id:9}' or ('0' * 9))
+            + '{self.assignment_number:7}'
+            '{self.assignment_account:11}' + ('0' * 45)
         ).format(self=self)
 
 
@@ -269,15 +283,15 @@ class AssignmentEnd(Record):
     num_records = attr.ib(converter=int)
 
     # Only for transactions and cancellations
-    total_amount = attr.ib(
-        default=None, converter=value_or_none(int))
+    total_amount = attr.ib(default=None, converter=value_or_none(int))
     nets_date_1 = attr.ib(default=None, converter=to_date)
     nets_date_2 = attr.ib(default=None, converter=to_date)
     nets_date_3 = attr.ib(default=None, converter=to_date)
 
     RECORD_TYPE = netsgiro.RecordType.ASSIGNMENT_END
     _PATTERNS = [
-        re.compile(r'''
+        re.compile(
+            r'''
             ^
             NY      # Format code
             (?P<service_code>(09|21))
@@ -293,8 +307,11 @@ class AssignmentEnd(Record):
 
             0{21}   # Filler
             $
-        ''', re.VERBOSE),
-        re.compile(r'''
+            ''',
+            re.VERBOSE,
+        ),
+        re.compile(
+            r'''
             ^
             NY      # Format code
             (?P<service_code>21)
@@ -306,8 +323,11 @@ class AssignmentEnd(Record):
 
             0{56}   # Filler
             $
-        ''', re.VERBOSE),
-        re.compile(r'''
+            ''',
+            re.VERBOSE,
+        ),
+        re.compile(
+            r'''
             ^
             NY      # Format code
             (?P<service_code>21)
@@ -322,7 +342,9 @@ class AssignmentEnd(Record):
 
             0{27}   # Filler
             $
-        ''', re.VERBOSE),
+            ''',
+            re.VERBOSE,
+        ),
     ]
 
     @property
@@ -346,7 +368,8 @@ class AssignmentEnd(Record):
             return self.nets_date_1
         else:
             raise ValueError(
-                'Unhandled service code: {}'.format(self.service_code))
+                'Unhandled service code: {}'.format(self.service_code)
+            )
 
     @property
     def nets_date_latest(self):
@@ -358,7 +381,8 @@ class AssignmentEnd(Record):
             return self.nets_date_2
         else:
             raise ValueError(
-                'Unhandled service code: {}'.format(self.service_code))
+                'Unhandled service code: {}'.format(self.service_code)
+            )
 
     def to_ocr(self) -> str:
         """Get record as OCR string."""
@@ -393,21 +417,24 @@ class TransactionAmountItem1(TransactionRecord):
     nets_date = attr.ib(converter=to_date)
     amount = attr.ib(converter=int)
     kid = attr.ib(
-        converter=to_safe_str_or_none,
-        validator=optional(str_of_max_length(25)))
+        converter=to_safe_str_or_none, validator=optional(str_of_max_length(25))
+    )
 
     # Only OCR Giro
     centre_id = attr.ib(default=None, validator=optional(str_of_length(2)))
     day_code = attr.ib(default=None, converter=value_or_none(int))
     partial_settlement_number = attr.ib(
-        default=None, converter=value_or_none(int))
+        default=None, converter=value_or_none(int)
+    )
     partial_settlement_serial_number = attr.ib(
-        default=None, validator=optional(str_of_length(5)))
+        default=None, validator=optional(str_of_length(5))
+    )
     sign = attr.ib(default=None, validator=optional(str_of_length(1)))
 
     RECORD_TYPE = netsgiro.RecordType.TRANSACTION_AMOUNT_ITEM_1
     _PATTERNS = [
-        re.compile(r'''
+        re.compile(
+            r'''
             ^
             NY      # Format code
             (?P<service_code>09)
@@ -428,8 +455,11 @@ class TransactionAmountItem1(TransactionRecord):
 
             0{6}    # Filler
             $
-        ''', re.VERBOSE),
-        re.compile(r'''
+            ''',
+            re.VERBOSE,
+        ),
+        re.compile(
+            r'''
             ^
             NY      # Format code
             (?P<service_code>21)
@@ -446,7 +476,9 @@ class TransactionAmountItem1(TransactionRecord):
 
             0{6}    # Filler
             $
-        ''', re.VERBOSE),
+            ''',
+            re.VERBOSE,
+        ),
     ]
 
     def to_ocr(self) -> str:
@@ -468,11 +500,8 @@ class TransactionAmountItem1(TransactionRecord):
             '{self.transaction_type:02d}'
             '30'
             '{self.transaction_number:07d}'
-            '{self.nets_date:%d%m%y}'
-            + ocr_giro_fields +
-            '{self.amount:017d}'
-            '{self.kid:>25}'
-            + ('0' * 6)
+            '{self.nets_date:%d%m%y}' + ocr_giro_fields + '{self.amount:017d}'
+            '{self.kid:>25}' + ('0' * 6)
         ).format(self=self)
 
 
@@ -489,8 +518,7 @@ class TransactionAmountItem2(TransactionRecord):
     # Only OCR Giro
     form_number = attr.ib(default=None, validator=optional(str_of_length(10)))
     bank_date = attr.ib(default=None, converter=to_date)
-    debit_account = attr.ib(
-        default=None, validator=optional(str_of_length(11)))
+    debit_account = attr.ib(default=None, validator=optional(str_of_length(11)))
     # XXX In use in OCR Giro "from giro debited account" transactions in test
     # data, but documented as a filler field.
     _filler = attr.ib(default=None)
@@ -500,7 +528,8 @@ class TransactionAmountItem2(TransactionRecord):
 
     RECORD_TYPE = netsgiro.RecordType.TRANSACTION_AMOUNT_ITEM_2
     _PATTERNS = [
-        re.compile(r'''
+        re.compile(
+            r'''
             ^
             NY      # Format code
             (?P<service_code>09)
@@ -518,8 +547,11 @@ class TransactionAmountItem2(TransactionRecord):
 
             0{22}    # Filler
             $
-        ''', re.VERBOSE),
-        re.compile(r'''
+            ''',
+            re.VERBOSE,
+        ),
+        re.compile(
+            r'''
             ^
             NY      # Format code
             (?P<service_code>21)
@@ -535,7 +567,9 @@ class TransactionAmountItem2(TransactionRecord):
 
             0{5}    # Filler
             $
-        ''', re.VERBOSE),
+            ''',
+            re.VERBOSE,
+        ),
     ]
 
     def to_ocr(self) -> str:
@@ -553,14 +587,17 @@ class TransactionAmountItem2(TransactionRecord):
                 '{self.form_number:10}'
                 + (self.reference and '{self.reference:9}' or (' ' * 9))
                 + (self._filler and '{self._filler:7}' or ('0' * 7))
-                + (self.bank_date and '{self.bank_date:%d%m%y}' or '0' * 6) +
-                '{self.debit_account:11}'
+                + (self.bank_date and '{self.bank_date:%d%m%y}' or '0' * 6)
+                + '{self.debit_account:11}'
                 + ('0' * 22)
             ).format(self=self)
         elif self.service_code == netsgiro.ServiceCode.AVTALEGIRO:
             service_fields = (
-                (self.payer_name and
-                    '{:10}'.format(self.payer_name[:10]) or (' ' * 10))
+                (
+                    self.payer_name
+                    and '{:10}'.format(self.payer_name[:10])
+                    or (' ' * 10)
+                )
                 + (' ' * 25)
                 + (self.reference and '{self.reference:25}' or (' ' * 25))
                 + ('0' * 5)
@@ -579,12 +616,13 @@ class TransactionAmountItem3(TransactionRecord):
     """
 
     text = attr.ib(
-        converter=to_safe_str_or_none,
-        validator=optional(str_of_max_length(40)))
+        converter=to_safe_str_or_none, validator=optional(str_of_max_length(40))
+    )
 
     RECORD_TYPE = netsgiro.RecordType.TRANSACTION_AMOUNT_ITEM_3
     _PATTERNS = [
-        re.compile(r'''
+        re.compile(
+            r'''
             ^
             NY      # Format code
             (?P<service_code>09)
@@ -596,7 +634,9 @@ class TransactionAmountItem3(TransactionRecord):
 
             0{25}    # Filler
             $
-        ''', re.VERBOSE),
+            ''',
+            re.VERBOSE,
+        )
     ]
 
     def to_ocr(self) -> str:
@@ -626,11 +666,13 @@ class TransactionSpecification(TransactionRecord):
     column_number = attr.ib(converter=int)
     text = attr.ib(
         converter=stripped_newlines(fixed_len_str(40, str)),
-        validator=optional(str_of_max_length(40)))
+        validator=optional(str_of_max_length(40)),
+    )
 
     RECORD_TYPE = netsgiro.RecordType.TRANSACTION_SPECIFICATION
     _PATTERNS = [
-        re.compile(r'''
+        re.compile(
+            r'''
             ^
             NY      # Format code
             (?P<service_code>21)
@@ -645,7 +687,9 @@ class TransactionSpecification(TransactionRecord):
 
             0{20}    # Filler
             $
-        ''', re.VERBOSE),
+            ''',
+            re.VERBOSE,
+        )
     ]
 
     _MAX_LINES = 42
@@ -655,18 +699,15 @@ class TransactionSpecification(TransactionRecord):
 
     @classmethod
     def from_text(
-            cls, *,
-            service_code, transaction_type, transaction_number, text
-            ) -> Iterable['TransactionSpecification']:
+        cls, *, service_code, transaction_type, transaction_number, text
+    ) -> Iterable['TransactionSpecification']:
         """Create a sequence of specification records from a text string."""
 
-        for line, column, text in (
-                cls._split_text_to_lines_and_columns(text)):
+        for line, column, text in cls._split_text_to_lines_and_columns(text):
             yield cls(
                 service_code=service_code,
                 transaction_type=transaction_type,
                 transaction_number=transaction_number,
-
                 line_number=line,
                 column_number=column,
                 text=text,
@@ -674,20 +715,25 @@ class TransactionSpecification(TransactionRecord):
 
     @classmethod
     def _split_text_to_lines_and_columns(
-            cls, text) -> Iterable[Tuple[int, int, str]]:
+        cls, text
+    ) -> Iterable[Tuple[int, int, str]]:
         lines = text.splitlines()
 
         if len(lines) > cls._MAX_LINES:
             raise ValueError(
-                'Max {} specification lines allowed, got {}'
-                .format(cls._MAX_LINES, len(lines)))
+                'Max {} specification lines allowed, got {}'.format(
+                    cls._MAX_LINES, len(lines)
+                )
+            )
 
         for line_number, line_text in enumerate(lines, 1):
             if len(line_text) > cls._MAX_LINE_LENGTH:
                 raise ValueError(
                     'Specification lines must be max {} chars long, '
-                    'got {}: {!r}'
-                    .format(cls._MAX_LINE_LENGTH, len(line_text), line_text))
+                    'got {}: {!r}'.format(
+                        cls._MAX_LINE_LENGTH, len(line_text), line_text
+                    )
+                )
 
             yield (line_number, 1, '{:40}'.format(line_text[0:40]))
             yield (line_number, 2, '{:40}'.format(line_text[40:80]))
@@ -698,13 +744,12 @@ class TransactionSpecification(TransactionRecord):
 
         if len(records) > cls._MAX_RECORDS:
             raise ValueError(
-                'Max {} specification records allowed, got {}'
-                .format(cls._MAX_RECORDS, len(records)))
+                'Max {} specification records allowed, got {}'.format(
+                    cls._MAX_RECORDS, len(records)
+                )
+            )
 
-        tuples = sorted([
-            (r.line_number, r.column_number, r)
-            for r in records
-        ])
+        tuples = sorted([(r.line_number, r.column_number, r) for r in records])
 
         text = ''
         for _, column, specification in tuples:
@@ -722,8 +767,7 @@ class TransactionSpecification(TransactionRecord):
             '4'
             '{self.line_number:03d}'
             '{self.column_number:01d}'
-            '{self.text:40}'
-            + ('0' * 20)
+            '{self.text:40}' + ('0' * 20)
         ).format(self=self)
 
 
@@ -737,13 +781,14 @@ class AvtaleGiroAgreement(TransactionRecord):
 
     registration_type = attr.ib(converter=to_avtalegiro_registration_type)
     kid = attr.ib(
-        converter=to_safe_str_or_none,
-        validator=optional(str_of_max_length(25)))
+        converter=to_safe_str_or_none, validator=optional(str_of_max_length(25))
+    )
     notify = attr.ib(converter=to_bool)
 
     RECORD_TYPE = netsgiro.RecordType.TRANSACTION_AGREEMENTS
     _PATTERNS = [
-        re.compile(r'''
+        re.compile(
+            r'''
             ^
             NY      # Format code
             (?P<service_code>21)
@@ -757,7 +802,9 @@ class AvtaleGiroAgreement(TransactionRecord):
 
             0{38}   # Filler
             $
-        ''', re.VERBOSE),
+            ''',
+            re.VERBOSE,
+        )
     ]
 
     def to_ocr(self) -> str:
@@ -766,9 +813,7 @@ class AvtaleGiroAgreement(TransactionRecord):
             'NY219470'
             '{self.transaction_number:07d}'
             '{self.registration_type:01d}'
-            '{self.kid:>25}'
-            + (self.notify and 'J' or 'N')
-            + ('0' * 38)
+            '{self.kid:>25}' + (self.notify and 'J' or 'N') + ('0' * 38)
         ).format(self=self)
 
 
@@ -779,7 +824,8 @@ def parse(data: str) -> List[Record]:
         return cls.__subclasses__() + [
             subsubcls
             for subcls in cls.__subclasses__()
-            for subsubcls in all_subclasses(subcls)]
+            for subsubcls in all_subclasses(subcls)
+        ]
 
     record_classes = {
         cls.RECORD_TYPE: cls
@@ -796,8 +842,8 @@ def parse(data: str) -> List[Record]:
         record_type_str = line[6:8]
         if not record_type_str.isnumeric():
             raise ValueError(
-                'Record type must be numeric, got {!r}'
-                .format(record_type_str))
+                'Record type must be numeric, got {!r}'.format(record_type_str)
+            )
 
         record_type = netsgiro.RecordType(int(record_type_str))
         record_cls = record_classes[record_type]

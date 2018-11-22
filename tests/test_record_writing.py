@@ -21,16 +21,19 @@ def test_transmission_start():
 
 
 @pytest.mark.parametrize(
-    'transmission_number, data_transmitter, data_recipient, exc', [
+    'transmission_number, data_transmitter, data_recipient, exc',
+    [
         ('81', '55555555', '44444444', ValueError),
         (1000081, '55555555', '44444444', TypeError),
         ('1000081', '5555', '44444444', ValueError),
         ('1000081', 55555555, '44444444', TypeError),
         ('1000081', '55555555', '4444', ValueError),
         ('1000081', '55555555', 44444444, TypeError),
-    ])
+    ],
+)
 def test_transmission_start_with_invalid_data(
-        transmission_number, data_transmitter, data_recipient, exc):
+    transmission_number, data_transmitter, data_recipient, exc
+):
     with pytest.raises(exc):
         netsgiro.records.TransmissionStart(
             service_code=netsgiro.ServiceCode.NONE,
@@ -56,14 +59,17 @@ def test_transmission_end():
 
 
 @pytest.mark.parametrize(
-    'num_tx, num_records, total_amount, nets_date, exc', [
+    'num_tx, num_records, total_amount, nets_date, exc',
+    [
         ('abc', 22, 600, date(2004, 6, 17), ValueError),
         (6, 'abc', 600, date(2004, 6, 17), ValueError),
         (6, 22, 'abc', date(2004, 6, 17), ValueError),
         (6, 22, 600, '2004-06-17', ValueError),
-    ])
+    ],
+)
 def test_transmission_end_with_invalid_data(
-        num_tx, num_records, total_amount, nets_date, exc):
+    num_tx, num_records, total_amount, nets_date, exc
+):
     with pytest.raises(exc):
         netsgiro.records.TransmissionEnd(
             service_code=netsgiro.ServiceCode.NONE,
@@ -105,16 +111,17 @@ def test_assignment_start_for_avtalegiro_agreements():
 
 
 @pytest.mark.parametrize(
-    'number, account, agreement_id, exc', [
+    'number, account, agreement_id, exc',
+    [
         (4000086, '88888888888', '123456789', TypeError),
         ('86', '88888888888', '123456789', ValueError),
         ('4000086', 88888888888, '123456789', TypeError),
         ('4000086', '88', '123456789', ValueError),
         ('4000086', '88888888888', 123456789, TypeError),
         ('4000086', '88888888888', '6789', ValueError),
-    ])
-def test_assignment_start_with_invalid_data(
-        number, account, agreement_id, exc):
+    ],
+)
+def test_assignment_start_with_invalid_data(number, account, agreement_id, exc):
     with pytest.raises(exc):
         netsgiro.records.AssignmentStart(
             service_code=netsgiro.ServiceCode.AVTALEGIRO,
@@ -164,7 +171,6 @@ def test_transaction_amount_item_1_for_ocr_giro_transactions():
         nets_date=date(1992, 1, 20),
         amount=102000,
         kid='0000531',
-
         centre_id='13',
         day_code=20,
         partial_settlement_number=1,
@@ -182,7 +188,8 @@ def test_transaction_amount_item_1_for_avtalegiro_payment_requests():
     record = netsgiro.records.TransactionAmountItem1(
         service_code=netsgiro.ServiceCode.AVTALEGIRO,
         transaction_type=(
-            netsgiro.TransactionType.AVTALEGIRO_WITH_BANK_NOTIFICATION),
+            netsgiro.TransactionType.AVTALEGIRO_WITH_BANK_NOTIFICATION
+        ),
         transaction_number=1,
         nets_date=date(2004, 6, 17),
         amount=100,
@@ -200,7 +207,8 @@ def test_transaction_amount_item_1_raises_if_kid_is_too_long():
         netsgiro.records.TransactionAmountItem1(
             service_code=netsgiro.ServiceCode.AVTALEGIRO,
             transaction_type=(
-                netsgiro.TransactionType.AVTALEGIRO_WITH_BANK_NOTIFICATION),
+                netsgiro.TransactionType.AVTALEGIRO_WITH_BANK_NOTIFICATION
+            ),
             transaction_number=1,
             nets_date=date(2004, 6, 17),
             amount=100,
@@ -214,10 +222,10 @@ def test_transaction_amount_item_2_for_avtalegiro_payment_request():
     record = netsgiro.records.TransactionAmountItem2(
         service_code=netsgiro.ServiceCode.AVTALEGIRO,
         transaction_type=(
-            netsgiro.TransactionType.AVTALEGIRO_WITH_BANK_NOTIFICATION),
+            netsgiro.TransactionType.AVTALEGIRO_WITH_BANK_NOTIFICATION
+        ),
         transaction_number=1,
         reference=None,
-
         payer_name='NAVN',
     )
 
@@ -227,20 +235,22 @@ def test_transaction_amount_item_2_for_avtalegiro_payment_request():
     )
 
 
-@pytest.mark.parametrize('payer_name,expected', [
-    (None, None),  # Without payer name
-    ('NAVN123456789', 'NAVN123456'),  # Too long payer name is cut
-    ('NA\nVN', 'NAVN'),  # Newlines are stripped
-])
-def test_transaction_amount_item_2_payer_name_behavior(
-        payer_name, expected):
+@pytest.mark.parametrize(
+    'payer_name,expected',
+    [
+        (None, None),  # Without payer name
+        ('NAVN123456789', 'NAVN123456'),  # Too long payer name is cut
+        ('NA\nVN', 'NAVN'),  # Newlines are stripped
+    ],
+)
+def test_transaction_amount_item_2_payer_name_behavior(payer_name, expected):
     original = netsgiro.records.TransactionAmountItem2(
         service_code=netsgiro.ServiceCode.AVTALEGIRO,
         transaction_type=(
-            netsgiro.TransactionType.AVTALEGIRO_WITH_BANK_NOTIFICATION),
+            netsgiro.TransactionType.AVTALEGIRO_WITH_BANK_NOTIFICATION
+        ),
         transaction_number=1,
         reference=None,
-
         payer_name=payer_name,
     )
 
@@ -253,11 +263,9 @@ def test_transaction_amount_item_2_payer_name_behavior(
 def test_transaction_amount_item_2_for_ocr_giro_transactions():
     record = netsgiro.records.TransactionAmountItem2(
         service_code=netsgiro.ServiceCode.OCR_GIRO,
-        transaction_type=(
-            netsgiro.TransactionType.FROM_GIRO_DEBITED_ACCOUNT),
+        transaction_type=(netsgiro.TransactionType.FROM_GIRO_DEBITED_ACCOUNT),
         transaction_number=1,
         reference='099038562',
-
         form_number='9636827194',
         bank_date=date(1992, 1, 16),
         debit_account='99990512341',
@@ -272,11 +280,9 @@ def test_transaction_amount_item_2_for_ocr_giro_transactions():
 def test_transaction_amount_item_2_for_ocr_giro_without_bank_date():
     record = netsgiro.records.TransactionAmountItem2(
         service_code=netsgiro.ServiceCode.OCR_GIRO,
-        transaction_type=(
-            netsgiro.TransactionType.FROM_GIRO_DEBITED_ACCOUNT),
+        transaction_type=(netsgiro.TransactionType.FROM_GIRO_DEBITED_ACCOUNT),
         transaction_number=1,
         reference='099038562',
-
         form_number='9636827194',
         bank_date=None,
         debit_account='99990512341',
@@ -291,8 +297,7 @@ def test_transaction_amount_item_2_for_ocr_giro_without_bank_date():
 def test_transaction_amount_item_3_for_ocr_giro_transactions():
     record = netsgiro.records.TransactionAmountItem3(
         service_code=netsgiro.ServiceCode.OCR_GIRO,
-        transaction_type=(
-            netsgiro.TransactionType.PURCHASE_WITH_TEXT),
+        transaction_type=(netsgiro.TransactionType.PURCHASE_WITH_TEXT),
         transaction_number=1,
         text='Foo bar baz',
     )
@@ -303,16 +308,17 @@ def test_transaction_amount_item_3_for_ocr_giro_transactions():
     )
 
 
-@pytest.mark.parametrize('text,expected', [
-    (None, None),  # Without text
-    ('Foo\nbar', 'Foobar'),  # Newlines are stripped
-])
-def test_transaction_amount_item_3_text_behavior(
-        text, expected):
+@pytest.mark.parametrize(
+    'text,expected',
+    [
+        (None, None),  # Without text
+        ('Foo\nbar', 'Foobar'),  # Newlines are stripped
+    ],
+)
+def test_transaction_amount_item_3_text_behavior(text, expected):
     original = netsgiro.records.TransactionAmountItem3(
         service_code=netsgiro.ServiceCode.OCR_GIRO,
-        transaction_type=(
-            netsgiro.TransactionType.PURCHASE_WITH_TEXT),
+        transaction_type=(netsgiro.TransactionType.PURCHASE_WITH_TEXT),
         transaction_number=1,
         text=text,
     )
@@ -327,8 +333,7 @@ def test_transaction_amount_item_3_raises_if_text_is_too_long():
     with pytest.raises(ValueError) as exc_info:
         netsgiro.records.TransactionAmountItem3(
             service_code=netsgiro.ServiceCode.OCR_GIRO,
-            transaction_type=(
-                netsgiro.TransactionType.PURCHASE_WITH_TEXT),
+            transaction_type=(netsgiro.TransactionType.PURCHASE_WITH_TEXT),
             transaction_number=1,
             text='Fooo' * 12,  # Max 40 chars
         )
@@ -340,7 +345,8 @@ def test_transaction_specification_for_avtalegiro_payment_request():
     record = netsgiro.records.TransactionSpecification(
         service_code=netsgiro.ServiceCode.AVTALEGIRO,
         transaction_type=(
-            netsgiro.TransactionType.AVTALEGIRO_WITH_BANK_NOTIFICATION),
+            netsgiro.TransactionType.AVTALEGIRO_WITH_BANK_NOTIFICATION
+        ),
         transaction_number=1,
         line_number=1,
         column_number=1,
@@ -354,13 +360,16 @@ def test_transaction_specification_for_avtalegiro_payment_request():
 
 
 def test_transaction_specification_from_longer_text():
-    records = list(netsgiro.records.TransactionSpecification.from_text(
-        service_code=netsgiro.ServiceCode.AVTALEGIRO,
-        transaction_type=(
-            netsgiro.TransactionType.AVTALEGIRO_WITH_BANK_NOTIFICATION),
-        transaction_number=1,
-        text=' Gjelder Faktura: 168837  Dato: 19/03/04\nFoo bar baz quux',
-    ))
+    records = list(
+        netsgiro.records.TransactionSpecification.from_text(
+            service_code=netsgiro.ServiceCode.AVTALEGIRO,
+            transaction_type=(
+                netsgiro.TransactionType.AVTALEGIRO_WITH_BANK_NOTIFICATION
+            ),
+            transaction_number=1,
+            text=' Gjelder Faktura: 168837  Dato: 19/03/04\nFoo bar baz quux',
+        )
+    )
 
     assert len(records) == 4
     assert records[0].to_ocr() == (
@@ -381,19 +390,23 @@ def test_transaction_specification_from_longer_text():
     )
 
 
-@pytest.mark.parametrize('text,expected', [
-    # No text remains a str, not None
-    ('', ' ' * 40),
-    # Newlines are stripped:
-    ('Foo\nbar', 'Foobar                                  '),
-    # Spaces around are preserved:
-    (' Foobar ', ' Foobar                                 '),
-])
+@pytest.mark.parametrize(
+    'text,expected',
+    [
+        # No text remains a str, not None
+        ('', ' ' * 40),
+        # Newlines are stripped:
+        ('Foo\nbar', 'Foobar                                  '),
+        # Spaces around are preserved:
+        (' Foobar ', ' Foobar                                 '),
+    ],
+)
 def test_transaction_specification_text_behavior(text, expected):
     original = netsgiro.records.TransactionSpecification(
         service_code=netsgiro.ServiceCode.AVTALEGIRO,
         transaction_type=(
-            netsgiro.TransactionType.AVTALEGIRO_WITH_BANK_NOTIFICATION),
+            netsgiro.TransactionType.AVTALEGIRO_WITH_BANK_NOTIFICATION
+        ),
         transaction_number=1,
         line_number=1,
         column_number=1,
@@ -414,7 +427,8 @@ def test_transaction_specification_raises_if_text_is_too_long():
         netsgiro.records.TransactionSpecification(
             service_code=netsgiro.ServiceCode.AVTALEGIRO,
             transaction_type=(
-                netsgiro.TransactionType.AVTALEGIRO_WITH_BANK_NOTIFICATION),
+                netsgiro.TransactionType.AVTALEGIRO_WITH_BANK_NOTIFICATION
+            ),
             transaction_number=1,
             line_number=1,
             column_number=1,
@@ -427,11 +441,11 @@ def test_transaction_specification_raises_if_text_is_too_long():
 def test_avtalegiro_agreement():
     record = netsgiro.records.AvtaleGiroAgreement(
         service_code=netsgiro.ServiceCode.AVTALEGIRO,
-        transaction_type=(
-            netsgiro.TransactionType.AVTALEGIRO_AGREEMENT),
+        transaction_type=(netsgiro.TransactionType.AVTALEGIRO_AGREEMENT),
         transaction_number=1,
         registration_type=(
-            netsgiro.AvtaleGiroRegistrationType.NEW_OR_UPDATED_AGREEMENT),
+            netsgiro.AvtaleGiroRegistrationType.NEW_OR_UPDATED_AGREEMENT
+        ),
         kid='008000011688373',
         notify=False,
     )
@@ -446,11 +460,11 @@ def test_avtalegiro_agreement_raises_if_kid_is_too_long():
     with pytest.raises(ValueError) as exc_info:
         netsgiro.records.AvtaleGiroAgreement(
             service_code=netsgiro.ServiceCode.AVTALEGIRO,
-            transaction_type=(
-                netsgiro.TransactionType.AVTALEGIRO_AGREEMENT),
+            transaction_type=(netsgiro.TransactionType.AVTALEGIRO_AGREEMENT),
             transaction_number=1,
             registration_type=(
-                netsgiro.AvtaleGiroRegistrationType.NEW_OR_UPDATED_AGREEMENT),
+                netsgiro.AvtaleGiroRegistrationType.NEW_OR_UPDATED_AGREEMENT
+            ),
             kid='008000011688373' * 4,  # Max 25 chars
             notify=False,
         )

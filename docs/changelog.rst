@@ -13,6 +13,8 @@ v1.2.0 (UNRELEASED)
   ``convert`` with ``converter`` so that netsgiro can continue working with
   attrs relases after January 2019.
 
+- Format code with Black.
+
 
 v1.1.0 (2017-10-23)
 ===================

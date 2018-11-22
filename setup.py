@@ -33,10 +33,7 @@ setup(
     keywords='avtalegiro ocr giro',
     packages=find_packages(exclude=['tests', 'tests.*']),
     python_requires='>=3.4',
-    install_requires=[
-        'attrs >= 17.4',
-        'typing',  # Needed for Python 3.4
-    ],
+    install_requires=['attrs >= 17.4', 'typing'],  # Needed for Python 3.4
     extras_require={
         'dev': [
             'check-manifest',
@@ -50,6 +47,6 @@ setup(
             'sphinx',
             'sphinx_rtd_theme',
             'tox',
-        ],
+        ]
     },
 )

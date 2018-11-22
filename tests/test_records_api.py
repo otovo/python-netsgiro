@@ -8,10 +8,7 @@ import netsgiro.records
 
 def test_parse_with_too_short_lines_fails():
     with pytest.raises(ValueError) as exc_info:
-        netsgiro.records.parse(
-            'NY0000\n'
-            'NY0000\n'
-        )
+        netsgiro.records.parse('NY0000\n' 'NY0000\n')
 
     assert 'exactly 80 chars long' in str(exc_info)
 
@@ -51,13 +48,15 @@ def test_parse_avtalegiro_agreements(agreements_data):
 
     assert isinstance(agreement_1, netsgiro.records.AvtaleGiroAgreement)
     assert agreement_1.registration_type == (
-        netsgiro.AvtaleGiroRegistrationType.NEW_OR_UPDATED_AGREEMENT)
+        netsgiro.AvtaleGiroRegistrationType.NEW_OR_UPDATED_AGREEMENT
+    )
     assert agreement_1.kid == '000112000507155'
     assert agreement_1.notify is True
 
     assert isinstance(agreement_2, netsgiro.records.AvtaleGiroAgreement)
     assert agreement_2.registration_type == (
-        netsgiro.AvtaleGiroRegistrationType.NEW_OR_UPDATED_AGREEMENT)
+        netsgiro.AvtaleGiroRegistrationType.NEW_OR_UPDATED_AGREEMENT
+    )
     assert agreement_2.kid == '001006300507304'
     assert agreement_2.notify is False
 
@@ -97,25 +96,31 @@ def test_parse_avtalegiro_payment_requests(payment_request_data):
     assert assignment_start.assignment_account == '88888888888'
 
     assert isinstance(
-        transaction_amount_1, netsgiro.records.TransactionAmountItem1)
+        transaction_amount_1, netsgiro.records.TransactionAmountItem1
+    )
     assert transaction_amount_1.nets_date == date(2004, 6, 17)
     assert transaction_amount_1.amount == 100
     assert transaction_amount_1.kid == '008000011688373'
 
     assert isinstance(
-        transaction_amount_2, netsgiro.records.TransactionAmountItem2)
+        transaction_amount_2, netsgiro.records.TransactionAmountItem2
+    )
     assert transaction_amount_2.payer_name == 'NAVN'
     assert transaction_amount_2.reference is None
 
     assert isinstance(
-        transaction_spec_1, netsgiro.records.TransactionSpecification)
+        transaction_spec_1, netsgiro.records.TransactionSpecification
+    )
     assert transaction_spec_1.text == (
-        ' Gjelder Faktura: 168837  Dato: 19/03/04')
+        ' Gjelder Faktura: 168837  Dato: 19/03/04'
+    )
 
     assert isinstance(
-        transaction_spec_2, netsgiro.records.TransactionSpecification)
+        transaction_spec_2, netsgiro.records.TransactionSpecification
+    )
     assert transaction_spec_2.text == (
-        '                  ForfallsDato: 17/06/04')
+        '                  ForfallsDato: 17/06/04'
+    )
 
     assert isinstance(assignment_end, netsgiro.records.AssignmentEnd)
     assert assignment_end.num_transactions == 6
@@ -144,23 +149,23 @@ def test_parse_ocr_giro_transactions(ocr_giro_transactions_data):
     assignment_end = result[-2]
     transmission_end = result[-1]
 
-    assert isinstance(
-        transmission_start, netsgiro.records.TransmissionStart)
+    assert isinstance(transmission_start, netsgiro.records.TransmissionStart)
     assert transmission_start.transmission_number == '0170031'
     assert transmission_start.data_recipient == '00010200'
 
-    assert isinstance(
-        assignment_start, netsgiro.records.AssignmentStart)
+    assert isinstance(assignment_start, netsgiro.records.AssignmentStart)
     assert assignment_start.assignment_account == '99991042764'
 
     assert isinstance(
-        transaction_amount_1, netsgiro.records.TransactionAmountItem1)
+        transaction_amount_1, netsgiro.records.TransactionAmountItem1
+    )
     assert transaction_amount_1.nets_date == date(1992, 1, 20)
     assert transaction_amount_1.amount == 102000
     assert transaction_amount_1.kid == '0000531'
 
     assert isinstance(
-        transaction_amount_2, netsgiro.records.TransactionAmountItem2)
+        transaction_amount_2, netsgiro.records.TransactionAmountItem2
+    )
     assert transaction_amount_2.payer_name is None
     assert transaction_amount_2.form_number == '9636827194'
     assert transaction_amount_2.reference == '099038562'
@@ -168,7 +173,8 @@ def test_parse_ocr_giro_transactions(ocr_giro_transactions_data):
     assert transaction_amount_2.debit_account == '99990512341'
 
     assert isinstance(
-        transaction_amount_3, netsgiro.records.TransactionAmountItem3)
+        transaction_amount_3, netsgiro.records.TransactionAmountItem3
+    )
     assert transaction_amount_3.text == 'Foo bar baz'
 
     assert isinstance(assignment_end, netsgiro.records.AssignmentEnd)
