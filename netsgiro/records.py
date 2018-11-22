@@ -80,7 +80,7 @@ to_safe_str_or_none = value_or_none(
 
 @attr.s
 class Record:
-    service_code = attr.ib(convert=to_service_code)
+    service_code = attr.ib(converter=to_service_code)
 
     _PATTERNS = []
 
@@ -148,10 +148,10 @@ class TransmissionStart(Record):
 class TransmissionEnd(Record):
     """TransmissionEnd is the first record in every OCR file."""
 
-    num_transactions = attr.ib(convert=int)
-    num_records = attr.ib(convert=int)
-    total_amount = attr.ib(convert=int)
-    nets_date = attr.ib(convert=to_date)
+    num_transactions = attr.ib(converter=int)
+    num_records = attr.ib(converter=int)
+    total_amount = attr.ib(converter=int)
+    nets_date = attr.ib(converter=to_date)
 
     RECORD_TYPE = netsgiro.RecordType.TRANSMISSION_END
     _PATTERNS = [
@@ -191,7 +191,7 @@ class AssignmentStart(Record):
     Each assignment can contain any number of transactions.
     """
 
-    assignment_type = attr.ib(convert=to_assignment_type)
+    assignment_type = attr.ib(converter=to_assignment_type)
     assignment_number = attr.ib(validator=str_of_length(7))
     assignment_account = attr.ib(validator=str_of_length(11))
 
@@ -264,16 +264,16 @@ class AssignmentStart(Record):
 class AssignmentEnd(Record):
     """AssignmentEnd is the last record of an assignment."""
 
-    assignment_type = attr.ib(convert=to_assignment_type)
-    num_transactions = attr.ib(convert=int)
-    num_records = attr.ib(convert=int)
+    assignment_type = attr.ib(converter=to_assignment_type)
+    num_transactions = attr.ib(converter=int)
+    num_records = attr.ib(converter=int)
 
     # Only for transactions and cancellations
     total_amount = attr.ib(
-        default=None, convert=value_or_none(int))
-    nets_date_1 = attr.ib(default=None, convert=to_date)
-    nets_date_2 = attr.ib(default=None, convert=to_date)
-    nets_date_3 = attr.ib(default=None, convert=to_date)
+        default=None, converter=value_or_none(int))
+    nets_date_1 = attr.ib(default=None, converter=to_date)
+    nets_date_2 = attr.ib(default=None, converter=to_date)
+    nets_date_3 = attr.ib(default=None, converter=to_date)
 
     RECORD_TYPE = netsgiro.RecordType.ASSIGNMENT_END
     _PATTERNS = [
@@ -379,8 +379,8 @@ class AssignmentEnd(Record):
 
 @attr.s
 class TransactionRecord(Record):
-    transaction_type = attr.ib(convert=to_transaction_type)
-    transaction_number = attr.ib(convert=int)
+    transaction_type = attr.ib(converter=to_transaction_type)
+    transaction_number = attr.ib(converter=int)
 
 
 @attr.s
@@ -390,17 +390,17 @@ class TransactionAmountItem1(TransactionRecord):
     The record is used both for AvtaleGiro and for OCR Giro.
     """
 
-    nets_date = attr.ib(convert=to_date)
-    amount = attr.ib(convert=int)
+    nets_date = attr.ib(converter=to_date)
+    amount = attr.ib(converter=int)
     kid = attr.ib(
-        convert=to_safe_str_or_none,
+        converter=to_safe_str_or_none,
         validator=optional(str_of_max_length(25)))
 
     # Only OCR Giro
     centre_id = attr.ib(default=None, validator=optional(str_of_length(2)))
-    day_code = attr.ib(default=None, convert=value_or_none(int))
+    day_code = attr.ib(default=None, converter=value_or_none(int))
     partial_settlement_number = attr.ib(
-        default=None, convert=value_or_none(int))
+        default=None, converter=value_or_none(int))
     partial_settlement_serial_number = attr.ib(
         default=None, validator=optional(str_of_length(5)))
     sign = attr.ib(default=None, validator=optional(str_of_length(1)))
@@ -484,11 +484,11 @@ class TransactionAmountItem2(TransactionRecord):
     """
 
     # TODO Validate `reference` length, which depends on service code
-    reference = attr.ib(convert=to_safe_str_or_none)
+    reference = attr.ib(converter=to_safe_str_or_none)
 
     # Only OCR Giro
     form_number = attr.ib(default=None, validator=optional(str_of_length(10)))
-    bank_date = attr.ib(default=None, convert=to_date)
+    bank_date = attr.ib(default=None, converter=to_date)
     debit_account = attr.ib(
         default=None, validator=optional(str_of_length(11)))
     # XXX In use in OCR Giro "from giro debited account" transactions in test
@@ -496,7 +496,7 @@ class TransactionAmountItem2(TransactionRecord):
     _filler = attr.ib(default=None)
 
     # Only AvtaleGiro
-    payer_name = attr.ib(default=None, convert=to_safe_str_or_none)
+    payer_name = attr.ib(default=None, converter=to_safe_str_or_none)
 
     RECORD_TYPE = netsgiro.RecordType.TRANSACTION_AMOUNT_ITEM_2
     _PATTERNS = [
@@ -579,7 +579,7 @@ class TransactionAmountItem3(TransactionRecord):
     """
 
     text = attr.ib(
-        convert=to_safe_str_or_none,
+        converter=to_safe_str_or_none,
         validator=optional(str_of_max_length(40)))
 
     RECORD_TYPE = netsgiro.RecordType.TRANSACTION_AMOUNT_ITEM_3
@@ -622,10 +622,10 @@ class TransactionSpecification(TransactionRecord):
     specification text.
     """
 
-    line_number = attr.ib(convert=int)
-    column_number = attr.ib(convert=int)
+    line_number = attr.ib(converter=int)
+    column_number = attr.ib(converter=int)
     text = attr.ib(
-        convert=stripped_newlines(fixed_len_str(40, str)),
+        converter=stripped_newlines(fixed_len_str(40, str)),
         validator=optional(str_of_max_length(40)))
 
     RECORD_TYPE = netsgiro.RecordType.TRANSACTION_SPECIFICATION
@@ -735,11 +735,11 @@ class AvtaleGiroAgreement(TransactionRecord):
     notification preferences.
     """
 
-    registration_type = attr.ib(convert=to_avtalegiro_registration_type)
+    registration_type = attr.ib(converter=to_avtalegiro_registration_type)
     kid = attr.ib(
-        convert=to_safe_str_or_none,
+        converter=to_safe_str_or_none,
         validator=optional(str_of_max_length(25)))
-    notify = attr.ib(convert=to_bool)
+    notify = attr.ib(converter=to_bool)
 
     RECORD_TYPE = netsgiro.RecordType.TRANSACTION_AGREEMENTS
     _PATTERNS = [

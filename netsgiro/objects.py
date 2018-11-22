@@ -185,10 +185,10 @@ class Assignment:
     """
 
     #: The service code. One of :class:`~netsgiro.ServiceCode`.
-    service_code = attr.ib(convert=netsgiro.ServiceCode)
+    service_code = attr.ib(converter=netsgiro.ServiceCode)
 
     #: The transaction type. One of :class:`~netsgiro.TransactionType`.
-    type = attr.ib(convert=netsgiro.AssignmentType)
+    type = attr.ib(converter=netsgiro.AssignmentType)
 
     #: The assignment number. String of 7 digits.
     number = attr.ib(validator=str_of_length(7))
@@ -474,14 +474,14 @@ class Agreement:
     """
 
     #: The service code. One of :class:`~netsgiro.ServiceCode`.
-    service_code = attr.ib(convert=netsgiro.ServiceCode)
+    service_code = attr.ib(converter=netsgiro.ServiceCode)
 
     #: Transaction number. Unique and ordered within an assignment.
     number = attr.ib(validator=instance_of(int))
 
     #: Type of agreement registration update.
     #: One of :class:`~netsgiro.AvtaleGiroRegistrationType`.
-    registration_type = attr.ib(convert=netsgiro.AvtaleGiroRegistrationType)
+    registration_type = attr.ib(converter=netsgiro.AvtaleGiroRegistrationType)
 
     #: KID number to identify the customer and invoice.
     kid = attr.ib(validator=optional(instance_of(str)))
@@ -535,10 +535,10 @@ class PaymentRequest:
     """
 
     #: The service code. One of :class:`~netsgiro.ServiceCode`.
-    service_code = attr.ib(convert=netsgiro.ServiceCode)
+    service_code = attr.ib(converter=netsgiro.ServiceCode)
 
     #: The transaction type. One of :class:`~netsgiro.TransactionType`.
-    type = attr.ib(convert=netsgiro.TransactionType)
+    type = attr.ib(converter=netsgiro.TransactionType)
 
     #: Transaction number. Unique and ordered within an assignment.
     number = attr.ib(validator=instance_of(int))
@@ -547,7 +547,7 @@ class PaymentRequest:
     date = attr.ib(validator=instance_of(datetime.date))
 
     #: Transaction amount in NOK with two decimals.
-    amount = attr.ib(convert=Decimal)
+    amount = attr.ib(converter=Decimal)
 
     #: KID number to identify the customer and invoice.
     kid = attr.ib(validator=optional(instance_of(str)))
@@ -636,10 +636,10 @@ class Transaction:
     """
 
     #: The service code. One of :class:`~netsgiro.ServiceCode`.
-    service_code = attr.ib(convert=netsgiro.ServiceCode)
+    service_code = attr.ib(converter=netsgiro.ServiceCode)
 
     #: The transaction type. One of :class:`~netsgiro.TransactionType`.
-    type = attr.ib(convert=netsgiro.TransactionType)
+    type = attr.ib(converter=netsgiro.TransactionType)
 
     #: Transaction number. Unique and ordered within an assignment.
     number = attr.ib(validator=instance_of(int))
@@ -648,7 +648,7 @@ class Transaction:
     date = attr.ib(validator=instance_of(datetime.date))
 
     #: Transaction amount in NOK with two decimals.
-    amount = attr.ib(convert=Decimal)
+    amount = attr.ib(converter=Decimal)
 
     #: KID number to identify the customer and invoice.
     kid = attr.ib(validator=optional(instance_of(str)))

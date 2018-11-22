@@ -9,6 +9,10 @@ v1.2.0 (UNRELEASED)
 - Python 3.7 is now explicitly supported. No changes was required to the
   library, but the test suite now runs on Python 3.4, 3.5, 3.6, and 3.7.
 
+- Require attrs >= 17.4, and replace all use of the deprecated keyword argument
+  ``convert`` with ``converter`` so that netsgiro can continue working with
+  attrs relases after January 2019.
+
 
 v1.1.0 (2017-10-23)
 ===================
