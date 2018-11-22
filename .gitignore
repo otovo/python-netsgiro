@@ -1,8 +1,9 @@
 *.egg-info/
 *.pyc
-.cache/
 .coverage
 .hypothesis/
+.mypy_cache/
+.pytest_cache/
 .tox/
 __pycache__/
 build/
