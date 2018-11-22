@@ -34,7 +34,7 @@ documentation from Nets.
 License
 =======
 
-Copyright 2017 `Otovo AS <https://www.otovo.no/>`_. Licensed under the Apache
+Copyright 2017 `Otovo AS <https://www.otovo.com/>`_. Licensed under the Apache
 License, Version 2.0. See the ``LICENSE`` file for the full license text.
 
 

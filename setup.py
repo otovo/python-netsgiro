@@ -18,7 +18,7 @@ setup(
     long_description=long_description,
     url='https://netsgiro.readthedocs.io/',
     author='Otovo AS',
-    author_email='jodal+netsgiro@otovo.no',
+    author_email='jodal+netsgiro@otovo.com',
     license='Apache License, Version 2.0',
     classifiers=[
         'Development Status :: 5 - Production/Stable',
