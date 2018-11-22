@@ -3,7 +3,7 @@ Changelog
 =========
 
 
-v1.2.0 (UNRELEASED)
+v1.2.0 (2018-11-22)
 ===================
 
 - Python 3.7 is now explicitly supported. No changes was required to the
