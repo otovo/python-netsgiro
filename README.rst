@@ -50,10 +50,14 @@ Project resources
     :target: https://pypi.org/project/netsgiro/
     :alt: Latest PyPI version
 
-.. image:: https://img.shields.io/travis/otovo/python-netsgiro/master.svg?style=flat
-    :target: https://travis-ci.org/otovo/python-netsgiro
-    :alt: Travis CI build status
+.. image:: https://img.shields.io/circleci/project/github/otovo/python-netsgiro/master.svg
+    :target: https://circleci.com/gh/otovo/python-netsgiro
+    :alt: CircleCI build status
 
-.. image:: https://img.shields.io/coveralls/otovo/python-netsgiro/master.svg?style=flat
-    :target: https://coveralls.io/github/otovo/python-netsgiro
-    :alt: Test coverage
+.. image:: https://img.shields.io/readthedocs/netsgiro.svg
+   :target: https://netsgiro.readthedocs.io/
+   :alt: Read the Docs build status
+
+.. image:: https://img.shields.io/codecov/c/github/otovo/python-netsgiro/master.svg
+   :target: https://codecov.io/gh/otovo/python-netsgiro
+   :alt: Test coverage
