@@ -19,7 +19,7 @@ source_suffix = '.rst'
 master_doc = 'index'
 
 project = 'netsgiro'
-copyright = '2017-2018, Otovo AS'
+copyright = '2017-2019, Otovo AS'
 author = 'Otovo AS'
 
 release = netsgiro.__version__
