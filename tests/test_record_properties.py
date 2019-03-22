@@ -38,9 +38,9 @@ def test_transmission_start(tn, dt, dr):
 
 
 @given(
-    nt=st.integers(min_value=0),
-    nr=st.integers(min_value=0),
-    ta=st.integers(min_value=0),
+    nt=st.integers(min_value=0, max_value=99999999),
+    nr=st.integers(min_value=0, max_value=99999999),
+    ta=st.integers(min_value=0, max_value=99999999999999999),
     nd=dates(),
 )
 def test_transmission_end(nt, nr, ta, nd):
@@ -101,9 +101,9 @@ def test_assignment_start_for_avtalegiro_agreements(an, aa):
 
 
 @given(
-    nt=st.integers(min_value=0),
-    nr=st.integers(min_value=0),
-    ta=st.integers(min_value=0),
+    nt=st.integers(min_value=0, max_value=99999999),
+    nr=st.integers(min_value=0, max_value=99999999),
+    ta=st.integers(min_value=0, max_value=99999999999999999),
     nd1=dates(),
     nd2=dates(),
 )
@@ -128,7 +128,10 @@ def test_assignment_end_for_avtalegiro_payment_requests(nt, nr, ta, nd1, nd2):
     assert record.nets_date_latest == nd2
 
 
-@given(nt=st.integers(min_value=0), nr=st.integers(min_value=0))
+@given(
+    nt=st.integers(min_value=0, max_value=99999999),
+    nr=st.integers(min_value=0, max_value=99999999),
+)
 def test_assignment_end_for_avtalegiro_agreements(nt, nr):
     original = netsgiro.records.AssignmentEnd(
         service_code=netsgiro.ServiceCode.AVTALEGIRO,
@@ -147,7 +150,7 @@ def test_assignment_end_for_avtalegiro_agreements(nt, nr):
 @given(
     tn=st.integers(min_value=0, max_value=9999999),
     nd=dates(),
-    a=st.integers(min_value=0),
+    a=st.integers(min_value=0, max_value=99999999999999999),
     kid=digits(min_size=4, max_size=25),
     cid=digits(2),
     dc=st.integers(min_value=1, max_value=31),
@@ -190,7 +193,7 @@ def test_transaction_amount_item_1_for_ocr_giro_transactions(
 @given(
     tn=st.integers(min_value=0, max_value=9999999),
     nd=dates(),
-    a=st.integers(min_value=0),
+    a=st.integers(min_value=0, max_value=99999999999999999),
     kid=digits(min_size=4, max_size=25),
 )
 def test_transaction_amount_item_1_for_avtalegiro_payment_requests(
