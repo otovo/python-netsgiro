@@ -3,6 +3,12 @@ Changelog
 =========
 
 
+v1.3.0 (UNRELEASED)
+===================
+
+- Drop support for Python 3.4, which has reached end of life.
+
+
 v1.2.0 (2018-11-22)
 ===================
 

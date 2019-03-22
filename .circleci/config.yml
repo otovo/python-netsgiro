@@ -7,7 +7,6 @@ workflows:
   version: 2
   test:
     jobs:
-      - py34
       - py35
       - py36
       - py37
@@ -49,11 +48,6 @@ jobs:
           file: coverage.xml
       - store_test_results:
           path: test-results
-
-  py34:
-    <<: *test-template
-    docker:
-      - image: circleci/python:3.4
 
   py35:
     <<: *test-template
