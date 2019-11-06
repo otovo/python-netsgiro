@@ -273,7 +273,7 @@ class Assignment:
 
     @staticmethod
     def _group_by_transaction_number(
-        records: List[Record]
+        records: List[Record],
     ) -> Mapping[int, List[Record]]:
         transactions = collections.OrderedDict()
 
