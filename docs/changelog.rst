@@ -7,7 +7,8 @@ v1.3.0 (UNRELEASED)
 ===================
 
 - Drop support for Python 3.4, which has reached end of life.
-
+- Python 3.8 is now explicitly supported. No changes was required to the
+  library, but the test suite now runs on Python 3.4, 3.5, 3.6, 3.7 and 3.8.
 
 v1.2.0 (2018-11-22)
 ===================
