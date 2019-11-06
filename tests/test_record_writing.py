@@ -203,7 +203,7 @@ def test_transaction_amount_item_1_for_avtalegiro_payment_requests():
 
 
 def test_transaction_amount_item_1_raises_if_kid_is_too_long():
-    with pytest.raises(ValueError) as exc_info:
+    with pytest.raises(ValueError, match='kid must be at most 25 chars'):
         netsgiro.records.TransactionAmountItem1(
             service_code=netsgiro.ServiceCode.AVTALEGIRO,
             transaction_type=(
@@ -214,8 +214,6 @@ def test_transaction_amount_item_1_raises_if_kid_is_too_long():
             amount=100,
             kid='008000011688373' * 4,  # Max 25 chars
         )
-
-    assert 'kid must be at most 25 chars' in str(exc_info)
 
 
 def test_transaction_amount_item_2_for_avtalegiro_payment_request():
@@ -330,15 +328,13 @@ def test_transaction_amount_item_3_text_behavior(text, expected):
 
 
 def test_transaction_amount_item_3_raises_if_text_is_too_long():
-    with pytest.raises(ValueError) as exc_info:
+    with pytest.raises(ValueError, match='text must be at most 40 chars'):
         netsgiro.records.TransactionAmountItem3(
             service_code=netsgiro.ServiceCode.OCR_GIRO,
             transaction_type=(netsgiro.TransactionType.PURCHASE_WITH_TEXT),
             transaction_number=1,
             text='Fooo' * 12,  # Max 40 chars
         )
-
-    assert 'text must be at most 40 chars' in str(exc_info)
 
 
 def test_transaction_specification_for_avtalegiro_payment_request():
@@ -423,7 +419,7 @@ def test_transaction_specification_text_behavior(text, expected):
 
 
 def test_transaction_specification_raises_if_text_is_too_long():
-    with pytest.raises(ValueError) as exc_info:
+    with pytest.raises(ValueError, match='text must be at most 40 chars'):
         netsgiro.records.TransactionSpecification(
             service_code=netsgiro.ServiceCode.AVTALEGIRO,
             transaction_type=(
@@ -434,8 +430,6 @@ def test_transaction_specification_raises_if_text_is_too_long():
             column_number=1,
             text='Fooo' * 12,  # Max 40 chars
         )
-
-    assert 'text must be at most 40 chars' in str(exc_info)
 
 
 def test_avtalegiro_agreement():
@@ -457,7 +451,7 @@ def test_avtalegiro_agreement():
 
 
 def test_avtalegiro_agreement_raises_if_kid_is_too_long():
-    with pytest.raises(ValueError) as exc_info:
+    with pytest.raises(ValueError, match='kid must be at most 25 chars'):
         netsgiro.records.AvtaleGiroAgreement(
             service_code=netsgiro.ServiceCode.AVTALEGIRO,
             transaction_type=(netsgiro.TransactionType.AVTALEGIRO_AGREEMENT),
@@ -468,5 +462,3 @@ def test_avtalegiro_agreement_raises_if_kid_is_too_long():
             kid='008000011688373' * 4,  # Max 25 chars
             notify=False,
         )
-
-    assert 'kid must be at most 25 chars' in str(exc_info)

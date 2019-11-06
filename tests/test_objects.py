@@ -16,14 +16,10 @@ def transmission():
 
 
 def test_transmission_from_zero_records_fails():
-    with pytest.raises(ValueError) as exc_info:
+    with pytest.raises(ValueError, match='At least 2 records required, got 0'):
         netsgiro.Transmission.from_records([])
-
-    assert 'At least 2 records required, got 0' in str(exc_info)
 
 
 def test_assignment_from_zero_records_fails():
-    with pytest.raises(ValueError) as exc_info:
+    with pytest.raises(ValueError, match='At least 2 records required, got 0'):
         netsgiro.Assignment.from_records([])
-
-    assert 'At least 2 records required, got 0' in str(exc_info)

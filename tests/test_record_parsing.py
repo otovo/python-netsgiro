@@ -23,12 +23,11 @@ def test_transmission_start():
 def test_transmission_start_fails_when_invalid_format():
     line = 'XX' + ('0' * 78)
 
-    with pytest.raises(ValueError) as exc_info:
+    with pytest.raises(
+        ValueError,
+        match='{!r} did not match TransmissionStart record format'.format(line),
+    ):
         netsgiro.records.TransmissionStart.from_string(line)
-
-    assert '{!r} did not match TransmissionStart record format'.format(
-        line
-    ) in str(exc_info)
 
 
 def test_transmission_end():
@@ -382,10 +381,10 @@ def test_transaction_specification_to_text_with_max_number_of_records():
 def test_transaction_specification_to_text_with_too_many_records():
     records = make_specification_records(43)
 
-    with pytest.raises(ValueError) as exc_info:
+    with pytest.raises(
+        ValueError, match='Max 84 specification records allowed, got 86'
+    ):
         netsgiro.records.TransactionSpecification.to_text(records)
-
-    assert 'Max 84 specification records allowed, got 86' in str(exc_info)
 
 
 def test_avtalegiro_active_agreement():
