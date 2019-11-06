@@ -10,6 +10,7 @@ workflows:
       - py35
       - py36
       - py37
+      - py38
       - flake8
       #- mypy  # TODO Enable once the mypy checks passes
       - check-manifest
@@ -19,9 +20,9 @@ workflows:
       - pydocstyle
 
 jobs:
-  py37: &test-template
+  py38: &test-template
     docker:
-      - image: circleci/python:3.7
+      - image: circleci/python:3.8
     steps:
       - checkout
       - run:
@@ -58,6 +59,11 @@ jobs:
     <<: *test-template
     docker:
       - image: circleci/python:3.6
+
+  py37:
+    <<: *test-template
+    docker:
+      - image: circleci/python:3.7
 
   flake8: *test-template
 
