@@ -7,24 +7,20 @@ import netsgiro.records
 
 
 def test_parse_with_too_short_lines_fails():
-    with pytest.raises(ValueError) as exc_info:
+    with pytest.raises(ValueError, match='exactly 80 chars long'):
         netsgiro.records.parse('NY0000\n' 'NY0000\n')
-
-    assert 'exactly 80 chars long' in str(exc_info)
 
 
 def test_parse_with_nonnumeric_record_type():
-    with pytest.raises(ValueError) as exc_info:
+    with pytest.raises(
+        ValueError, match="Record type must be numeric, got 'AA'"
+    ):
         netsgiro.records.parse('NY0000AA' + '0' * 72)
-
-    assert "Record type must be numeric, got 'AA'" in str(exc_info)
 
 
 def test_parse_with_unknown_record_type():
-    with pytest.raises(ValueError) as exc_info:
+    with pytest.raises(ValueError, match='99 is not a valid RecordType'):
         netsgiro.records.parse('NY000099' + '0' * 72)
-
-    assert '99 is not a valid RecordType' in str(exc_info)
 
 
 def test_parse_avtalegiro_agreements(agreements_data):
