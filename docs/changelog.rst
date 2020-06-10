@@ -3,7 +3,7 @@ Changelog
 =========
 
 
-v1.3.0 (UNRELEASED)
+v1.3.0 (2020-06-10)
 ===================
 
 - Drop support for Python 3.4, which has reached end of life.
