@@ -11,6 +11,8 @@ workflows:
       - py36
       - py37
       - py38
+      - py39
+      - py310
       - flake8
       #- mypy  # TODO Enable once the mypy checks passes
       - check-manifest

@@ -10,6 +10,7 @@ with open('netsgiro/__init__.py') as fh:
 with open('README.rst') as fh:
     long_description = fh.read()
 
+tox
 
 setup(
     name='netsgiro',
