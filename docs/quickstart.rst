@@ -13,7 +13,7 @@ Parsing AvtaleGiro agreements
 =============================
 
 To parse an OCR file, you must first read the contents of the OCR file. It
-should be decoded using the ISO-8559-1 encoding::
+should be decoded using the ISO-8859-1 encoding::
 
     with open('my-ocr-file.txt', 'r', encoding='iso-8859-1') as fh:
         data = fh.read()
