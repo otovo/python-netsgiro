@@ -25,7 +25,7 @@ def test_transmission_start_fails_when_invalid_format():
 
     with pytest.raises(
         ValueError,
-        match='{!r} did not match TransmissionStart record format'.format(line),
+        match=f'{line!r} did not match TransmissionStart record format',
     ):
         netsgiro.records.TransmissionStart.from_string(line)
 
@@ -361,7 +361,7 @@ def make_specification_records(num_lines, num_columns=2):
             transaction_number=1,
             line_number=line,
             column_number=column,
-            text='Line {}, column {}'.format(line, column),
+            text=f'Line {line}, column {column}',
         )
         for line in range(1, num_lines + 1)
         for column in range(1, num_columns + 1)

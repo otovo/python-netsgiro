@@ -72,7 +72,7 @@ def to_bool(value: Union[bool, str]) -> bool:
     elif value == 'N':
         return False
     else:
-        raise ValueError("Expected 'J' or 'N', got {!r}".format(value))
+        raise ValueError(f"Expected 'J' or 'N', got {value!r}")
 
 
 to_safe_str_or_none = value_or_none(
@@ -96,7 +96,7 @@ class Record:
                 return cls(**matches.groupdict())
 
         raise ValueError(
-            '{!r} did not match {} record formats'.format(line, cls.__name__)
+            f'{line!r} did not match {cls.__name__} record formats'
         )
 
     def to_ocr(self) -> str:
@@ -368,7 +368,7 @@ class AssignmentEnd(Record):
             return self.nets_date_1
         else:
             raise ValueError(
-                'Unhandled service code: {}'.format(self.service_code)
+                f'Unhandled service code: {self.service_code}'
             )
 
     @property
@@ -381,7 +381,7 @@ class AssignmentEnd(Record):
             return self.nets_date_2
         else:
             raise ValueError(
-                'Unhandled service code: {}'.format(self.service_code)
+                f'Unhandled service code: {self.service_code}'
             )
 
     def to_ocr(self) -> str:
@@ -595,7 +595,7 @@ class TransactionAmountItem2(TransactionRecord):
             service_fields = (
                 (
                     self.payer_name
-                    and '{:10}'.format(self.payer_name[:10])
+                    and f'{self.payer_name[:10]:10}'
                     or (' ' * 10)
                 )
                 + (' ' * 25)
@@ -646,7 +646,7 @@ class TransactionAmountItem3(TransactionRecord):
             '{self.transaction_type:02d}'
             '32'
             '{self.transaction_number:07d}'
-            + (self.text and '{:40}'.format(self.text) or (' ' * 40))
+            + (self.text and f'{self.text:40}' or (' ' * 40))
             + ('0' * 25)
         ).format(self=self)
 
@@ -735,8 +735,8 @@ class TransactionSpecification(TransactionRecord):
                     )
                 )
 
-            yield (line_number, 1, '{:40}'.format(line_text[0:40]))
-            yield (line_number, 2, '{:40}'.format(line_text[40:80]))
+            yield (line_number, 1, f'{line_text[0:40]:40}')
+            yield (line_number, 2, f'{line_text[40:80]:40}')
 
     @classmethod
     def to_text(cls, records: Sequence['TransactionSpecification']) -> str:
@@ -749,7 +749,7 @@ class TransactionSpecification(TransactionRecord):
                 )
             )
 
-        tuples = sorted([(r.line_number, r.column_number, r) for r in records])
+        tuples = sorted((r.line_number, r.column_number, r) for r in records)
 
         text = ''
         for _, column, specification in tuples:
@@ -842,7 +842,7 @@ def parse(data: str) -> List[Record]:
         record_type_str = line[6:8]
         if not record_type_str.isnumeric():
             raise ValueError(
-                'Record type must be numeric, got {!r}'.format(record_type_str)
+                f'Record type must be numeric, got {record_type_str!r}'
             )
 
         record_type = netsgiro.RecordType(int(record_type_str))
