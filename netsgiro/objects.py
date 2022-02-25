@@ -56,7 +56,7 @@ class Transmission:
         """Build a Transmission object from a list of record objects."""
         if len(records) < 2:
             raise ValueError(
-                'At least 2 records required, got {}'.format(len(records))
+                f'At least 2 records required, got {len(records)}'
             )
 
         start, body, end = records[0], records[1:-1], records[-1]
@@ -83,7 +83,7 @@ class Transmission:
                 assignments[current_assignment_number] = []
             if current_assignment_number is None:
                 raise ValueError(
-                    'Expected AssignmentStart record, got {!r}'.format(record)
+                    f'Expected AssignmentStart record, got {record!r}'
                 )
             assignments[current_assignment_number].append(record)
             if isinstance(record, netsgiro.records.AssignmentEnd):
@@ -222,7 +222,7 @@ class Assignment:
         """Build an Assignment object from a list of record objects."""
         if len(records) < 2:
             raise ValueError(
-                'At least 2 records required, got {}'.format(len(records))
+                f'At least 2 records required, got {len(records)}'
             )
 
         start, body, end = records[0], records[1:-1], records[-1]
@@ -242,7 +242,7 @@ class Assignment:
             transactions = cls._get_transactions(body)
         else:
             raise ValueError(
-                'Unknown service code: {}'.format(start.service_code)
+                f'Unknown service code: {start.service_code}'
             )
 
         return cls(
@@ -314,7 +314,7 @@ class Assignment:
             }
         else:
             raise ValueError(
-                'Unhandled service code: {}'.format(self.service_code)
+                f'Unhandled service code: {self.service_code}'
             )
 
         return netsgiro.records.AssignmentEnd(
