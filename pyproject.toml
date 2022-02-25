@@ -41,7 +41,6 @@ pytest = "*"
 pytest-xdist = "*"
 Sphinx = "*"
 sphinx-rtd-theme = "*"
-tox = "*"
 
 [build-system]
 requires = ["poetry-core>=1.0.0"]
