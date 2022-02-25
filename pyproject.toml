@@ -1,3 +1,52 @@
+[tool.poetry]
+name = "netsgiro"
+version = "1.3.0"
+description = "File parsers for Nets AvtaleGiro and OCR Giro"
+homepage = 'https://pypi.org/project/netsgiro/'
+repository = 'https://github.com/otovo/python-netsgiro'
+authors = ["Otovo AS <jodal+netsgiro@otovo.com>"]
+license = 'Apache License, Version 2.0'
+readme = 'README.rst'
+keywords = ['avtalegiro', 'ocr', 'giro']
+packages = [{ include = 'netsgiro' }]
+classifiers=[
+    'Development Status :: 5 - Production/Stable',
+    'Intended Audience :: Developers',
+    'License :: OSI Approved :: Apache Software License',
+    'Programming Language :: Python :: 3',
+    'Programming Language :: Python :: 3.5',
+    'Programming Language :: Python :: 3.6',
+    'Programming Language :: Python :: 3.7',
+    'Programming Language :: Python :: 3.8',
+    'Programming Language :: Python :: 3.9',
+    'Programming Language :: Python :: 3.10',
+]
+
+[tool.poetry.urls]
+"Docs" = "https://netsgiro.readthedocs.io/"
+"Changelog" = "https://netsgiro.readthedocs.io/en/latest/changelog/"
+
+[tool.poetry.dependencies]
+python = ">=3.5"
+attrs = ">=17.4"
+
+[tool.poetry.dev-dependencies]
+check-manifest = "*"
+flake8 = "*"
+flake8-import-order = "*"
+hypothesis = "*"
+mypy = "*"
+pydocstyle = "*"
+pytest = "*"
+pytest-xdist = "*"
+Sphinx = "*"
+sphinx-rtd-theme = "*"
+tox = "*"
+
+[build-system]
+requires = ["poetry-core>=1.0.0"]
+build-backend = "poetry.core.masonry.api"
+
 [tool.black]
 line-length = 80
 skip-string-normalization = true
