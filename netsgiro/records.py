@@ -735,7 +735,7 @@ class TransactionSpecification(TransactionRecord):
                     )
                 )
 
-            yield (line_number, 1, f'{line_text[0:40]:40}')
+            yield (line_number, 1, f'{line_text[:40]:40}')
             yield (line_number, 2, f'{line_text[40:80]:40}')
 
     @classmethod
