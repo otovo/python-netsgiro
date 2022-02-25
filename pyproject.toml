@@ -47,3 +47,7 @@ quiet = true
 line-length = 80
 skip-string-normalization = true
 experimental-string-processing = true
+
+[tool.isort]
+profile = "black"
+line_length = 80
