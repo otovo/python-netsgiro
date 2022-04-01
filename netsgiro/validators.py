@@ -1,6 +1,10 @@
 """Custom validators for :mod:`attrs`."""
+from datetime import date, datetime
+from typing import NoReturn
 
 from attr.validators import instance_of
+
+from netsgiro.utils import OSLO_TZ, get_minimum_due_date
 
 
 def str_of_length(length):
@@ -32,3 +36,13 @@ def str_of_max_length(length):
             )
 
     return validator
+
+
+def validate_minimum_date(value: date) -> NoReturn:
+    """Make sure payment request dates are gt the minimum allowed date."""
+    if value < get_minimum_due_date(now=datetime.now(tz=OSLO_TZ)):
+        raise ValueError(
+            'The minimum due date of a transaction is today + 4 calendar days.'
+            ' OCR files with due dates earlier than this will be rejected when'
+            ' submitted.'
+        )
