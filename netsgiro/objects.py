@@ -11,7 +11,7 @@ from attr.validators import instance_of, optional
 import netsgiro
 import netsgiro.records
 from netsgiro.records import Record
-from netsgiro.validators import str_of_length, validate_minimum_date
+from netsgiro.validators import str_of_length, validate_due_date
 
 __all__ = [
     'Transmission',
@@ -352,7 +352,7 @@ class Assignment:
 
         if strict:
             # Make sure we're not passing invalid due dates
-            validate_minimum_date(due_date)
+            validate_due_date(due_date)
 
         if bank_notification:
             transaction_type = (
