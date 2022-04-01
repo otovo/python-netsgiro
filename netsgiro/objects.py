@@ -11,6 +11,7 @@ from attr.validators import instance_of, optional
 import netsgiro
 import netsgiro.records
 from netsgiro.records import Record
+from netsgiro.utils import validate_minimum_date
 from netsgiro.validators import str_of_length
 
 
@@ -568,7 +569,9 @@ class PaymentRequest:
     number = attr.ib(validator=instance_of(int))
 
     #: The due date.
-    date = attr.ib(validator=instance_of(datetime.date))
+    date = attr.ib(
+        validator=[instance_of(datetime.date), validate_minimum_date]
+    )
 
     #: Transaction amount in NOK with two decimals.
     amount = attr.ib(converter=Decimal)
