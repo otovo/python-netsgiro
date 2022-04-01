@@ -142,10 +142,10 @@ class TransmissionStart(Record):
         """Get record as OCR string."""
         return (
             'NY000010'
-            '{self.data_transmitter:8}'
-            '{self.transmission_number:7}'
-            '{self.data_recipient:8}' + ('0' * 49)
-        ).format(self=self)
+            f'{self.data_transmitter:8}'
+            f'{self.transmission_number:7}'
+            f'{self.data_recipient:8}' + ('0' * 49)
+        )
 
 
 @attr.s
@@ -183,11 +183,11 @@ class TransmissionEnd(Record):
         """Get record as OCR string."""
         return (
             'NY000089'
-            '{self.num_transactions:08d}'
-            '{self.num_records:08d}'
-            '{self.total_amount:017d}'
-            '{self.nets_date:%d%m%y}' + ('0' * 33)
-        ).format(self=self)
+            f'{self.num_transactions:08d}'
+            f'{self.num_records:08d}'
+            f'{self.total_amount:017d}'
+            f'{self.nets_date:%d%m%y}' + ('0' * 33)
+        )
 
 
 @attr.s
@@ -264,14 +264,14 @@ class AssignmentStart(Record):
     def to_ocr(self) -> str:
         """Get record as OCR string."""
         return (
-            'NY'
-            '{self.service_code:02d}'
-            '{self.assignment_type:02d}'
-            '20'
-            + (self.agreement_id and '{self.agreement_id:9}' or ('0' * 9))
-            + '{self.assignment_number:7}'
-            '{self.assignment_account:11}' + ('0' * 45)
-        ).format(self=self)
+                'NY'
+                f'{self.service_code:02d}'
+                f'{self.assignment_type:02d}'
+                '20'
+                + (self.agreement_id and f'{self.agreement_id:9}' or ('0' * 9))
+                + f'{self.assignment_number:7}'
+                  f'{self.assignment_account:11}' + ('0' * 45)
+        )
 
 
 @attr.s
@@ -387,18 +387,18 @@ class AssignmentEnd(Record):
     def to_ocr(self) -> str:
         """Get record as OCR string."""
         return (
-            'NY'
-            '{self.service_code:02d}'
-            '{self.assignment_type:02d}'
-            '88'
-            '{self.num_transactions:08d}'
-            '{self.num_records:08d}'
-            + (self.total_amount and '{self.total_amount:017d}' or ('0' * 17))
-            + (self.nets_date_1 and '{self.nets_date_1:%d%m%y}' or ('0' * 6))
-            + (self.nets_date_2 and '{self.nets_date_2:%d%m%y}' or ('0' * 6))
-            + (self.nets_date_3 and '{self.nets_date_3:%d%m%y}' or ('0' * 6))
-            + ('0' * 21)
-        ).format(self=self)
+                'NY'
+                f'{self.service_code:02d}'
+                f'{self.assignment_type:02d}'
+                '88'
+                f'{self.num_transactions:08d}'
+                f'{self.num_records:08d}'
+                + (self.total_amount and f'{self.total_amount:017d}' or ('0' * 17))
+                + (self.nets_date_1 and f'{self.nets_date_1:%d%m%y}' or ('0' * 6))
+                + (self.nets_date_2 and f'{self.nets_date_2:%d%m%y}' or ('0' * 6))
+                + (self.nets_date_3 and f'{self.nets_date_3:%d%m%y}' or ('0' * 6))
+                + ('0' * 21)
+        )
 
 
 @attr.s
@@ -495,14 +495,14 @@ class TransactionAmountItem1(TransactionRecord):
             ocr_giro_fields = ' ' * 11
 
         return (
-            'NY'
-            '{self.service_code:02d}'
-            '{self.transaction_type:02d}'
-            '30'
-            '{self.transaction_number:07d}'
-            '{self.nets_date:%d%m%y}' + ocr_giro_fields + '{self.amount:017d}'
-            '{self.kid:>25}' + ('0' * 6)
-        ).format(self=self)
+                'NY'
+                f'{self.service_code:02d}'
+                f'{self.transaction_type:02d}'
+                '30'
+                f'{self.transaction_number:07d}'
+                f'{self.nets_date:%d%m%y}' + ocr_giro_fields + f'{self.amount:017d}'
+                                                              f'{self.kid:>25}' + ('0' * 6)
+        )
 
 
 @attr.s
@@ -576,32 +576,31 @@ class TransactionAmountItem2(TransactionRecord):
         """Get record as OCR string."""
         common_fields = (
             'NY'
-            '{self.service_code:02d}'
-            '{self.transaction_type:02d}'
+            f'{self.service_code:02d}'
+            f'{self.transaction_type:02d}'
             '31'
-            '{self.transaction_number:07d}'
-        ).format(self=self)
-
+            f'{self.transaction_number:07d}'
+        )
         if self.service_code == netsgiro.ServiceCode.OCR_GIRO:
             service_fields = (
-                '{self.form_number:10}'
-                + (self.reference and '{self.reference:9}' or (' ' * 9))
-                + (self._filler and '{self._filler:7}' or ('0' * 7))
-                + (self.bank_date and '{self.bank_date:%d%m%y}' or '0' * 6)
-                + '{self.debit_account:11}'
-                + ('0' * 22)
-            ).format(self=self)
+                    f'{self.form_number:10}'
+                    + (self.reference and f'{self.reference:9}' or (' ' * 9))
+                    + (self._filler and f'{self._filler:7}' or ('0' * 7))
+                    + (self.bank_date and f'{self.bank_date:%d%m%y}' or '0' * 6)
+                    + f'{self.debit_account:11}'
+                    + ('0' * 22)
+            )
         elif self.service_code == netsgiro.ServiceCode.AVTALEGIRO:
             service_fields = (
-                (
-                    self.payer_name
-                    and f'{self.payer_name[:10]:10}'
-                    or (' ' * 10)
-                )
-                + (' ' * 25)
-                + (self.reference and '{self.reference:25}' or (' ' * 25))
-                + ('0' * 5)
-            ).format(self=self)
+                    (
+                            self.payer_name
+                            and f'{self.payer_name[:10]:10}'
+                            or (' ' * 10)
+                    )
+                    + (' ' * 25)
+                    + (self.reference and f'{self.reference:25}' or (' ' * 25))
+                    + ('0' * 5)
+            )
         else:
             service_fields = ' ' * 35
 
@@ -642,13 +641,13 @@ class TransactionAmountItem3(TransactionRecord):
     def to_ocr(self) -> str:
         """Get record as OCR string."""
         return (
-            'NY09'
-            '{self.transaction_type:02d}'
-            '32'
-            '{self.transaction_number:07d}'
-            + (self.text and f'{self.text:40}' or (' ' * 40))
-            + ('0' * 25)
-        ).format(self=self)
+                'NY09'
+                f'{self.transaction_type:02d}'
+                '32'
+                f'{self.transaction_number:07d}'
+                + (self.text and f'{self.text:40}' or (' ' * 40))
+                + ('0' * 25)
+        )
 
 
 @attr.s
@@ -763,12 +762,12 @@ class TransactionSpecification(TransactionRecord):
         """Get record as OCR string."""
         return (
             'NY212149'
-            '{self.transaction_number:07d}'
+            f'{self.transaction_number:07d}'
             '4'
-            '{self.line_number:03d}'
-            '{self.column_number:01d}'
-            '{self.text:40}' + ('0' * 20)
-        ).format(self=self)
+            f'{self.line_number:03d}'
+            f'{self.column_number:01d}'
+            f'{self.text:40}' + ('0' * 20)
+        )
 
 
 @attr.s
@@ -811,9 +810,9 @@ class AvtaleGiroAgreement(TransactionRecord):
         """Get record as OCR string."""
         return (
             'NY219470'
-            '{self.transaction_number:07d}'
-            '{self.registration_type:01d}'
-            '{self.kid:>25}' + (self.notify and 'J' or 'N') + ('0' * 38)
+            f'{self.transaction_number:07d}'
+            f'{self.registration_type:01d}'
+            f'{self.kid:>25}' + (self.notify and 'J' or 'N') + ('0' * 38)
         ).format(self=self)
 
 
