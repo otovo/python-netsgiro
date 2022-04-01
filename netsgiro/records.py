@@ -720,10 +720,9 @@ class TransactionSpecification(TransactionRecord):
 
         if len(lines) > cls._MAX_LINES:
             raise ValueError(
-                'Max {} specification lines allowed, got {}'.format(
-                    cls._MAX_LINES, len(lines)
-                )
+                f'Max {cls._MAX_LINES} specification lines allowed, got {len(lines)}'
             )
+
 
         for line_number, line_text in enumerate(lines, 1):
             if len(line_text) > cls._MAX_LINE_LENGTH:
@@ -734,7 +733,7 @@ class TransactionSpecification(TransactionRecord):
                     )
                 )
 
-            yield (line_number, 1, f'{line_text[0:40]:40}')
+            yield (line_number, 1, f'{line_text[:40]:40}')
             yield (line_number, 2, f'{line_text[40:80]:40}')
 
     @classmethod
@@ -743,10 +742,9 @@ class TransactionSpecification(TransactionRecord):
 
         if len(records) > cls._MAX_RECORDS:
             raise ValueError(
-                'Max {} specification records allowed, got {}'.format(
-                    cls._MAX_RECORDS, len(records)
-                )
+                f'Max {cls._MAX_RECORDS} specification records allowed, got {len(records)}'
             )
+
 
         tuples = sorted((r.line_number, r.column_number, r) for r in records)
 
