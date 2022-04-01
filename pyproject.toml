@@ -28,6 +28,11 @@ classifiers=[
 python = ">=3.7"
 attrs = ">=17.4"
 
+[tool.poetry.extras]
+# Holidays can be installed to enable holiday-adjustments
+# in minimum due-date validation.
+holidays = ['holidays']
+
 [tool.poetry.dev-dependencies]
 check-manifest = "*"
 hypothesis = "*"
