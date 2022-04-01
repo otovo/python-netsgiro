@@ -4,12 +4,13 @@
 __version__ = '1.3.0'
 
 
-from netsgiro.constants import *  # noqa: Reexport
-from netsgiro.enums import *  # noqa: Reexport
-from netsgiro.objects import *  # noqa: Reexport
+from netsgiro.constants import *
+from netsgiro.enums import *
+from netsgiro.objects import *
+from netsgiro.utils import *
+
+# Must be placed last
+from netsgiro import constants, enums, objects  # noqa, isort: skip
 
 
-from netsgiro import constants, enums, objects  # noqa: Must come after reexport
-
-
-__all__ = constants.__all__ + enums.__all__ + objects.__all__
+__all__ = constants.__all__ + enums.__all__ + objects.__all__ + utils.__all__
