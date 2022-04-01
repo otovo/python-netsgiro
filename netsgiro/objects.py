@@ -11,8 +11,7 @@ from attr.validators import instance_of, optional
 import netsgiro
 import netsgiro.records
 from netsgiro.records import Record
-from netsgiro.validators import str_of_length
-
+from netsgiro.validators import str_of_length, validate_minimum_date
 
 __all__ = [
     'Transmission',
@@ -334,7 +333,8 @@ class Assignment:
         amount: Decimal,
         reference: Optional[str] = None,
         payer_name: Optional[str] = None,
-        bank_notification: Union[bool, str] = False
+        bank_notification: Union[bool, str] = False,
+        strict: bool = False,
     ) -> 'Transaction':
         """Add an AvtaleGiro payment request to the assignment.
 
@@ -349,6 +349,10 @@ class Assignment:
         assert (
             self.type == netsgiro.AssignmentType.TRANSACTIONS
         ), 'Can only add payment requests to transaction assignments'
+
+        if strict:
+            # Make sure we're not passing invalid due dates
+            validate_minimum_date(due_date)
 
         if bank_notification:
             transaction_type = (
