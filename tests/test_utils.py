@@ -1,8 +1,10 @@
 from datetime import datetime, timedelta
 
 import holidays
+import pytest
 
 from netsgiro.utils import OSLO_TZ, get_minimum_due_date
+from netsgiro.validators import validate_due_date
 
 monday = datetime(2022, 3, 28, 13, 59, tzinfo=OSLO_TZ)
 
@@ -73,3 +75,12 @@ def test_minimum_due_date_without_holiday_dependency():
     sys.modules['holidays'] = None
     assert get_minimum_due_date(monday) == (monday + timedelta(days=4)).date()
     sys.modules['holidays'] = holidays
+
+
+def test_validate_due_date():
+    with pytest.raises(ValueError, match='The minimum due date of a transaction'):
+        validate_due_date(datetime.now().date())
+
+    with pytest.raises(ValueError, match='The maximum due date of a transaction'):
+        validate_due_date( (datetime.now() + timedelta(days=366)).date() )
+
