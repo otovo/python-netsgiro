@@ -122,6 +122,22 @@ optional = false
 python-versions = ">=2.7, !=3.0.*, !=3.1.*, !=3.2.*, !=3.3.*, !=3.4.*"
 
 [[package]]
+name = "convertdate"
+version = "2.3.2"
+description = "Converts between Gregorian dates and other calendar systems.Calendars included: Baha'i, French Republican, Hebrew, Indian Civil, Islamic, ISO, Julian, Mayan and Persian."
+category = "dev"
+optional = false
+python-versions = ">=3.5"
+
+[package.dependencies]
+pymeeus = ">=0.3.13,<=1"
+pytz = ">=2014.10"
+
+[package.extras]
+docs = ["sphinx", "sphinx-rtd-theme"]
+test = ["coverage"]
+
+[[package]]
 name = "distlib"
 version = "0.3.4"
 description = "Distribution utilities"
@@ -159,6 +175,28 @@ python-versions = ">=3.7"
 [package.extras]
 docs = ["furo (>=2021.8.17b43)", "sphinx (>=4.1)", "sphinx-autodoc-typehints (>=1.12)"]
 testing = ["covdefaults (>=1.2.0)", "coverage (>=4)", "pytest (>=4)", "pytest-cov", "pytest-timeout (>=1.4.2)"]
+
+[[package]]
+name = "hijri-converter"
+version = "2.2.3"
+description = "Accurate Hijri-Gregorian dates converter based on the Umm al-Qura calendar"
+category = "dev"
+optional = false
+python-versions = ">=3.6"
+
+[[package]]
+name = "holidays"
+version = "0.13"
+description = "Generate and work with holidays in Python"
+category = "dev"
+optional = false
+python-versions = ">=3.6"
+
+[package.dependencies]
+convertdate = ">=2.3.0"
+hijri-converter = "*"
+korean-lunar-calendar = "*"
+python-dateutil = "*"
 
 [[package]]
 name = "hypothesis"
@@ -253,6 +291,14 @@ MarkupSafe = ">=2.0"
 
 [package.extras]
 i18n = ["Babel (>=2.7)"]
+
+[[package]]
+name = "korean-lunar-calendar"
+version = "0.2.1"
+description = "Korean Lunar Calendar"
+category = "dev"
+optional = false
+python-versions = "*"
 
 [[package]]
 name = "markupsafe"
@@ -369,6 +415,14 @@ optional = false
 python-versions = ">=3.5"
 
 [[package]]
+name = "pymeeus"
+version = "0.5.11"
+description = "Python implementation of Jean Meeus astronomical routines"
+category = "dev"
+optional = false
+python-versions = "*"
+
+[[package]]
 name = "pyparsing"
 version = "3.0.7"
 description = "Python parsing module"
@@ -430,6 +484,17 @@ pytest-forked = "*"
 psutil = ["psutil (>=3.0)"]
 setproctitle = ["setproctitle"]
 testing = ["filelock"]
+
+[[package]]
+name = "python-dateutil"
+version = "2.8.2"
+description = "Extensions to the standard Python datetime module"
+category = "dev"
+optional = false
+python-versions = "!=3.0.*,!=3.1.*,!=3.2.*,>=2.7"
+
+[package.dependencies]
+six = ">=1.5"
 
 [[package]]
 name = "pytz"
@@ -680,7 +745,7 @@ holidays = []
 [metadata]
 lock-version = "1.1"
 python-versions = ">=3.7"
-content-hash = "8dea3692cccd3d16e3ef73e355336c3cb34ab4a54ec88290078f09bb9e542aa0"
+content-hash = "d8e066d86064d73e7c4c07292e357dc4353b5695fd2a38df2a067ba550507fe6"
 
 [metadata.files]
 alabaster = [
@@ -741,6 +806,10 @@ colorama = [
     {file = "colorama-0.4.4-py2.py3-none-any.whl", hash = "sha256:9f47eda37229f68eee03b24b9748937c7dc3868f906e8ba69fbcbdd3bc5dc3e2"},
     {file = "colorama-0.4.4.tar.gz", hash = "sha256:5941b2b48a20143d2267e95b1c2a7603ce057ee39fd88e7329b0c292aa16869b"},
 ]
+convertdate = [
+    {file = "convertdate-2.3.2-py3-none-any.whl", hash = "sha256:8f5e9efc2b71410d33217012c0a215f83463f765c94d5883bf656ce7a962b888"},
+    {file = "convertdate-2.3.2.tar.gz", hash = "sha256:57df962a6047534f1452c390ad48e3dc5c83052ad83ad6dd78d60ae22f99214c"},
+]
 distlib = [
     {file = "distlib-0.3.4-py2.py3-none-any.whl", hash = "sha256:6564fe0a8f51e734df6333d08b8b94d4ea8ee6b99b5ed50613f731fd4089f34b"},
     {file = "distlib-0.3.4.zip", hash = "sha256:e4b58818180336dc9c529bfb9a0b58728ffc09ad92027a3f30b7cd91e3458579"},
@@ -756,6 +825,14 @@ execnet = [
 filelock = [
     {file = "filelock-3.6.0-py3-none-any.whl", hash = "sha256:f8314284bfffbdcfa0ff3d7992b023d4c628ced6feb957351d4c48d059f56bc0"},
     {file = "filelock-3.6.0.tar.gz", hash = "sha256:9cd540a9352e432c7246a48fe4e8712b10acb1df2ad1f30e8c070b82ae1fed85"},
+]
+hijri-converter = [
+    {file = "hijri-converter-2.2.3.tar.gz", hash = "sha256:e7149cececca647bf40689ec89bf593c7252b31d699ea587ad0bce91ba42d382"},
+    {file = "hijri_converter-2.2.3-py3-none-any.whl", hash = "sha256:50648d45a0b850c6d4a3aa7cf88ec4c03ee44740c339ee2bb021c7bb69791dcc"},
+]
+holidays = [
+    {file = "holidays-0.13-py3-none-any.whl", hash = "sha256:ca944d20762f027770ceae2f21d037f959c9b206afe92db97161ce78538c275e"},
+    {file = "holidays-0.13.tar.gz", hash = "sha256:c6f7c3ab8ada94806702da931d94d37cd61bcfa92cb4d39d351b6a9c5210675c"},
 ]
 hypothesis = [
     {file = "hypothesis-6.41.0-py3-none-any.whl", hash = "sha256:ca931c5a6414f3f9636fdaf978a216ee9b5c4a6b4415adf628e9d5e5003dcd99"},
@@ -784,6 +861,10 @@ iniconfig = [
 jinja2 = [
     {file = "Jinja2-3.1.1-py3-none-any.whl", hash = "sha256:539835f51a74a69f41b848a9645dbdc35b4f20a3b601e2d9a7e22947b15ff119"},
     {file = "Jinja2-3.1.1.tar.gz", hash = "sha256:640bed4bb501cbd17194b3cace1dc2126f5b619cf068a726b98192a0fde74ae9"},
+]
+korean-lunar-calendar = [
+    {file = "korean_lunar_calendar-0.2.1-py3-none-any.whl", hash = "sha256:a619ea88610129019267467b85cc9faf0fab6e1694b2e782d1aeb610cdd382d5"},
+    {file = "korean_lunar_calendar-0.2.1.tar.gz", hash = "sha256:12ce54b1392ed45a82dc6cea85ee5f7e33630556e82488f57e37a22482c8275d"},
 ]
 markupsafe = [
     {file = "MarkupSafe-2.1.1-cp310-cp310-macosx_10_9_universal2.whl", hash = "sha256:86b1f75c4e7c2ac2ccdaec2b9022845dbb81880ca318bb7a0a01fbf7813e3812"},
@@ -863,6 +944,9 @@ pygments = [
     {file = "Pygments-2.11.2-py3-none-any.whl", hash = "sha256:44238f1b60a76d78fc8ca0528ee429702aae011c265fe6a8dd8b63049ae41c65"},
     {file = "Pygments-2.11.2.tar.gz", hash = "sha256:4e426f72023d88d03b2fa258de560726ce890ff3b630f88c21cbb8b2503b8c6a"},
 ]
+pymeeus = [
+    {file = "PyMeeus-0.5.11.tar.gz", hash = "sha256:bb9d670818d8b0594317b48a7dadea02a0594e5344263bf2054e1a011c8fed55"},
+]
 pyparsing = [
     {file = "pyparsing-3.0.7-py3-none-any.whl", hash = "sha256:a6c06a88f252e6c322f65faf8f418b16213b51bdfaece0524c1c1bc30c63c484"},
     {file = "pyparsing-3.0.7.tar.gz", hash = "sha256:18ee9022775d270c55187733956460083db60b37d0d0fb357445f3094eed3eea"},
@@ -878,6 +962,10 @@ pytest-forked = [
 pytest-xdist = [
     {file = "pytest-xdist-2.5.0.tar.gz", hash = "sha256:4580deca3ff04ddb2ac53eba39d76cb5dd5edeac050cb6fbc768b0dd712b4edf"},
     {file = "pytest_xdist-2.5.0-py3-none-any.whl", hash = "sha256:6fe5c74fec98906deb8f2d2b616b5c782022744978e7bd4695d39c8f42d0ce65"},
+]
+python-dateutil = [
+    {file = "python-dateutil-2.8.2.tar.gz", hash = "sha256:0123cacc1627ae19ddf3c27a5de5bd67ee4586fbdd6440d9748f8abb483d3e86"},
+    {file = "python_dateutil-2.8.2-py2.py3-none-any.whl", hash = "sha256:961d03dc3453ebbc59dbdea9e4e11c5651520a876d0f4db161e8674aae935da9"},
 ]
 pytz = [
     {file = "pytz-2022.1-py2.py3-none-any.whl", hash = "sha256:e68985985296d9a66a881eb3193b0906246245294a881e7c8afe623866ac6a5c"},

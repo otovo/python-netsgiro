@@ -45,6 +45,7 @@ pytest-xdist = "*"
 Sphinx = "*"
 sphinx-rtd-theme = "*"
 pre-commit = "^2.17.0"
+holidays = "^0.13"
 
 [build-system]
 requires = ["poetry-core>=1.0.0"]
