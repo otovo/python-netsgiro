@@ -2,7 +2,6 @@
 
 from enum import IntEnum
 
-
 __all__ = [
     'ServiceCode',
     'RecordType',
