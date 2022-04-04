@@ -8,7 +8,7 @@ import netsgiro.records
 
 def test_parse_with_too_short_lines_fails():
     with pytest.raises(ValueError, match='exactly 80 chars long'):
-        netsgiro.records.parse('NY0000\n' 'NY0000\n')
+        netsgiro.records.parse('NY0000\nNY0000\n')
 
 
 def test_parse_with_nonnumeric_record_type():
@@ -107,16 +107,12 @@ def test_parse_avtalegiro_payment_requests(payment_request_data):
     assert isinstance(
         transaction_spec_1, netsgiro.records.TransactionSpecification
     )
-    assert transaction_spec_1.text == (
-        ' Gjelder Faktura: 168837  Dato: 19/03/04'
-    )
+    assert transaction_spec_1.text == ' Gjelder Faktura: 168837  Dato: 19/03/04'
 
     assert isinstance(
         transaction_spec_2, netsgiro.records.TransactionSpecification
     )
-    assert transaction_spec_2.text == (
-        '                  ForfallsDato: 17/06/04'
-    )
+    assert transaction_spec_2.text == '                  ForfallsDato: 17/06/04'
 
     assert isinstance(assignment_end, netsgiro.records.AssignmentEnd)
     assert assignment_end.num_transactions == 6

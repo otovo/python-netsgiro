@@ -88,8 +88,9 @@ def test_parse_payment_request(payment_request_data):
     assert transaction.amount_in_cents == 100
     assert transaction.kid == '008000011688373'
     assert transaction.reference is None
-    assert transaction.text == (
-        ' Gjelder Faktura: 168837  Dato: 19/03/04'
+    assert (
+        transaction.text
+        == ' Gjelder Faktura: 168837  Dato: 19/03/04'
         '                  ForfallsDato: 17/06/04\n'
     )
 
