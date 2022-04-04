@@ -17,7 +17,6 @@ from netsgiro.converters import (
 )
 from netsgiro.validators import str_of_length, str_of_max_length
 
-
 __all__ = [
     'TransmissionStart',
     'TransmissionEnd',
@@ -144,7 +143,8 @@ class TransmissionStart(Record):
             'NY000010'
             f'{self.data_transmitter:8}'
             f'{self.transmission_number:7}'
-            f'{self.data_recipient:8}' + ('0' * 49)
+            f'{self.data_recipient:8}'
+            + ('0' * 49)
         )
 
 
@@ -186,7 +186,8 @@ class TransmissionEnd(Record):
             f'{self.num_transactions:08d}'
             f'{self.num_records:08d}'
             f'{self.total_amount:017d}'
-            f'{self.nets_date:%d%m%y}' + ('0' * 33)
+            f'{self.nets_date:%d%m%y}'
+            + ('0' * 33)
         )
 
 
@@ -264,13 +265,10 @@ class AssignmentStart(Record):
     def to_ocr(self) -> str:
         """Get record as OCR string."""
         return (
-                'NY'
-                f'{self.service_code:02d}'
-                f'{self.assignment_type:02d}'
-                '20'
-                + (self.agreement_id and f'{self.agreement_id:9}' or ('0' * 9))
-                + f'{self.assignment_number:7}'
-                  f'{self.assignment_account:11}' + ('0' * 45)
+            f'NY{self.service_code:02d}{self.assignment_type:02d}20'
+            + (self.agreement_id and f'{self.agreement_id:9}' or ('0' * 9))
+            + f'{self.assignment_number:7}{self.assignment_account:11}'
+            + ('0' * 45)
         )
 
 
@@ -367,9 +365,7 @@ class AssignmentEnd(Record):
         elif self.service_code == netsgiro.ServiceCode.AVTALEGIRO:
             return self.nets_date_1
         else:
-            raise ValueError(
-                f'Unhandled service code: {self.service_code}'
-            )
+            raise ValueError(f'Unhandled service code: {self.service_code}')
 
     @property
     def nets_date_latest(self):
@@ -380,24 +376,22 @@ class AssignmentEnd(Record):
         elif self.service_code == netsgiro.ServiceCode.AVTALEGIRO:
             return self.nets_date_2
         else:
-            raise ValueError(
-                f'Unhandled service code: {self.service_code}'
-            )
+            raise ValueError(f'Unhandled service code: {self.service_code}')
 
     def to_ocr(self) -> str:
         """Get record as OCR string."""
         return (
-                'NY'
-                f'{self.service_code:02d}'
-                f'{self.assignment_type:02d}'
-                '88'
-                f'{self.num_transactions:08d}'
-                f'{self.num_records:08d}'
-                + (self.total_amount and f'{self.total_amount:017d}' or ('0' * 17))
-                + (self.nets_date_1 and f'{self.nets_date_1:%d%m%y}' or ('0' * 6))
-                + (self.nets_date_2 and f'{self.nets_date_2:%d%m%y}' or ('0' * 6))
-                + (self.nets_date_3 and f'{self.nets_date_3:%d%m%y}' or ('0' * 6))
-                + ('0' * 21)
+            'NY'
+            f'{self.service_code:02d}'
+            f'{self.assignment_type:02d}'
+            '88'
+            f'{self.num_transactions:08d}'
+            f'{self.num_records:08d}'
+            + (self.total_amount and f'{self.total_amount:017d}' or ('0' * 17))
+            + (self.nets_date_1 and f'{self.nets_date_1:%d%m%y}' or ('0' * 6))
+            + (self.nets_date_2 and f'{self.nets_date_2:%d%m%y}' or ('0' * 6))
+            + (self.nets_date_3 and f'{self.nets_date_3:%d%m%y}' or ('0' * 6))
+            + ('0' * 21)
         )
 
 
@@ -495,13 +489,15 @@ class TransactionAmountItem1(TransactionRecord):
             ocr_giro_fields = ' ' * 11
 
         return (
-                'NY'
-                f'{self.service_code:02d}'
-                f'{self.transaction_type:02d}'
-                '30'
-                f'{self.transaction_number:07d}'
-                f'{self.nets_date:%d%m%y}' + ocr_giro_fields + f'{self.amount:017d}'
-                                                              f'{self.kid:>25}' + ('0' * 6)
+            'NY'
+            f'{self.service_code:02d}'
+            f'{self.transaction_type:02d}'
+            '30'
+            f'{self.transaction_number:07d}'
+            f'{self.nets_date:%d%m%y}'
+            + ocr_giro_fields
+            + f'{self.amount:017d}{self.kid:>25}'
+            + ('0' * 6)
         )
 
 
@@ -583,23 +579,19 @@ class TransactionAmountItem2(TransactionRecord):
         )
         if self.service_code == netsgiro.ServiceCode.OCR_GIRO:
             service_fields = (
-                    f'{self.form_number:10}'
-                    + (self.reference and f'{self.reference:9}' or (' ' * 9))
-                    + (self._filler and f'{self._filler:7}' or ('0' * 7))
-                    + (self.bank_date and f'{self.bank_date:%d%m%y}' or '0' * 6)
-                    + f'{self.debit_account:11}'
-                    + ('0' * 22)
+                f'{self.form_number:10}'
+                + (self.reference and f'{self.reference:9}' or (' ' * 9))
+                + (self._filler and f'{self._filler:7}' or ('0' * 7))
+                + (self.bank_date and f'{self.bank_date:%d%m%y}' or '0' * 6)
+                + f'{self.debit_account:11}'
+                + ('0' * 22)
             )
         elif self.service_code == netsgiro.ServiceCode.AVTALEGIRO:
             service_fields = (
-                    (
-                            self.payer_name
-                            and f'{self.payer_name[:10]:10}'
-                            or (' ' * 10)
-                    )
-                    + (' ' * 25)
-                    + (self.reference and f'{self.reference:25}' or (' ' * 25))
-                    + ('0' * 5)
+                (self.payer_name and f'{self.payer_name[:10]:10}' or (' ' * 10))
+                + (' ' * 25)
+                + (self.reference and f'{self.reference:25}' or (' ' * 25))
+                + ('0' * 5)
             )
         else:
             service_fields = ' ' * 35
@@ -641,12 +633,9 @@ class TransactionAmountItem3(TransactionRecord):
     def to_ocr(self) -> str:
         """Get record as OCR string."""
         return (
-                'NY09'
-                f'{self.transaction_type:02d}'
-                '32'
-                f'{self.transaction_number:07d}'
-                + (self.text and f'{self.text:40}' or (' ' * 40))
-                + ('0' * 25)
+            f'NY09{self.transaction_type:02d}32{self.transaction_number:07d}'
+            + (self.text and f'{self.text:40}' or (' ' * 40))
+            + ('0' * 25)
         )
 
 
@@ -766,7 +755,8 @@ class TransactionSpecification(TransactionRecord):
             '4'
             f'{self.line_number:03d}'
             f'{self.column_number:01d}'
-            f'{self.text:40}' + ('0' * 20)
+            f'{self.text:40}'
+            + ('0' * 20)
         )
 
 
@@ -812,7 +802,9 @@ class AvtaleGiroAgreement(TransactionRecord):
             'NY219470'
             f'{self.transaction_number:07d}'
             f'{self.registration_type:01d}'
-            f'{self.kid:>25}' + (self.notify and 'J' or 'N') + ('0' * 38)
+            f'{self.kid:>25}'
+            + (self.notify and 'J' or 'N')
+            + ('0' * 38)
         ).format(self=self)
 
 
