@@ -706,10 +706,9 @@ class TransactionSpecification(TransactionRecord):
 
         if len(lines) > cls._MAX_LINES:
             raise ValueError(
-                'Max {} specification lines allowed, got {}'.format(
-                    cls._MAX_LINES, len(lines)
-                )
+                f'Max {cls._MAX_LINES} specification lines allowed, got {len(lines)}'
             )
+
 
         for line_number, line_text in enumerate(lines, 1):
             if len(line_text) > cls._MAX_LINE_LENGTH:
@@ -728,10 +727,9 @@ class TransactionSpecification(TransactionRecord):
         """Get a text string from a sequence of specification records."""
         if len(records) > cls._MAX_RECORDS:
             raise ValueError(
-                'Max {} specification records allowed, got {}'.format(
-                    cls._MAX_RECORDS, len(records)
-                )
+                f'Max {cls._MAX_RECORDS} specification records allowed, got {len(records)}'
             )
+
 
         tuples = sorted((r.line_number, r.column_number, r) for r in records)
 

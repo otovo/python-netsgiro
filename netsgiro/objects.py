@@ -411,11 +411,7 @@ class Assignment:
         bank_notification=None,
     ) -> 'Transaction':
 
-        if isinstance(bank_notification, str):
-            text = bank_notification
-        else:
-            text = ''
-
+        text = bank_notification if isinstance(bank_notification, str) else ''
         number = self._next_transaction_number
         self._next_transaction_number += 1
 
