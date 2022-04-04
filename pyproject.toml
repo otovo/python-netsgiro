@@ -49,6 +49,7 @@ coverage = [
     { extras = ["toml"], version = "^6", python = "3.10" },
     { version = "^5 || ^6", python = ">=3.6!=3.10" },
 ]
+holidays = "^0.13"
 
 [build-system]
 requires = ["poetry-core>=1.0.0"]
