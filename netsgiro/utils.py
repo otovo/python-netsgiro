@@ -1,14 +1,22 @@
 from contextlib import suppress
-from datetime import date, datetime, timedelta
-from zoneinfo import ZoneInfo
+from datetime import timedelta
+from typing import TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from datetime import date, datetime
+
+try:
+    import zoneinfo
+except ImportError:
+    from backports import zoneinfo
 
 __all__ = ['get_minimum_due_date']
 
 # Nets operates in the Norwegian timezone, so that's what we'll use
-OSLO_TZ = ZoneInfo('Europe/Oslo')
+OSLO_TZ = zoneinfo.ZoneInfo('Europe/Oslo')
 
 
-def get_minimum_due_date(now: datetime) -> date:
+def get_minimum_due_date(now: 'datetime') -> 'date':
     """Return the minimum viable due date for a an ocrgiro created right now."""
     today = now.date()
 
