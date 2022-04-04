@@ -55,12 +55,12 @@ jobs:
         id: cache-venv
         with:
           path: .venv
-          key: ${{ hashFiles('**/poetry.lock') }}-0
+          key: ${{ hashFiles('**/poetry.lock') }}-1
       - run: |
           python -m venv .venv
           source .venv/bin/activate
           pip install -U pip wheel
-          poetry install --no-interaction --no-root
+          poetry install --no-interaction --no-root --extras "holidays"
         if: steps.cache-venv.outputs.cache-hit != 'true'
       - name: Run tests
         run: |
