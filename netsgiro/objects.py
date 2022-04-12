@@ -13,7 +13,6 @@ import netsgiro.records
 from netsgiro.records import Record
 from netsgiro.validators import str_of_length
 
-
 __all__ = [
     'Transmission',
     'Assignment',
@@ -55,9 +54,7 @@ class Transmission:
     def from_records(cls, records: List[Record]) -> 'Transmission':
         """Build a Transmission object from a list of record objects."""
         if len(records) < 2:
-            raise ValueError(
-                f'At least 2 records required, got {len(records)}'
-            )
+            raise ValueError(f'At least 2 records required, got {len(records)}')
 
         start, body, end = records[0], records[1:-1], records[-1]
 
@@ -145,7 +142,7 @@ class Transmission:
         agreement_id: Optional[str] = None,
         number: str,
         account: str,
-        date: Optional[datetime.date] = None
+        date: Optional[datetime.date] = None,
     ) -> 'Assignment':
         """Add an assignment to the tranmission."""
 
@@ -221,9 +218,7 @@ class Assignment:
     def from_records(cls, records: List[Record]) -> 'Assignment':
         """Build an Assignment object from a list of record objects."""
         if len(records) < 2:
-            raise ValueError(
-                f'At least 2 records required, got {len(records)}'
-            )
+            raise ValueError(f'At least 2 records required, got {len(records)}')
 
         start, body, end = records[0], records[1:-1], records[-1]
 
@@ -241,9 +236,7 @@ class Assignment:
         elif start.service_code == netsgiro.ServiceCode.OCR_GIRO:
             transactions = cls._get_transactions(body)
         else:
-            raise ValueError(
-                f'Unknown service code: {start.service_code}'
-            )
+            raise ValueError(f'Unknown service code: {start.service_code}')
 
         return cls(
             service_code=start.service_code,
@@ -313,9 +306,7 @@ class Assignment:
                 'nets_date_2': self.get_latest_transaction_date(),
             }
         else:
-            raise ValueError(
-                f'Unhandled service code: {self.service_code}'
-            )
+            raise ValueError(f'Unhandled service code: {self.service_code}')
 
         return netsgiro.records.AssignmentEnd(
             service_code=self.service_code,
@@ -323,7 +314,7 @@ class Assignment:
             num_transactions=self.get_num_transactions(),
             num_records=self.get_num_records(),
             total_amount=int(self.get_total_amount() * 100),
-            **dates
+            **dates,
         )
 
     def add_payment_request(
@@ -334,7 +325,7 @@ class Assignment:
         amount: Decimal,
         reference: Optional[str] = None,
         payer_name: Optional[str] = None,
-        bank_notification: Union[bool, str] = False
+        bank_notification: Union[bool, str] = False,
     ) -> 'Transaction':
         """Add an AvtaleGiro payment request to the assignment.
 
@@ -377,7 +368,7 @@ class Assignment:
         amount: Decimal,
         reference: Optional[str] = None,
         payer_name: Optional[str] = None,
-        bank_notification: Union[bool, str] = False
+        bank_notification: Union[bool, str] = False,
     ) -> 'Transaction':
         """Add an AvtaleGiro cancellation to the assignment.
 
@@ -415,7 +406,7 @@ class Assignment:
         amount,
         reference=None,
         payer_name=None,
-        bank_notification=None
+        bank_notification=None,
     ) -> 'Transaction':
 
         if isinstance(bank_notification, str):

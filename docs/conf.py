@@ -7,7 +7,6 @@ sys.path.insert(0, os.path.abspath('..'))
 
 import netsgiro  # noqa
 
-
 # -- General configuration ------------------------------------------------
 
 # needs_sphinx = '1.0'
@@ -36,10 +35,9 @@ todo_include_todos = False
 # -- Options for HTML output ----------------------------------------------
 
 html_theme = 'sphinx_rtd_theme'
-html_theme_options = {}
-html_theme_options[
-    'canonical_url'
-] = 'https://netsgiro.readthedocs.io/en/latest/'
+html_theme_options = {
+    'canonical_url': 'https://netsgiro.readthedocs.io/en/latest/'
+}
 html_theme_path = [sphinx_rtd_theme.get_html_theme_path()]
 html_static_path = ['_static']
 
