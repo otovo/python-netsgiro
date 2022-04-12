@@ -689,14 +689,14 @@ class TransactionSpecification(TransactionRecord):
         cls, *, service_code, transaction_type, transaction_number, text
     ) -> Iterable['TransactionSpecification']:
         """Create a sequence of specification records from a text string."""
-        for line, column, text in cls._split_text_to_lines_and_columns(text):
+        for line, column, txt in cls._split_text_to_lines_and_columns(text):
             yield cls(
                 service_code=service_code,
                 transaction_type=transaction_type,
                 transaction_number=transaction_number,
                 line_number=line,
                 column_number=column,
-                text=text,
+                text=txt,
             )
 
     @classmethod
@@ -720,8 +720,8 @@ class TransactionSpecification(TransactionRecord):
                     )
                 )
 
-            yield (line_number, 1, f'{line_text[:40]:40}')
-            yield (line_number, 2, f'{line_text[40:80]:40}')
+            yield line_number, 1, f'{line_text[:40]:40}'
+            yield line_number, 2, f'{line_text[40:80]:40}'
 
     @classmethod
     def to_text(cls, records: Sequence['TransactionSpecification']) -> str:

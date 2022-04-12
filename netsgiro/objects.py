@@ -1,5 +1,4 @@
 """The higher-level objects API."""
-
 import collections
 import datetime
 from decimal import Decimal
@@ -13,7 +12,7 @@ import netsgiro.records
 from netsgiro.validators import str_of_length
 
 if TYPE_CHECKING:
-    from netsgiro.records import Record
+    from netsgiro.records import Record, TransactionRecord
 
 __all__ = [
     'Transmission',
@@ -146,7 +145,7 @@ class Transmission:
         account: str,
         date: Optional[datetime.date] = None,
     ) -> 'Assignment':
-        """Add an assignment to the tranmission."""
+        """Add an assignment to the transmission."""
         assignment = Assignment(
             service_code=service_code,
             type=assignment_type,
@@ -704,7 +703,7 @@ class Transaction:
         return int(self.amount * 100)
 
     @classmethod
-    def from_records(cls, records: List['Record']) -> 'Transaction':
+    def from_records(cls, records: List['TransactionRecord']) -> 'Transaction':
         """Build a Transaction object from a list of record objects."""
         amount_item_1 = records.pop(0)
         assert isinstance(
