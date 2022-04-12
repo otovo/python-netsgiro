@@ -2,12 +2,13 @@
 
 import datetime
 import re
-from typing import Iterable, List, Optional, Sequence, Tuple, Union
+from typing import Iterable, List, Optional, Tuple, Union
 
 import attr
 from attr.validators import optional
 
 import netsgiro
+from netsgiro import TransactionType, AvtaleGiroRegistrationType
 from netsgiro.converters import (
     fixed_len_str,
     stripped_newlines,
@@ -394,8 +395,8 @@ class AssignmentEnd(Record):
 
 @attr.s
 class TransactionRecord(Record):
-    transaction_type = attr.ib(converter=to_transaction_type)
-    transaction_number = attr.ib(converter=int)
+    transaction_type: TransactionType = attr.ib(converter=to_transaction_type)
+    transaction_number: int = attr.ib(converter=int)
 
 
 @attr.s
@@ -405,9 +406,9 @@ class TransactionAmountItem1(TransactionRecord):
     The record is used both for AvtaleGiro and for OCR Giro.
     """
 
-    nets_date = attr.ib(converter=to_date)
-    amount = attr.ib(converter=int)
-    kid = attr.ib(
+    nets_date: datetime.date = attr.ib(converter=to_date)
+    amount: int = attr.ib(converter=int)
+    kid: Optional[str] = attr.ib(
         converter=to_safe_str_or_none, validator=optional(str_of_max_length(25))
     )
 
@@ -718,11 +719,11 @@ class TransactionSpecification(TransactionRecord):
                     )
                 )
 
-            yield (line_number, 1, f'{line_text[:40]:40}')
-            yield (line_number, 2, f'{line_text[40:80]:40}')
+            yield line_number, 1, f'{line_text[:40]:40}'
+            yield line_number, 2, f'{line_text[40:80]:40}'
 
     @classmethod
-    def to_text(cls, records: Sequence['TransactionSpecification']) -> str:
+    def to_text(cls, records: List['TransactionSpecification']) -> str:
         """Get a text string from a sequence of specification records."""
         if len(records) > cls._MAX_RECORDS:
             raise ValueError(
@@ -760,12 +761,9 @@ class AvtaleGiroAgreement(TransactionRecord):
     This includes new or deleted agreements, as well as updates to the payer's
     notification preferences.
     """
-
-    registration_type = attr.ib(converter=to_avtalegiro_registration_type)
-    kid = attr.ib(
-        converter=to_safe_str_or_none, validator=optional(str_of_max_length(25))
-    )
-    notify = attr.ib(converter=to_bool)
+    registration_type: AvtaleGiroRegistrationType = attr.ib(converter=to_avtalegiro_registration_type)
+    kid: Optional[str] = attr.ib(converter=to_safe_str_or_none, validator=optional(str_of_max_length(25)))
+    notify: bool = attr.ib(converter=to_bool)
 
     RECORD_TYPE = netsgiro.RecordType.TRANSACTION_AGREEMENTS
     _PATTERNS = [
