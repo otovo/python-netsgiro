@@ -9,7 +9,7 @@ import attr
 from attr.validators import optional
 
 import netsgiro
-from netsgiro import AvtaleGiroRegistrationType
+from netsgiro import AvtaleGiroRegistrationType, TransactionType
 from netsgiro.converters import (
     fixed_len_str,
     stripped_newlines,
@@ -397,8 +397,8 @@ class AssignmentEnd(Record):
 
 @attr.s
 class TransactionRecord(Record, ABC):
-    transaction_type = attr.ib(converter=to_transaction_type)
-    transaction_number = attr.ib(converter=int)
+    transaction_type: TransactionType = attr.ib(converter=to_transaction_type)
+    transaction_number: int = attr.ib(converter=int)
 
 
 @attr.s
