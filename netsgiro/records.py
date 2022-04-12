@@ -2,6 +2,7 @@
 
 import datetime
 import re
+from abc import ABC, abstractmethod
 from typing import Iterable, List, Optional, Sequence, Tuple, Union
 
 import attr
@@ -97,9 +98,10 @@ class Record:
             f'{line!r} did not match {cls.__name__} record formats'
         )
 
+    @abstractmethod
     def to_ocr(self) -> str:
         """Get record as OCR string."""
-        raise NotImplementedError
+        ...
 
 
 @attr.s
@@ -393,7 +395,7 @@ class AssignmentEnd(Record):
 
 
 @attr.s
-class TransactionRecord(Record):
+class TransactionRecord(Record, ABC):
     transaction_type = attr.ib(converter=to_transaction_type)
     transaction_number = attr.ib(converter=int)
 
