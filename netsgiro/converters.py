@@ -24,7 +24,7 @@ def truthy_or_none(
 
     ``converter`` is called to further convert non-``None`` values.
     """
-    return lambda value: None if not value else converter(value)
+    return lambda value: converter(value) if value else None
 
 
 def stripped_spaces_around(
