@@ -3,15 +3,17 @@
 import collections
 import datetime
 from decimal import Decimal
-from typing import Iterable, List, Mapping, Optional, Union
+from typing import TYPE_CHECKING, Iterable, List, Mapping, Optional, Union
 
 import attr
 from attr.validators import instance_of, optional
 
 import netsgiro
 import netsgiro.records
-from netsgiro.records import Record
 from netsgiro.validators import str_of_length
+
+if TYPE_CHECKING:
+    from netsgiro.records import Record
 
 __all__ = [
     'Transmission',
@@ -51,7 +53,7 @@ class Transmission:
     assignments = attr.ib(default=attr.Factory(list), repr=False)
 
     @classmethod
-    def from_records(cls, records: List[Record]) -> 'Transmission':
+    def from_records(cls, records: List['Record']) -> 'Transmission':
         """Build a Transmission object from a list of record objects."""
         if len(records) < 2:
             raise ValueError(f'At least 2 records required, got {len(records)}')
@@ -70,7 +72,7 @@ class Transmission:
         )
 
     @staticmethod
-    def _get_assignments(records: List[Record]) -> List['Assignment']:
+    def _get_assignments(records: List['Record']) -> List['Assignment']:
         assignments = collections.OrderedDict()
 
         current_assignment_number = None
@@ -93,14 +95,14 @@ class Transmission:
         lines = [record.to_ocr() for record in self.to_records()]
         return '\n'.join(lines)
 
-    def to_records(self) -> Iterable[Record]:
+    def to_records(self) -> Iterable['Record']:
         """Convert the transmission to a list of records."""
         yield self._get_start_record()
         for assignment in self.assignments:
             yield from assignment.to_records()
         yield self._get_end_record()
 
-    def _get_start_record(self) -> Record:
+    def _get_start_record(self) -> 'Record':
         return netsgiro.records.TransmissionStart(
             service_code=netsgiro.ServiceCode.NONE,
             transmission_number=self.number,
@@ -108,7 +110,7 @@ class Transmission:
             data_recipient=self.data_recipient,
         )
 
-    def _get_end_record(self) -> Record:
+    def _get_end_record(self) -> 'Record':
         avtalegiro_payment_request = all(
             assignment.service_code == netsgiro.ServiceCode.AVTALEGIRO
             and assignment.type
@@ -215,7 +217,7 @@ class Assignment:
     _next_transaction_number = 1
 
     @classmethod
-    def from_records(cls, records: List[Record]) -> 'Assignment':
+    def from_records(cls, records: List['Record']) -> 'Assignment':
         """Build an Assignment object from a list of record objects."""
         if len(records) < 2:
             raise ValueError(f'At least 2 records required, got {len(records)}')
@@ -249,25 +251,25 @@ class Assignment:
         )
 
     @staticmethod
-    def _get_agreements(records: List[Record]) -> List['Agreement']:
+    def _get_agreements(records: List['Record']) -> List['Agreement']:
         return [Agreement.from_records([r]) for r in records]
 
     @classmethod
     def _get_payment_requests(
-        cls, records: List[Record]
+        cls, records: List['Record']
     ) -> List['PaymentRequest']:
         transactions = cls._group_by_transaction_number(records)
         return [PaymentRequest.from_records(rs) for rs in transactions.values()]
 
     @classmethod
-    def _get_transactions(cls, records: List[Record]) -> List['Transaction']:
+    def _get_transactions(cls, records: List['Record']) -> List['Transaction']:
         transactions = cls._group_by_transaction_number(records)
         return [Transaction.from_records(rs) for rs in transactions.values()]
 
     @staticmethod
     def _group_by_transaction_number(
-        records: List[Record],
-    ) -> Mapping[int, List[Record]]:
+        records: List['Record'],
+    ) -> Mapping[int, List['Record']]:
         transactions = collections.OrderedDict()
 
         for record in records:
@@ -277,14 +279,14 @@ class Assignment:
 
         return transactions
 
-    def to_records(self) -> Iterable[Record]:
+    def to_records(self) -> Iterable['Record']:
         """Convert the assignment to a list of records."""
         yield self._get_start_record()
         for transaction in self.transactions:
             yield from transaction.to_records()
         yield self._get_end_record()
 
-    def _get_start_record(self) -> Record:
+    def _get_start_record(self) -> 'Record':
         return netsgiro.records.AssignmentStart(
             service_code=self.service_code,
             assignment_type=self.type,
@@ -293,7 +295,7 @@ class Assignment:
             agreement_id=self.agreement_id,
         )
 
-    def _get_end_record(self) -> Record:
+    def _get_end_record(self) -> 'Record':
         if self.service_code == netsgiro.ServiceCode.OCR_GIRO:
             dates = {
                 'nets_date_1': self.date,
@@ -508,7 +510,7 @@ class Agreement:
     TRANSACTION_TYPE = netsgiro.TransactionType.AVTALEGIRO_AGREEMENT
 
     @classmethod
-    def from_records(cls, records: List[Record]) -> 'Agreement':
+    def from_records(cls, records: List['Record']) -> 'Agreement':
         """Build an Agreement object from a list of record objects."""
 
         assert len(records) == 1
@@ -527,7 +529,7 @@ class Agreement:
             notify=record.notify,
         )
 
-    def to_records(self) -> Iterable[Record]:
+    def to_records(self) -> Iterable['Record']:
         """Convert the agreement to a list of records."""
         yield netsgiro.records.AvtaleGiroAgreement(
             service_code=self.service_code,
@@ -586,7 +588,7 @@ class PaymentRequest:
         return int(self.amount * 100)
 
     @classmethod
-    def from_records(cls, records: List[Record]) -> 'Transaction':
+    def from_records(cls, records: List['Record']) -> 'Transaction':
         """Build a Transaction object from a list of record objects."""
         amount_item_1 = records.pop(0)
         assert isinstance(
@@ -611,7 +613,7 @@ class PaymentRequest:
             payer_name=amount_item_2.payer_name,
         )
 
-    def to_records(self) -> Iterable[Record]:
+    def to_records(self) -> Iterable['Record']:
         """Convert the transaction to a list of records."""
         yield netsgiro.records.TransactionAmountItem1(
             service_code=self.service_code,
@@ -707,7 +709,7 @@ class Transaction:
         return int(self.amount * 100)
 
     @classmethod
-    def from_records(cls, records: List[Record]) -> 'Transaction':
+    def from_records(cls, records: List['Record']) -> 'Transaction':
         """Build a Transaction object from a list of record objects."""
         amount_item_1 = records.pop(0)
         assert isinstance(
@@ -747,7 +749,7 @@ class Transaction:
             filler=amount_item_2._filler,
         )
 
-    def to_records(self) -> Iterable[Record]:
+    def to_records(self) -> Iterable['Record']:
         """Convert the transaction to a list of records."""
         yield netsgiro.records.TransactionAmountItem1(
             service_code=self.service_code,
