@@ -147,7 +147,6 @@ class Transmission:
         date: Optional[datetime.date] = None,
     ) -> 'Assignment':
         """Add an assignment to the tranmission."""
-
         assignment = Assignment(
             service_code=service_code,
             type=assignment_type,
@@ -335,7 +334,6 @@ class Assignment:
         :attr:`~netsgiro.ServiceCode.AVTALEGIRO` and assignment type
         :attr:`~netsgiro.AssignmentType.TRANSACTIONS`.
         """
-
         assert (
             self.service_code == netsgiro.ServiceCode.AVTALEGIRO
         ), 'Can only add payment requests to AvtaleGiro assignments'
@@ -381,7 +379,6 @@ class Assignment:
         Otherwise, the cancellation must be identical to the payment request it
         is cancelling.
         """
-
         assert (
             self.service_code == netsgiro.ServiceCode.AVTALEGIRO
         ), 'Can only add cancellation to AvtaleGiro assignments'
@@ -442,7 +439,6 @@ class Assignment:
 
         Includes the assignment's start and end record.
         """
-
         return 2 + sum(
             len(list(transaction.to_records()))
             for transaction in self.transactions
@@ -512,7 +508,6 @@ class Agreement:
     @classmethod
     def from_records(cls, records: List['Record']) -> 'Agreement':
         """Build an Agreement object from a list of record objects."""
-
         assert len(records) == 1
         record = records[0]
         assert isinstance(record, netsgiro.records.AvtaleGiroAgreement)

@@ -88,7 +88,6 @@ class Record:
     @classmethod
     def from_string(cls, line: str) -> 'Record':
         """Parse OCR string into a record object."""
-
         for pattern in cls._PATTERNS:
             matches = pattern.match(line)
             if matches is not None:
@@ -359,7 +358,6 @@ class AssignmentEnd(Record):
     @property
     def nets_date_earliest(self):
         """Earliest date from the contained transactions."""
-
         if self.service_code == netsgiro.ServiceCode.OCR_GIRO:
             return self.nets_date_2
         elif self.service_code == netsgiro.ServiceCode.AVTALEGIRO:
@@ -370,7 +368,6 @@ class AssignmentEnd(Record):
     @property
     def nets_date_latest(self):
         """Latest date from the contained transactions."""
-
         if self.service_code == netsgiro.ServiceCode.OCR_GIRO:
             return self.nets_date_3
         elif self.service_code == netsgiro.ServiceCode.AVTALEGIRO:
@@ -690,7 +687,6 @@ class TransactionSpecification(TransactionRecord):
         cls, *, service_code, transaction_type, transaction_number, text
     ) -> Iterable['TransactionSpecification']:
         """Create a sequence of specification records from a text string."""
-
         for line, column, text in cls._split_text_to_lines_and_columns(text):
             yield cls(
                 service_code=service_code,
@@ -728,7 +724,6 @@ class TransactionSpecification(TransactionRecord):
     @classmethod
     def to_text(cls, records: Sequence['TransactionSpecification']) -> str:
         """Get a text string from a sequence of specification records."""
-
         if len(records) > cls._MAX_RECORDS:
             raise ValueError(
                 f'Max {cls._MAX_RECORDS} specification records allowed, got'
