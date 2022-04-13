@@ -1,5 +1,8 @@
 """Custom converters for :mod:`attrs`."""
-from typing import Any, Callable, Optional, TypeVar
+import datetime
+from typing import Any, Callable, Optional, TypeVar, Union
+
+from netsgiro import AssignmentType, AvtaleGiroRegistrationType, ServiceCode, TransactionType
 
 T = TypeVar('T')
 
@@ -45,3 +48,43 @@ def fixed_len_str(length: int, converter: Callable[[Any], T]) -> Callable[[Any],
     ``converter`` is called to further convert non-``None`` values.
     """
     return lambda value: converter('{value:{length}}'.format(value=value, length=length))
+
+
+def to_service_code(value: Union[ServiceCode, int, str]) -> ServiceCode:
+    return ServiceCode(int(value))
+
+
+def to_assignment_type(value: Union[AssignmentType, int, str]) -> AssignmentType:
+    return AssignmentType(int(value))
+
+
+def to_transaction_type(value: Union[TransactionType, int, str]) -> TransactionType:
+    return TransactionType(int(value))
+
+
+def to_avtalegiro_registration_type(
+    value: Union[AvtaleGiroRegistrationType, int, str]
+) -> AvtaleGiroRegistrationType:
+    return AvtaleGiroRegistrationType(int(value))
+
+
+def to_date(value: Union[datetime.date, str, None]) -> Optional[datetime.date]:
+    if isinstance(value, datetime.date):
+        return value
+    if value is None or value == '000000':
+        return None
+    return datetime.datetime.strptime(value, '%d%m%y').date()
+
+
+def to_bool(value: Union[bool, str]) -> bool:
+    if isinstance(value, bool):
+        return value
+    if value == 'J':
+        return True
+    elif value == 'N':
+        return False
+    else:
+        raise ValueError(f"Expected 'J' or 'N', got {value!r}")
+
+
+to_safe_str_or_none = value_or_none(stripped_newlines(stripped_spaces_around(truthy_or_none(str))))

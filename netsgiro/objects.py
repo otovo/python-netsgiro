@@ -8,11 +8,12 @@ from typing import TYPE_CHECKING, Iterable, List, Mapping, Optional, Union
 import attr
 from attrs.validators import instance_of, optional
 
-from netsgiro import (
-    AssignmentType,
-    AvtaleGiroRegistrationType,
-    ServiceCode,
-    TransactionType,
+from netsgiro import AssignmentType, ServiceCode, TransactionType
+from netsgiro.converters import (
+    to_assignment_type,
+    to_avtalegiro_registration_type,
+    to_service_code,
+    to_transaction_type,
 )
 from netsgiro.records import (
     AssignmentEnd,
@@ -29,6 +30,7 @@ from netsgiro.records import parse as records_parse
 from netsgiro.validators import str_of_length
 
 if TYPE_CHECKING:
+    from netsgiro.enums import AvtaleGiroRegistrationType
     from netsgiro.records import Record, TransactionRecord
 
 __all__ = [
@@ -68,9 +70,7 @@ class Transmission:
     )
 
     #: List of assignments.
-    assignments: list['Assignment'] = attr.ib(
-        default=attr.Factory(list), repr=False
-    )
+    assignments: list['Assignment'] = attr.ib(default=attr.Factory(list), repr=False)
 
     @classmethod
     def from_records(cls, records: List['Record']) -> 'Transmission':
@@ -140,8 +140,7 @@ class Transmission:
         )
         if self.assignments and avtalegiro_payment_request:
             date = min(
-                assignment.get_earliest_transaction_date()
-                for assignment in self.assignments
+                assignment.get_earliest_transaction_date() for assignment in self.assignments
             )
         else:
             date = self.date
@@ -189,9 +188,7 @@ class Transmission:
 
     def get_total_amount(self) -> Decimal:
         """Get the total amount from all transactions in the transmission."""
-        return sum(
-            assignment.get_total_amount() for assignment in self.assignments
-        )
+        return sum(assignment.get_total_amount() for assignment in self.assignments)
 
 
 @attr.s
@@ -202,10 +199,10 @@ class Assignment:
     """
 
     #: The service code. One of :class:`~netsgiro.ServiceCode`.
-    service_code: ServiceCode = attr.ib(converter=ServiceCode)
+    service_code: ServiceCode = attr.ib(converter=to_service_code)
 
     #: The transaction type. One of :class:`~TransactionType`.
-    type: AssignmentType = attr.ib(converter=AssignmentType)
+    type: AssignmentType = attr.ib(converter=to_assignment_type)
 
     #: The assignment number. String of 7 digits.
     number: str = attr.ib(validator=str_of_length(7))
@@ -216,9 +213,7 @@ class Assignment:
     #: Used for OCR Giro.
     #:
     #: The payee's agreement ID with Nets. String of 9 digits.
-    agreement_id: Optional[str] = attr.ib(
-        default=None, validator=optional(str_of_length(9))
-    )
+    agreement_id: Optional[str] = attr.ib(default=None, validator=optional(str_of_length(9)))
 
     #: Used for OCR Giro.
     #:
@@ -229,9 +224,7 @@ class Assignment:
 
     #: List of transaction objects, like :class:`~netsgiro.Agreement`,
     #: :class:`~netsgiro.PaymentRequest`, :class:`~netsgiro.Transaction`.
-    transactions: list['Transaction'] = attr.ib(
-        default=attr.Factory(list), repr=False
-    )
+    transactions: list['Transaction'] = attr.ib(default=attr.Factory(list), repr=False)
 
     _next_transaction_number: int = attr.ib(default=1, init=False)
 
@@ -271,9 +264,7 @@ class Assignment:
         return [Agreement.from_records([r]) for r in records]
 
     @classmethod
-    def _get_payment_requests(
-        cls, records: List['Record']
-    ) -> List['PaymentRequest']:
+    def _get_payment_requests(cls, records: List['Record']) -> List['PaymentRequest']:
         transactions = cls._group_by_transaction_number(records)
         return [PaymentRequest.from_records(rs) for rs in transactions.values()]
 
@@ -286,9 +277,7 @@ class Assignment:
     def _group_by_transaction_number(
         records: List['Record'],
     ) -> Mapping[int, List['Record']]:
-        transactions: OrderedDict[
-            int, list['TransactionRecord']
-        ] = OrderedDict()
+        transactions: OrderedDict[int, list['TransactionRecord']] = OrderedDict()
 
         transaction_record: 'TransactionRecord'
         for transaction_record in records:
@@ -456,9 +445,7 @@ class Assignment:
     def get_total_amount(self) -> Decimal:
         """Get the total amount from all transactions in the assignment."""
         transactions = [
-            transaction
-            for transaction in self.transactions
-            if hasattr(transaction, 'amount')
+            transaction for transaction in self.transactions if hasattr(transaction, 'amount')
         ]
         if not transactions:
             return Decimal(0)
@@ -493,15 +480,15 @@ class Agreement:
     """
 
     #: The service code. One of :class:`~netsgiro.ServiceCode`.
-    service_code: ServiceCode = attr.ib(converter=ServiceCode)
+    service_code: ServiceCode = attr.ib(converter=to_service_code)
 
     #: Transaction number. Unique and ordered within an assignment.
     number: int = attr.ib(validator=instance_of(int))
 
     #: Type of agreement registration update.
     #: One of :class:`~AvtaleGiroRegistrationType`.
-    registration_type: AvtaleGiroRegistrationType = attr.ib(
-        converter=AvtaleGiroRegistrationType
+    registration_type: 'AvtaleGiroRegistrationType' = attr.ib(
+        converter=to_avtalegiro_registration_type
     )
 
     #: KID number to identify the customer and invoice.
@@ -551,10 +538,10 @@ class PaymentRequest:
     """
 
     #: The service code. One of :class:`~netsgiro.ServiceCode`.
-    service_code: ServiceCode = attr.ib(converter=ServiceCode)
+    service_code: ServiceCode = attr.ib(converter=to_service_code)
 
     #: The transaction type. One of :class:`~TransactionType`.
-    type: TransactionType = attr.ib(converter=TransactionType)
+    type: TransactionType = attr.ib(converter=to_transaction_type)
 
     #: Transaction number. Unique and ordered within an assignment.
     number: int = attr.ib(validator=instance_of(int))
@@ -587,9 +574,7 @@ class PaymentRequest:
         return int(self.amount * 100)
 
     @classmethod
-    def from_records(
-        cls, records: List[TransactionSpecification]
-    ) -> 'PaymentRequest':
+    def from_records(cls, records: List[TransactionSpecification]) -> 'PaymentRequest':
         """Build a Transaction object from a list of record objects."""
         amount_item_1 = records.pop(0)
         assert isinstance(amount_item_1, TransactionAmountItem1)
@@ -637,9 +622,7 @@ class PaymentRequest:
             )
 
 
-_T = Union[
-    TransactionAmountItem1, TransactionAmountItem2, TransactionAmountItem3
-]
+_T = Union[TransactionAmountItem1, TransactionAmountItem2, TransactionAmountItem3]
 
 
 @attr.s
@@ -652,10 +635,10 @@ class Transaction:
     """
 
     #: The service code. One of :class:`~netsgiro.ServiceCode`.
-    service_code: ServiceCode = attr.ib(converter=ServiceCode)
+    service_code: ServiceCode = attr.ib(converter=to_service_code)
 
     #: The transaction type. One of :class:`~TransactionType`.
-    type: TransactionType = attr.ib(converter=TransactionType)
+    type: TransactionType = attr.ib(converter=to_transaction_type)
 
     #: Transaction number. Unique and ordered within an assignment.
     number: int = attr.ib(validator=instance_of(int))
@@ -682,14 +665,10 @@ class Transaction:
     day_code: Optional[int] = attr.ib(validator=optional(instance_of(int)))
 
     #: Used for OCR Giro.
-    partial_settlement_number: Optional[int] = attr.ib(
-        validator=optional(instance_of(int))
-    )
+    partial_settlement_number: Optional[int] = attr.ib(validator=optional(instance_of(int)))
 
     #: Used for OCR Giro.
-    partial_settlement_serial_number: Optional[str] = attr.ib(
-        validator=optional(str_of_length(5))
-    )
+    partial_settlement_serial_number: Optional[str] = attr.ib(validator=optional(str_of_length(5)))
 
     #: Used for OCR Giro.
     sign: Optional[str] = attr.ib(validator=optional(str_of_length(1)))
@@ -698,14 +677,10 @@ class Transaction:
     form_number: Optional[str] = attr.ib(validator=optional(str_of_length(10)))
 
     #: Used for OCR Giro.
-    bank_date: Optional[datetime.date] = attr.ib(
-        validator=optional(instance_of(datetime.date))
-    )
+    bank_date: Optional[datetime.date] = attr.ib(validator=optional(instance_of(datetime.date)))
 
     #: Used for OCR Giro.
-    debit_account: Optional[str] = attr.ib(
-        validator=optional(str_of_length(11))
-    )
+    debit_account: Optional[str] = attr.ib(validator=optional(str_of_length(11)))
 
     _filler: Optional[str] = attr.ib(validator=optional(str_of_length(7)))
 

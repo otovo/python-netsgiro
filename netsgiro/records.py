@@ -1,23 +1,31 @@
 """The lower-level records API."""
 
-import datetime
 import re
 from abc import ABC, abstractmethod
-from typing import Iterable, List, Optional, Tuple, Union
+from typing import TYPE_CHECKING, Iterable, List, Optional, Tuple
 
 import attr
 from attr.validators import optional
 
 import netsgiro
-from netsgiro import AvtaleGiroRegistrationType, TransactionType
 from netsgiro.converters import (
     fixed_len_str,
     stripped_newlines,
-    stripped_spaces_around,
-    truthy_or_none,
+    to_assignment_type,
+    to_avtalegiro_registration_type,
+    to_bool,
+    to_date,
+    to_safe_str_or_none,
+    to_service_code,
+    to_transaction_type,
     value_or_none,
 )
 from netsgiro.validators import str_of_length, str_of_max_length
+
+if TYPE_CHECKING:
+    import datetime
+
+    from netsgiro import AvtaleGiroRegistrationType, TransactionType
 
 __all__ = [
     'TransmissionStart',
@@ -31,54 +39,6 @@ __all__ = [
     'AvtaleGiroAgreement',
     'parse',
 ]
-
-
-def to_service_code(
-    value: Union[netsgiro.ServiceCode, int, str]
-) -> netsgiro.ServiceCode:
-    return netsgiro.ServiceCode(int(value))
-
-
-def to_assignment_type(
-    value: Union[netsgiro.AssignmentType, int, str]
-) -> netsgiro.AssignmentType:
-    return netsgiro.AssignmentType(int(value))
-
-
-def to_transaction_type(
-    value: Union[netsgiro.TransactionType, int, str]
-) -> netsgiro.TransactionType:
-    return netsgiro.TransactionType(int(value))
-
-
-def to_avtalegiro_registration_type(
-    value: Union[netsgiro.AvtaleGiroRegistrationType, int, str]
-) -> netsgiro.AvtaleGiroRegistrationType:
-    return netsgiro.AvtaleGiroRegistrationType(int(value))
-
-
-def to_date(value: Union[datetime.date, str, None]) -> Optional[datetime.date]:
-    if isinstance(value, datetime.date):
-        return value
-    if value is None or value == '000000':
-        return None
-    return datetime.datetime.strptime(value, '%d%m%y').date()
-
-
-def to_bool(value: Union[bool, str]) -> bool:
-    if isinstance(value, bool):
-        return value
-    if value == 'J':
-        return True
-    elif value == 'N':
-        return False
-    else:
-        raise ValueError(f"Expected 'J' or 'N', got {value!r}")
-
-
-to_safe_str_or_none = value_or_none(
-    stripped_newlines(stripped_spaces_around(truthy_or_none(str)))
-)
 
 
 @attr.s
@@ -392,7 +352,7 @@ class AssignmentEnd(Record):
 
 @attr.s
 class TransactionRecord(Record, ABC):
-    transaction_type: TransactionType = attr.ib(converter=to_transaction_type)
+    transaction_type: 'TransactionType' = attr.ib(converter=to_transaction_type)
     transaction_number: int = attr.ib(converter=int)
 
 
@@ -403,7 +363,7 @@ class TransactionAmountItem1(TransactionRecord):
     The record is used both for AvtaleGiro and for OCR Giro.
     """
 
-    nets_date: datetime.date = attr.ib(converter=to_date)
+    nets_date: 'datetime.date' = attr.ib(converter=to_date)
     amount: int = attr.ib(converter=int)
     kid: Optional[str] = attr.ib(
         converter=to_safe_str_or_none, validator=optional(str_of_max_length(25))
@@ -412,12 +372,8 @@ class TransactionAmountItem1(TransactionRecord):
     # Only OCR Giro
     centre_id = attr.ib(default=None, validator=optional(str_of_length(2)))
     day_code = attr.ib(default=None, converter=value_or_none(int))
-    partial_settlement_number = attr.ib(
-        default=None, converter=value_or_none(int)
-    )
-    partial_settlement_serial_number = attr.ib(
-        default=None, validator=optional(str_of_length(5))
-    )
+    partial_settlement_number = attr.ib(default=None, converter=value_or_none(int))
+    partial_settlement_serial_number = attr.ib(default=None, validator=optional(str_of_length(5)))
     sign = attr.ib(default=None, validator=optional(str_of_length(1)))
 
     RECORD_TYPE = netsgiro.RecordType.TRANSACTION_AMOUNT_ITEM_1
@@ -566,11 +522,7 @@ class TransactionAmountItem2(TransactionRecord):
     def to_ocr(self) -> str:
         """Get record as OCR string."""
         common_fields = (
-            'NY'
-            f'{self.service_code:02d}'
-            f'{self.transaction_type:02d}'
-            '31'
-            f'{self.transaction_number:07d}'
+            f'NY{self.service_code:02d}{self.transaction_type:02d}31{self.transaction_number:07d}'
         )
         if self.service_code == netsgiro.ServiceCode.OCR_GIRO:
             service_fields = (
@@ -601,9 +553,7 @@ class TransactionAmountItem3(TransactionRecord):
     The record is only used for some OCR Giro transaction types.
     """
 
-    text = attr.ib(
-        converter=to_safe_str_or_none, validator=optional(str_of_max_length(40))
-    )
+    text = attr.ib(converter=to_safe_str_or_none, validator=optional(str_of_max_length(40)))
 
     RECORD_TYPE = netsgiro.RecordType.TRANSACTION_AMOUNT_ITEM_3
     _PATTERNS = [
@@ -696,9 +646,7 @@ class TransactionSpecification(TransactionRecord):
             )
 
     @classmethod
-    def _split_text_to_lines_and_columns(
-        cls, text
-    ) -> Iterable[Tuple[int, int, str]]:
+    def _split_text_to_lines_and_columns(cls, text) -> Iterable[Tuple[int, int, str]]:
         lines = text.splitlines()
 
         if len(lines) > cls._MAX_LINES:
@@ -754,7 +702,7 @@ class AvtaleGiroAgreement(TransactionRecord):
     notification preferences.
     """
 
-    registration_type: AvtaleGiroRegistrationType = attr.ib(
+    registration_type: 'AvtaleGiroRegistrationType' = attr.ib(
         converter=to_avtalegiro_registration_type
     )
     kid: Optional[str] = attr.ib(
@@ -787,10 +735,7 @@ class AvtaleGiroAgreement(TransactionRecord):
     def to_ocr(self) -> str:
         """Get record as OCR string."""
         return (
-            'NY219470'
-            f'{self.transaction_number:07d}'
-            f'{self.registration_type:01d}'
-            f'{self.kid:>25}'
+            f'NY219470{self.transaction_number:07d}{self.registration_type:01d}{self.kid:>25}'
             + (self.notify and 'J' or 'N')
             + ('0' * 38)
         ).format(self=self)
@@ -801,15 +746,11 @@ def parse(data: str) -> List[Record]:
 
     def all_subclasses(cls):
         return cls.__subclasses__() + [
-            subsubcls
-            for subcls in cls.__subclasses__()
-            for subsubcls in all_subclasses(subcls)
+            subsubcls for subcls in cls.__subclasses__() for subsubcls in all_subclasses(subcls)
         ]
 
     record_classes = {
-        cls.RECORD_TYPE: cls
-        for cls in all_subclasses(Record)
-        if hasattr(cls, 'RECORD_TYPE')
+        cls.RECORD_TYPE: cls for cls in all_subclasses(Record) if hasattr(cls, 'RECORD_TYPE')
     }
 
     results = []
