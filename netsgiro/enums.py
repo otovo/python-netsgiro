@@ -1,8 +1,9 @@
 """Enums for all codes used in OCR files."""
 
 from enum import IntEnum
+from typing import List
 
-__all__ = [
+__all__: List[str] = [
     'ServiceCode',
     'RecordType',
     'AssignmentType',

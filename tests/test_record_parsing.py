@@ -304,7 +304,7 @@ def test_transaction_amount_item_3_for_ocr_giro_transactions():
     assert record.service_code == ServiceCode.OCR_GIRO
     assert record.RECORD_TYPE == RecordType.TRANSACTION_AMOUNT_ITEM_3
 
-    assert record.transaction_type == (TransactionType.PURCHASE_WITH_TEXT)
+    assert record.transaction_type == TransactionType.PURCHASE_WITH_TEXT
     assert record.transaction_number == 1
 
     assert record.text == 'Foo bar baz'

@@ -101,9 +101,7 @@ class Transmission:
                 current_assignment_number = record.assignment_number
                 assignments[current_assignment_number] = []
             if current_assignment_number is None:
-                raise ValueError(
-                    f'Expected AssignmentStart record, got {record!r}'
-                )
+                raise ValueError(f'Expected AssignmentStart record, got {record!r}')
             assignments[current_assignment_number].append(record)
             if isinstance(record, AssignmentEnd):
                 current_assignment_number = None
@@ -180,18 +178,14 @@ class Transmission:
 
     def get_num_transactions(self) -> int:
         """Get number of transactions in the transmission."""
-        return sum(
-            assignment.get_num_transactions() for assignment in self.assignments
-        )
+        return sum(assignment.get_num_transactions() for assignment in self.assignments)
 
     def get_num_records(self) -> int:
         """Get number of records in the transmission.
 
         Includes the transmission's start and end record.
         """
-        return 2 + sum(
-            assignment.get_num_records() for assignment in self.assignments
-        )
+        return 2 + sum(assignment.get_num_records() for assignment in self.assignments)
 
     def get_total_amount(self) -> Decimal:
         """Get the total amount from all transactions in the transmission."""
@@ -300,9 +294,7 @@ class Assignment:
         for transaction_record in records:
             if transaction_record.transaction_number not in transactions:
                 transactions[transaction_record.transaction_number] = []
-            transactions[transaction_record.transaction_number].append(
-                transaction_record
-            )
+            transactions[transaction_record.transaction_number].append(transaction_record)
 
         return transactions
 
@@ -372,9 +364,7 @@ class Assignment:
         if bank_notification:
             transaction_type = TransactionType.AVTALEGIRO_WITH_BANK_NOTIFICATION
         else:
-            transaction_type = (
-                TransactionType.AVTALEGIRO_WITH_PAYEE_NOTIFICATION
-            )
+            transaction_type = TransactionType.AVTALEGIRO_WITH_PAYEE_NOTIFICATION
 
         return self._add_avtalegiro_transaction(
             transaction_type=transaction_type,
@@ -461,10 +451,7 @@ class Assignment:
 
         Includes the assignment's start and end record.
         """
-        return 2 + sum(
-            len(list(transaction.to_records()))
-            for transaction in self.transactions
-        )
+        return 2 + sum(len(list(transaction.to_records())) for transaction in self.transactions)
 
     def get_total_amount(self) -> Decimal:
         """Get the total amount from all transactions in the assignment."""
@@ -480,9 +467,7 @@ class Assignment:
     def get_earliest_transaction_date(self) -> Optional[datetime.date]:
         """Get earliest date from the assignment's transactions."""
         transactions = [
-            transaction
-            for transaction in self.transactions
-            if hasattr(transaction, 'date')
+            transaction for transaction in self.transactions if hasattr(transaction, 'date')
         ]
         if not transactions:
             return None
@@ -491,9 +476,7 @@ class Assignment:
     def get_latest_transaction_date(self) -> Optional[datetime.date]:
         """Get latest date from the assignment's transactions."""
         transactions = [
-            transaction
-            for transaction in self.transactions
-            if hasattr(transaction, 'date')
+            transaction for transaction in self.transactions if hasattr(transaction, 'date')
         ]
         if not transactions:
             return None
@@ -756,9 +739,7 @@ class Transaction:
             centre_id=amount_item_1.centre_id,
             day_code=amount_item_1.day_code,
             partial_settlement_number=amount_item_1.partial_settlement_number,
-            partial_settlement_serial_number=(
-                amount_item_1.partial_settlement_serial_number
-            ),
+            partial_settlement_serial_number=amount_item_1.partial_settlement_serial_number,
             sign=amount_item_1.sign,
             form_number=amount_item_2.form_number,
             bank_date=amount_item_2.bank_date,
@@ -778,9 +759,7 @@ class Transaction:
             centre_id=self.centre_id,
             day_code=self.day_code,
             partial_settlement_number=self.partial_settlement_number,
-            partial_settlement_serial_number=(
-                self.partial_settlement_serial_number
-            ),
+            partial_settlement_serial_number=self.partial_settlement_serial_number,
             sign=self.sign,
         )
         yield TransactionAmountItem2(

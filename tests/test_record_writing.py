@@ -185,7 +185,7 @@ def test_transaction_amount_item_1_for_ocr_giro_transactions():
 def test_transaction_amount_item_1_for_avtalegiro_payment_requests():
     record = netsgiro.records.TransactionAmountItem1(
         service_code=netsgiro.ServiceCode.AVTALEGIRO,
-        transaction_type=(netsgiro.TransactionType.AVTALEGIRO_WITH_BANK_NOTIFICATION),
+        transaction_type=netsgiro.TransactionType.AVTALEGIRO_WITH_BANK_NOTIFICATION,
         transaction_number=1,
         nets_date=date(2004, 6, 17),
         amount=100,
@@ -202,7 +202,7 @@ def test_transaction_amount_item_1_raises_if_kid_is_too_long():
     with pytest.raises(ValueError, match='kid must be at most 25 chars'):
         netsgiro.records.TransactionAmountItem1(
             service_code=netsgiro.ServiceCode.AVTALEGIRO,
-            transaction_type=(netsgiro.TransactionType.AVTALEGIRO_WITH_BANK_NOTIFICATION),
+            transaction_type=netsgiro.TransactionType.AVTALEGIRO_WITH_BANK_NOTIFICATION,
             transaction_number=1,
             nets_date=date(2004, 6, 17),
             amount=100,
@@ -213,7 +213,7 @@ def test_transaction_amount_item_1_raises_if_kid_is_too_long():
 def test_transaction_amount_item_2_for_avtalegiro_payment_request():
     record = netsgiro.records.TransactionAmountItem2(
         service_code=netsgiro.ServiceCode.AVTALEGIRO,
-        transaction_type=(netsgiro.TransactionType.AVTALEGIRO_WITH_BANK_NOTIFICATION),
+        transaction_type=netsgiro.TransactionType.AVTALEGIRO_WITH_BANK_NOTIFICATION,
         transaction_number=1,
         reference=None,
         payer_name='NAVN',
@@ -236,7 +236,7 @@ def test_transaction_amount_item_2_for_avtalegiro_payment_request():
 def test_transaction_amount_item_2_payer_name_behavior(payer_name, expected):
     original = netsgiro.records.TransactionAmountItem2(
         service_code=netsgiro.ServiceCode.AVTALEGIRO,
-        transaction_type=(netsgiro.TransactionType.AVTALEGIRO_WITH_BANK_NOTIFICATION),
+        transaction_type=netsgiro.TransactionType.AVTALEGIRO_WITH_BANK_NOTIFICATION,
         transaction_number=1,
         reference=None,
         payer_name=payer_name,
@@ -251,7 +251,7 @@ def test_transaction_amount_item_2_payer_name_behavior(payer_name, expected):
 def test_transaction_amount_item_2_for_ocr_giro_transactions():
     record = netsgiro.records.TransactionAmountItem2(
         service_code=netsgiro.ServiceCode.OCR_GIRO,
-        transaction_type=(netsgiro.TransactionType.FROM_GIRO_DEBITED_ACCOUNT),
+        transaction_type=netsgiro.TransactionType.FROM_GIRO_DEBITED_ACCOUNT,
         transaction_number=1,
         reference='099038562',
         form_number='9636827194',
@@ -268,7 +268,7 @@ def test_transaction_amount_item_2_for_ocr_giro_transactions():
 def test_transaction_amount_item_2_for_ocr_giro_without_bank_date():
     record = netsgiro.records.TransactionAmountItem2(
         service_code=netsgiro.ServiceCode.OCR_GIRO,
-        transaction_type=(netsgiro.TransactionType.FROM_GIRO_DEBITED_ACCOUNT),
+        transaction_type=netsgiro.TransactionType.FROM_GIRO_DEBITED_ACCOUNT,
         transaction_number=1,
         reference='099038562',
         form_number='9636827194',
@@ -285,7 +285,7 @@ def test_transaction_amount_item_2_for_ocr_giro_without_bank_date():
 def test_transaction_amount_item_3_for_ocr_giro_transactions():
     record = netsgiro.records.TransactionAmountItem3(
         service_code=netsgiro.ServiceCode.OCR_GIRO,
-        transaction_type=(netsgiro.TransactionType.PURCHASE_WITH_TEXT),
+        transaction_type=netsgiro.TransactionType.PURCHASE_WITH_TEXT,
         transaction_number=1,
         text='Foo bar baz',
     )
@@ -306,7 +306,7 @@ def test_transaction_amount_item_3_for_ocr_giro_transactions():
 def test_transaction_amount_item_3_text_behavior(text, expected):
     original = netsgiro.records.TransactionAmountItem3(
         service_code=netsgiro.ServiceCode.OCR_GIRO,
-        transaction_type=(netsgiro.TransactionType.PURCHASE_WITH_TEXT),
+        transaction_type=netsgiro.TransactionType.PURCHASE_WITH_TEXT,
         transaction_number=1,
         text=text,
     )
@@ -321,7 +321,7 @@ def test_transaction_amount_item_3_raises_if_text_is_too_long():
     with pytest.raises(ValueError, match='text must be at most 40 chars'):
         netsgiro.records.TransactionAmountItem3(
             service_code=netsgiro.ServiceCode.OCR_GIRO,
-            transaction_type=(netsgiro.TransactionType.PURCHASE_WITH_TEXT),
+            transaction_type=netsgiro.TransactionType.PURCHASE_WITH_TEXT,
             transaction_number=1,
             text='Fooo' * 12,  # Max 40 chars
         )
@@ -330,7 +330,7 @@ def test_transaction_amount_item_3_raises_if_text_is_too_long():
 def test_transaction_specification_for_avtalegiro_payment_request():
     record = netsgiro.records.TransactionSpecification(
         service_code=netsgiro.ServiceCode.AVTALEGIRO,
-        transaction_type=(netsgiro.TransactionType.AVTALEGIRO_WITH_BANK_NOTIFICATION),
+        transaction_type=netsgiro.TransactionType.AVTALEGIRO_WITH_BANK_NOTIFICATION,
         transaction_number=1,
         line_number=1,
         column_number=1,
@@ -347,7 +347,7 @@ def test_transaction_specification_from_longer_text():
     records = list(
         netsgiro.records.TransactionSpecification.from_text(
             service_code=netsgiro.ServiceCode.AVTALEGIRO,
-            transaction_type=(netsgiro.TransactionType.AVTALEGIRO_WITH_BANK_NOTIFICATION),
+            transaction_type=netsgiro.TransactionType.AVTALEGIRO_WITH_BANK_NOTIFICATION,
             transaction_number=1,
             text=' Gjelder Faktura: 168837  Dato: 19/03/04\nFoo bar baz quux',
         )
@@ -386,7 +386,7 @@ def test_transaction_specification_from_longer_text():
 def test_transaction_specification_text_behavior(text, expected):
     original = netsgiro.records.TransactionSpecification(
         service_code=netsgiro.ServiceCode.AVTALEGIRO,
-        transaction_type=(netsgiro.TransactionType.AVTALEGIRO_WITH_BANK_NOTIFICATION),
+        transaction_type=netsgiro.TransactionType.AVTALEGIRO_WITH_BANK_NOTIFICATION,
         transaction_number=1,
         line_number=1,
         column_number=1,
@@ -406,7 +406,7 @@ def test_transaction_specification_raises_if_text_is_too_long():
     with pytest.raises(ValueError, match='text must be at most 40 chars'):
         netsgiro.records.TransactionSpecification(
             service_code=netsgiro.ServiceCode.AVTALEGIRO,
-            transaction_type=(netsgiro.TransactionType.AVTALEGIRO_WITH_BANK_NOTIFICATION),
+            transaction_type=netsgiro.TransactionType.AVTALEGIRO_WITH_BANK_NOTIFICATION,
             transaction_number=1,
             line_number=1,
             column_number=1,
@@ -417,9 +417,9 @@ def test_transaction_specification_raises_if_text_is_too_long():
 def test_avtalegiro_agreement():
     record = netsgiro.records.AvtaleGiroAgreement(
         service_code=netsgiro.ServiceCode.AVTALEGIRO,
-        transaction_type=(netsgiro.TransactionType.AVTALEGIRO_AGREEMENT),
+        transaction_type=netsgiro.TransactionType.AVTALEGIRO_AGREEMENT,
         transaction_number=1,
-        registration_type=(netsgiro.AvtaleGiroRegistrationType.NEW_OR_UPDATED_AGREEMENT),
+        registration_type=netsgiro.AvtaleGiroRegistrationType.NEW_OR_UPDATED_AGREEMENT,
         kid='008000011688373',
         notify=False,
     )
@@ -434,9 +434,9 @@ def test_avtalegiro_agreement_raises_if_kid_is_too_long():
     with pytest.raises(ValueError, match='kid must be at most 25 chars'):
         netsgiro.records.AvtaleGiroAgreement(
             service_code=netsgiro.ServiceCode.AVTALEGIRO,
-            transaction_type=(netsgiro.TransactionType.AVTALEGIRO_AGREEMENT),
+            transaction_type=netsgiro.TransactionType.AVTALEGIRO_AGREEMENT,
             transaction_number=1,
-            registration_type=(netsgiro.AvtaleGiroRegistrationType.NEW_OR_UPDATED_AGREEMENT),
+            registration_type=netsgiro.AvtaleGiroRegistrationType.NEW_OR_UPDATED_AGREEMENT,
             kid='008000011688373' * 4,  # Max 25 chars
             notify=False,
         )

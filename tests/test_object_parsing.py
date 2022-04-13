@@ -28,7 +28,7 @@ def test_parse_agreements(agreements_data):
 
     assert isinstance(agreement_1, netsgiro.Agreement)
     assert agreement_1.service_code == netsgiro.ServiceCode.AVTALEGIRO
-    assert agreement_1.TRANSACTION_TYPE == (netsgiro.TransactionType.AVTALEGIRO_AGREEMENT)
+    assert agreement_1.TRANSACTION_TYPE == netsgiro.TransactionType.AVTALEGIRO_AGREEMENT
     assert agreement_1.number == 1
 
     assert agreement_1.registration_type == (
@@ -41,7 +41,7 @@ def test_parse_agreements(agreements_data):
 
     assert isinstance(agreement_2, netsgiro.Agreement)
     assert agreement_2.service_code == netsgiro.ServiceCode.AVTALEGIRO
-    assert agreement_2.TRANSACTION_TYPE == (netsgiro.TransactionType.AVTALEGIRO_AGREEMENT)
+    assert agreement_2.TRANSACTION_TYPE == netsgiro.TransactionType.AVTALEGIRO_AGREEMENT
     assert agreement_2.number == 2
 
     assert agreement_2.registration_type == (
@@ -75,7 +75,7 @@ def test_parse_payment_request(payment_request_data):
 
     assert isinstance(transaction, netsgiro.PaymentRequest)
     assert transaction.service_code == netsgiro.ServiceCode.AVTALEGIRO
-    assert transaction.type == (netsgiro.TransactionType.AVTALEGIRO_WITH_BANK_NOTIFICATION)
+    assert transaction.type == netsgiro.TransactionType.AVTALEGIRO_WITH_BANK_NOTIFICATION
     assert transaction.number == 1
     assert transaction.date == date(2004, 6, 17)
     assert transaction.amount == Decimal('1.00')
@@ -115,7 +115,7 @@ def test_parse_ocr_giro_transactions(ocr_giro_transactions_data):
 
     assert isinstance(transaction, netsgiro.Transaction)
     assert transaction.service_code == netsgiro.ServiceCode.OCR_GIRO
-    assert transaction.type == (netsgiro.TransactionType.PURCHASE_WITH_TEXT)
+    assert transaction.type == netsgiro.TransactionType.PURCHASE_WITH_TEXT
     assert transaction.number == 1
     assert transaction.date == date(1992, 1, 20)
     assert transaction.amount == Decimal('1020')
