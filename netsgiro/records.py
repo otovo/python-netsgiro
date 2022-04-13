@@ -95,9 +95,7 @@ class Record:
             if matches is not None:
                 return cls(**matches.groupdict())
 
-        raise ValueError(
-            f'{line!r} did not match {cls.__name__} record formats'
-        )
+        raise ValueError(f'{line!r} did not match {cls.__name__} record formats')
 
     @abstractmethod
     def to_ocr(self) -> str:
@@ -142,10 +140,7 @@ class TransmissionStart(Record):
     def to_ocr(self) -> str:
         """Get record as OCR string."""
         return (
-            'NY000010'
-            f'{self.data_transmitter:8}'
-            f'{self.transmission_number:7}'
-            f'{self.data_recipient:8}'
+            f'NY000010{self.data_transmitter:8}{self.transmission_number:7}{self.data_recipient:8}'
             + ('0' * 49)
         )
 
@@ -479,12 +474,12 @@ class TransactionAmountItem1(TransactionRecord):
         """Get record as OCR string."""
         if self.service_code == netsgiro.ServiceCode.OCR_GIRO:
             ocr_giro_fields = (
-                '{self.centre_id:2}'
-                '{self.day_code:02d}'
-                '{self.partial_settlement_number:01d}'
-                '{self.partial_settlement_serial_number:5}'
-                '{self.sign:1}'
-            ).format(self=self)
+                f'{self.centre_id:2}'
+                f'{self.day_code:02d}'
+                f'{self.partial_settlement_number:01d}'
+                f'{self.partial_settlement_serial_number:5}'
+                f'{self.sign:1}'
+            )
         else:
             ocr_giro_fields = ' ' * 11
 
@@ -707,16 +702,12 @@ class TransactionSpecification(TransactionRecord):
         lines = text.splitlines()
 
         if len(lines) > cls._MAX_LINES:
-            raise ValueError(
-                f'Max {cls._MAX_LINES} specification lines allowed, got'
-                f' {len(lines)}'
-            )
+            raise ValueError(f'Max {cls._MAX_LINES} specification lines allowed, got {len(lines)}')
 
         for line_number, line_text in enumerate(lines, 1):
             if len(line_text) > cls._MAX_LINE_LENGTH:
                 raise ValueError(
-                    'Specification lines must be max {} chars long, '
-                    'got {}: {!r}'.format(
+                    'Specification lines must be max {} chars long, got {}: {!r}'.format(
                         cls._MAX_LINE_LENGTH, len(line_text), line_text
                     )
                 )
@@ -729,8 +720,7 @@ class TransactionSpecification(TransactionRecord):
         """Get a text string from a sequence of specification records."""
         if len(records) > cls._MAX_RECORDS:
             raise ValueError(
-                f'Max {cls._MAX_RECORDS} specification records allowed, got'
-                f' {len(records)}'
+                f'Max {cls._MAX_RECORDS} specification records allowed, got {len(records)}'
             )
 
         tuples = sorted((r.line_number, r.column_number, r) for r in records)
@@ -830,9 +820,7 @@ def parse(data: str) -> List[Record]:
 
         record_type_str = line[6:8]
         if not record_type_str.isnumeric():
-            raise ValueError(
-                f'Record type must be numeric, got {record_type_str!r}'
-            )
+            raise ValueError(f'Record type must be numeric, got {record_type_str!r}')
 
         record_type = netsgiro.RecordType(int(record_type_str))
         record_cls = record_classes[record_type]

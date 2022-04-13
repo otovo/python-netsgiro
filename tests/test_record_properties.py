@@ -199,7 +199,7 @@ def test_transaction_amount_item_1_for_ocr_giro_transactions(
 def test_transaction_amount_item_1_for_avtalegiro_payment_requests(tn, nd, a, kid):
     original = netsgiro.records.TransactionAmountItem1(
         service_code=netsgiro.ServiceCode.AVTALEGIRO,
-        transaction_type=(netsgiro.TransactionType.AVTALEGIRO_WITH_BANK_NOTIFICATION),
+        transaction_type=netsgiro.TransactionType.AVTALEGIRO_WITH_BANK_NOTIFICATION,
         transaction_number=tn,
         nets_date=nd,
         amount=a,
@@ -219,7 +219,7 @@ def test_transaction_amount_item_1_for_avtalegiro_payment_requests(tn, nd, a, ki
 def test_transaction_amount_item_2_for_avtalegiro_payment_request(tn, pn):
     original = netsgiro.records.TransactionAmountItem2(
         service_code=netsgiro.ServiceCode.AVTALEGIRO,
-        transaction_type=(netsgiro.TransactionType.AVTALEGIRO_WITH_BANK_NOTIFICATION),
+        transaction_type=netsgiro.TransactionType.AVTALEGIRO_WITH_BANK_NOTIFICATION,
         transaction_number=tn,
         reference=None,
         payer_name=pn,
@@ -242,7 +242,7 @@ def test_transaction_amount_item_2_for_avtalegiro_payment_request(tn, pn):
 def test_transaction_amount_item_2_for_ocr_giro_transactions(tn, ref, fn, bd, da):
     original = netsgiro.records.TransactionAmountItem2(
         service_code=netsgiro.ServiceCode.OCR_GIRO,
-        transaction_type=(netsgiro.TransactionType.FROM_GIRO_DEBITED_ACCOUNT),
+        transaction_type=netsgiro.TransactionType.FROM_GIRO_DEBITED_ACCOUNT,
         transaction_number=tn,
         reference=ref,
         form_number=fn,
@@ -265,7 +265,7 @@ def test_transaction_amount_item_2_for_ocr_giro_transactions(tn, ref, fn, bd, da
 def test_transaction_amount_item_3_for_ocr_giro_transactions(tn, text):
     original = netsgiro.records.TransactionAmountItem3(
         service_code=netsgiro.ServiceCode.OCR_GIRO,
-        transaction_type=(netsgiro.TransactionType.PURCHASE_WITH_TEXT),
+        transaction_type=netsgiro.TransactionType.PURCHASE_WITH_TEXT,
         transaction_number=tn,
         text=text,
     )
@@ -286,7 +286,7 @@ def test_transaction_amount_item_3_for_ocr_giro_transactions(tn, text):
 def test_transaction_specification_for_avtalegiro_payment_request(tn, ln, cn, text):
     original = netsgiro.records.TransactionSpecification(
         service_code=netsgiro.ServiceCode.AVTALEGIRO,
-        transaction_type=(netsgiro.TransactionType.AVTALEGIRO_WITH_BANK_NOTIFICATION),
+        transaction_type=netsgiro.TransactionType.AVTALEGIRO_WITH_BANK_NOTIFICATION,
         transaction_number=tn,
         line_number=ln,
         column_number=cn,
@@ -311,9 +311,9 @@ def test_transaction_specification_for_avtalegiro_payment_request(tn, ln, cn, te
 def test_avtalegiro_agreement(tn, kid, n):
     original = netsgiro.records.AvtaleGiroAgreement(
         service_code=netsgiro.ServiceCode.AVTALEGIRO,
-        transaction_type=(netsgiro.TransactionType.AVTALEGIRO_AGREEMENT),
+        transaction_type=netsgiro.TransactionType.AVTALEGIRO_AGREEMENT,
         transaction_number=tn,
-        registration_type=(netsgiro.AvtaleGiroRegistrationType.NEW_OR_UPDATED_AGREEMENT),
+        registration_type=netsgiro.AvtaleGiroRegistrationType.NEW_OR_UPDATED_AGREEMENT,
         kid=kid,
         notify=n,
     )
