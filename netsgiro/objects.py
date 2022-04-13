@@ -3,18 +3,12 @@
 import datetime
 from collections import OrderedDict
 from decimal import Decimal
-from typing import TYPE_CHECKING, Iterable, List, Mapping, Optional, Union
+from typing import TYPE_CHECKING, Iterable, List, Mapping, Optional, Sequence, TypeVar, Union
 
 import attr
 from attrs.validators import instance_of, optional
 
 from netsgiro import AssignmentType, ServiceCode, TransactionType
-from netsgiro.converters import (
-    to_assignment_type,
-    to_avtalegiro_registration_type,
-    to_service_code,
-    to_transaction_type,
-)
 from netsgiro.records import (
     AssignmentEnd,
     AssignmentStart,
@@ -27,13 +21,14 @@ from netsgiro.records import (
     TransmissionStart,
 )
 from netsgiro.records import parse as records_parse
+from netsgiro.records import to_assignment_type, to_service_code, to_transaction_type
 from netsgiro.validators import str_of_length
 
 if TYPE_CHECKING:
     from netsgiro.enums import AvtaleGiroRegistrationType
     from netsgiro.records import Record, TransactionRecord
 
-__all__ = [
+__all__: List[str] = [
     'Transmission',
     'Assignment',
     'Agreement',
@@ -41,6 +36,8 @@ __all__ = [
     'Transaction',
     'parse',
 ]
+
+R = TypeVar('R', bound='Record')
 
 
 @attr.s
@@ -73,7 +70,7 @@ class Transmission:
     assignments: list['Assignment'] = attr.ib(default=attr.Factory(list), repr=False)
 
     @classmethod
-    def from_records(cls, records: List['Record']) -> 'Transmission':
+    def from_records(cls, records: List[R]) -> 'Transmission':
         """Build a Transmission object from a list of record objects."""
         if len(records) < 2:
             raise ValueError(f'At least 2 records required, got {len(records)}')
@@ -92,8 +89,8 @@ class Transmission:
         )
 
     @staticmethod
-    def _get_assignments(records: List['Record']) -> List['Assignment']:
-        assignments: OrderedDict[int, list['Record']] = OrderedDict()
+    def _get_assignments(records: List[R]) -> List['Assignment']:
+        assignments: OrderedDict[str, list[R]] = OrderedDict()
 
         current_assignment_number = None
         for record in records:
@@ -139,9 +136,14 @@ class Transmission:
             for assignment in self.assignments
         )
         if self.assignments and avtalegiro_payment_request:
-            date = min(
-                assignment.get_earliest_transaction_date() for assignment in self.assignments
-            )
+            date: Optional[datetime.date] = None
+            for assignment in self.assignments:
+                earliest_transaction_date = assignment.get_earliest_transaction_date()
+                if date is None or (
+                    isinstance(earliest_transaction_date, datetime.date)
+                    and earliest_transaction_date < date
+                ):
+                    date = earliest_transaction_date
         else:
             date = self.date
 
@@ -188,7 +190,10 @@ class Transmission:
 
     def get_total_amount(self) -> Decimal:
         """Get the total amount from all transactions in the transmission."""
-        return sum(assignment.get_total_amount() for assignment in self.assignments)
+        return Decimal(sum(assignment.get_total_amount() for assignment in self.assignments))
+
+
+T = Sequence[Union['Agreement', 'Record', 'Transaction', 'PaymentRequest']]
 
 
 @attr.s
@@ -224,7 +229,7 @@ class Assignment:
 
     #: List of transaction objects, like :class:`~netsgiro.Agreement`,
     #: :class:`~netsgiro.PaymentRequest`, :class:`~netsgiro.Transaction`.
-    transactions: list['Transaction'] = attr.ib(default=attr.Factory(list), repr=False)
+    transactions: T = attr.ib(default=attr.Factory(list), repr=False)
 
     _next_transaction_number: int = attr.ib(default=1, init=False)
 
@@ -239,6 +244,7 @@ class Assignment:
         assert isinstance(start, AssignmentStart)
         assert isinstance(end, AssignmentEnd)
 
+        transactions: T
         if start.service_code == ServiceCode.AVTALEGIRO:
             if start.assignment_type == AssignmentType.AVTALEGIRO_AGREEMENTS:
                 transactions = cls._get_agreements(body)
@@ -260,23 +266,23 @@ class Assignment:
         )
 
     @staticmethod
-    def _get_agreements(records: List['Record']) -> List['Agreement']:
+    def _get_agreements(records: List[R]) -> List['Agreement']:
         return [Agreement.from_records([r]) for r in records]
 
     @classmethod
-    def _get_payment_requests(cls, records: List['Record']) -> List['PaymentRequest']:
+    def _get_payment_requests(
+        cls, records: List[TransactionSpecification]
+    ) -> List['PaymentRequest']:
         transactions = cls._group_by_transaction_number(records)
         return [PaymentRequest.from_records(rs) for rs in transactions.values()]
 
     @classmethod
-    def _get_transactions(cls, records: List['Record']) -> List['Transaction']:
+    def _get_transactions(cls, records: List['TransactionRecord']) -> List['Transaction']:
         transactions = cls._group_by_transaction_number(records)
         return [Transaction.from_records(rs) for rs in transactions.values()]
 
     @staticmethod
-    def _group_by_transaction_number(
-        records: List['Record'],
-    ) -> Mapping[int, List['Record']]:
+    def _group_by_transaction_number(records: List[R]) -> Mapping[int, List[R]]:
         transactions: OrderedDict[int, list['TransactionRecord']] = OrderedDict()
 
         transaction_record: 'TransactionRecord'
@@ -411,7 +417,7 @@ class Assignment:
         reference: Optional[str] = None,
         payer_name: Optional[str] = None,
         bank_notification: bool = False,
-    ) -> 'Transaction':
+    ) -> 'PaymentRequest':
 
         text = bank_notification if isinstance(bank_notification, str) else ''
         number = self._next_transaction_number
@@ -449,7 +455,7 @@ class Assignment:
         ]
         if not transactions:
             return Decimal(0)
-        return sum(transaction.amount for transaction in transactions)
+        return Decimal(sum(transaction.amount for transaction in transactions))
 
     def get_earliest_transaction_date(self) -> Optional[datetime.date]:
         """Get earliest date from the assignment's transactions."""
@@ -487,9 +493,7 @@ class Agreement:
 
     #: Type of agreement registration update.
     #: One of :class:`~AvtaleGiroRegistrationType`.
-    registration_type: 'AvtaleGiroRegistrationType' = attr.ib(
-        converter=to_avtalegiro_registration_type
-    )
+    registration_type: AvtaleGiroRegistrationType = attr.ib(converter=AvtaleGiroRegistrationType)
 
     #: KID number to identify the customer and invoice.
     kid: Optional[str] = attr.ib(validator=optional(instance_of(str)))
@@ -500,7 +504,7 @@ class Agreement:
     TRANSACTION_TYPE = TransactionType.AVTALEGIRO_AGREEMENT
 
     @classmethod
-    def from_records(cls, records: List['Record']) -> 'Agreement':
+    def from_records(cls, records: List[R]) -> 'Agreement':
         """Build an Agreement object from a list of record objects."""
         assert len(records) == 1
         record = records[0]
@@ -618,11 +622,11 @@ class PaymentRequest:
                 service_code=self.service_code,
                 transaction_type=self.type,
                 transaction_number=self.number,
-                text=self.text,
+                text=self.text,  # type: ignore[arg-type]
             )
 
 
-_T = Union[TransactionAmountItem1, TransactionAmountItem2, TransactionAmountItem3]
+TAI = Union[TransactionAmountItem1, TransactionAmountItem2, TransactionAmountItem3]
 
 
 @attr.s
@@ -659,7 +663,7 @@ class Transaction:
     text: Optional[str] = attr.ib(validator=optional(instance_of(str)))
 
     #: Used for OCR Giro.
-    centre_id: Optional[int] = attr.ib(validator=optional(str_of_length(2)))
+    centre_id: Optional[str] = attr.ib(validator=optional(str_of_length(2)))
 
     #: Used for OCR Giro.
     day_code: Optional[int] = attr.ib(validator=optional(instance_of(int)))
@@ -722,7 +726,7 @@ class Transaction:
             filler=amount_item_2._filler,
         )
 
-    def to_records(self) -> Iterable[_T]:
+    def to_records(self) -> Iterable[TAI]:
         """Convert the transaction to a list of records."""
         yield TransactionAmountItem1(
             service_code=self.service_code,
