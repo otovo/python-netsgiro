@@ -12,9 +12,7 @@ def test_parse_with_too_short_lines_fails():
 
 
 def test_parse_with_nonnumeric_record_type():
-    with pytest.raises(
-        ValueError, match="Record type must be numeric, got 'AA'"
-    ):
+    with pytest.raises(ValueError, match="Record type must be numeric, got 'AA'"):
         netsgiro.records.parse('NY0000AA' + '0' * 72)
 
 
@@ -91,27 +89,19 @@ def test_parse_avtalegiro_payment_requests(payment_request_data):
     assert isinstance(assignment_start, netsgiro.records.AssignmentStart)
     assert assignment_start.assignment_account == '88888888888'
 
-    assert isinstance(
-        transaction_amount_1, netsgiro.records.TransactionAmountItem1
-    )
+    assert isinstance(transaction_amount_1, netsgiro.records.TransactionAmountItem1)
     assert transaction_amount_1.nets_date == date(2004, 6, 17)
     assert transaction_amount_1.amount == 100
     assert transaction_amount_1.kid == '008000011688373'
 
-    assert isinstance(
-        transaction_amount_2, netsgiro.records.TransactionAmountItem2
-    )
+    assert isinstance(transaction_amount_2, netsgiro.records.TransactionAmountItem2)
     assert transaction_amount_2.payer_name == 'NAVN'
     assert transaction_amount_2.reference is None
 
-    assert isinstance(
-        transaction_spec_1, netsgiro.records.TransactionSpecification
-    )
+    assert isinstance(transaction_spec_1, netsgiro.records.TransactionSpecification)
     assert transaction_spec_1.text == ' Gjelder Faktura: 168837  Dato: 19/03/04'
 
-    assert isinstance(
-        transaction_spec_2, netsgiro.records.TransactionSpecification
-    )
+    assert isinstance(transaction_spec_2, netsgiro.records.TransactionSpecification)
     assert transaction_spec_2.text == '                  ForfallsDato: 17/06/04'
 
     assert isinstance(assignment_end, netsgiro.records.AssignmentEnd)
@@ -148,25 +138,19 @@ def test_parse_ocr_giro_transactions(ocr_giro_transactions_data):
     assert isinstance(assignment_start, netsgiro.records.AssignmentStart)
     assert assignment_start.assignment_account == '99991042764'
 
-    assert isinstance(
-        transaction_amount_1, netsgiro.records.TransactionAmountItem1
-    )
+    assert isinstance(transaction_amount_1, netsgiro.records.TransactionAmountItem1)
     assert transaction_amount_1.nets_date == date(1992, 1, 20)
     assert transaction_amount_1.amount == 102000
     assert transaction_amount_1.kid == '0000531'
 
-    assert isinstance(
-        transaction_amount_2, netsgiro.records.TransactionAmountItem2
-    )
+    assert isinstance(transaction_amount_2, netsgiro.records.TransactionAmountItem2)
     assert transaction_amount_2.payer_name is None
     assert transaction_amount_2.form_number == '9636827194'
     assert transaction_amount_2.reference == '099038562'
     assert transaction_amount_2.bank_date == date(1992, 1, 16)
     assert transaction_amount_2.debit_account == '99990512341'
 
-    assert isinstance(
-        transaction_amount_3, netsgiro.records.TransactionAmountItem3
-    )
+    assert isinstance(transaction_amount_3, netsgiro.records.TransactionAmountItem3)
     assert transaction_amount_3.text == 'Foo bar baz'
 
     assert isinstance(assignment_end, netsgiro.records.AssignmentEnd)
