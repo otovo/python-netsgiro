@@ -2,7 +2,7 @@
 
 import re
 from abc import ABC, abstractmethod
-from typing import TYPE_CHECKING, Iterable, List, Optional, Pattern, Tuple, Union
+from typing import TYPE_CHECKING, Iterable, List, Optional, Pattern, Tuple, Type, TypeVar, Union
 
 import attr
 from attr.validators import optional
@@ -27,7 +27,13 @@ from netsgiro.validators import str_of_length, str_of_max_length
 if TYPE_CHECKING:
     import datetime
 
-    from netsgiro import AssignmentType, AvtaleGiroRegistrationType, ServiceCode, TransactionType
+    from netsgiro import (
+        AssignmentType,
+        AvtaleGiroRegistrationType,
+        RecordType,
+        ServiceCode,
+        TransactionType,
+    )
 
 __all__: List[str] = [
     'TransmissionStart',
@@ -44,8 +50,11 @@ __all__: List[str] = [
 
 
 @attr.s
-class Record:
+class Record(ABC):
+    """Record base class."""
+
     _PATTERNS: List[Pattern]
+    RECORD_TYPE: 'RecordType'
 
     service_code: 'ServiceCode' = attr.ib(converter=to_service_code)
 
@@ -66,7 +75,7 @@ class Record:
 
 
 @attr.s
-class TransmissionStart(Record):
+class TransmissionStart(Record, ABC):
     """TransmissionStart is the first record in every OCR file.
 
     A file can only contain a single transmission.
@@ -354,6 +363,8 @@ class AssignmentEnd(Record):
 
 @attr.s
 class TransactionRecord(Record, ABC):
+    """Transaction record base class."""
+
     transaction_type: 'TransactionType' = attr.ib(converter=to_transaction_type)
     transaction_number: int = attr.ib(converter=int)
 
@@ -748,10 +759,14 @@ class AvtaleGiroAgreement(TransactionRecord):
         ).format(self=self)
 
 
-def parse(data: str) -> List[Record]:
+R = TypeVar('R', bound=Record)
+
+
+def parse(data: str) -> List[R]:
     """Parse an OCR file into a list of record objects."""
 
-    def all_subclasses(cls):
+    def all_subclasses(cls: Type[R]) -> List[Type[R]]:
+        """Return a list of subclasses for a given class."""
         return cls.__subclasses__() + [
             subsubcls for subcls in cls.__subclasses__() for subsubcls in all_subclasses(subcls)
         ]
