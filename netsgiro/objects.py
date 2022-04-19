@@ -245,15 +245,24 @@ class Assignment:
         assert isinstance(start, AssignmentStart)
         assert isinstance(end, AssignmentEnd)
 
-        if start.service_code == ServiceCode.AVTALEGIRO:
-            if start.assignment_type == AssignmentType.AVTALEGIRO_AGREEMENTS:
-                transactions = cls._get_agreements(body)
+        sc = start.service_code
+        at = start.assignment_type
+
+        cb: Callable
+        if sc == ServiceCode.OCR_GIRO:
+            # -> List[Transaction]
+            cb = cls._get_transactions
+        elif sc == ServiceCode.AVTALEGIRO:
+            if at == AssignmentType.AVTALEGIRO_AGREEMENTS:
+                # -> List[Agreement]
+                cb = cls._get_agreements
             else:
-                transactions = cls._get_payment_requests(body)
-        elif start.service_code == ServiceCode.OCR_GIRO:
-            transactions = cls._get_transactions(body)
+                # -> List[PaymentRequest]
+                cb = cls._get_payment_requests
         else:
             raise ValueError(f'Unknown service code: {start.service_code}')
+
+        transactions: TS = cb(body)
 
         return cls(
             service_code=start.service_code,
