@@ -8,13 +8,13 @@ from typing import TYPE_CHECKING, Callable, Iterable, List, Optional, TypeVar, U
 import attr
 from attrs.validators import instance_of, optional
 
-from netsgiro import AssignmentType, ServiceCode, TransactionType
 from netsgiro.converters import (
     to_assignment_type,
     to_avtalegiro_registration_type,
     to_service_code,
     to_transaction_type,
 )
+from netsgiro.enums import AssignmentType, ServiceCode, TransactionType
 from netsgiro.records import (
     AssignmentEnd,
     AssignmentStart,

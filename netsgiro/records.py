@@ -17,9 +17,7 @@ from typing import (
 
 import attr
 from attr.validators import optional
-
-import netsgiro
-from netsgiro.converters import (
+from converters import (
     fixed_len_str,
     stripped_newlines,
     to_assignment_type,
@@ -33,18 +31,14 @@ from netsgiro.converters import (
     to_transaction_type,
     value_or_none,
 )
-from netsgiro.validators import str_of_length, str_of_max_length
+from validators import str_of_length, str_of_max_length
+
+from netsgiro import RecordType, ServiceCode
 
 if TYPE_CHECKING:
     import datetime
 
-    from netsgiro import (
-        AssignmentType,
-        AvtaleGiroRegistrationType,
-        RecordType,
-        ServiceCode,
-        TransactionType,
-    )
+    from netsgiro.enums import AssignmentType, AvtaleGiroRegistrationType, TransactionType
 
 __all__: List[str] = [
     'TransmissionStart',
@@ -65,9 +59,9 @@ class Record(ABC):
     """Record base class."""
 
     _PATTERNS: List[Pattern]
-    RECORD_TYPE: 'RecordType'
+    RECORD_TYPE: RecordType
 
-    service_code: 'ServiceCode' = attr.ib(converter=to_service_code)
+    service_code: ServiceCode = attr.ib(converter=to_service_code)
 
     @classmethod
     def from_string(cls, line: str) -> 'Record':
@@ -98,7 +92,7 @@ class TransmissionStart(Record):
     data_transmitter: str = attr.ib(validator=str_of_length(8))
     data_recipient: str = attr.ib(validator=str_of_length(8))
 
-    RECORD_TYPE = netsgiro.RecordType.TRANSMISSION_START
+    RECORD_TYPE = RecordType.TRANSMISSION_START
     _PATTERNS = [
         re.compile(
             r'''
@@ -136,7 +130,7 @@ class TransmissionEnd(Record):
     total_amount: int = attr.ib(converter=int)
     nets_date: 'datetime.date' = attr.ib(converter=to_date)
 
-    RECORD_TYPE = netsgiro.RecordType.TRANSMISSION_END
+    RECORD_TYPE = RecordType.TRANSMISSION_END
     _PATTERNS = [
         re.compile(
             r'''
@@ -184,7 +178,7 @@ class AssignmentStart(Record):
     # Only for assignment_type == AssignmentType.TRANSACTIONS
     agreement_id: Optional[str] = attr.ib(default=None, validator=optional(str_of_length(9)))
 
-    RECORD_TYPE = netsgiro.RecordType.ASSIGNMENT_START
+    RECORD_TYPE = RecordType.ASSIGNMENT_START
     _PATTERNS = [
         re.compile(
             r'''
@@ -265,7 +259,7 @@ class AssignmentEnd(Record):
     nets_date_2: Optional['datetime.date'] = attr.ib(default=None, converter=to_date_or_none)
     nets_date_3: Optional['datetime.date'] = attr.ib(default=None, converter=to_date_or_none)
 
-    RECORD_TYPE = netsgiro.RecordType.ASSIGNMENT_END
+    RECORD_TYPE = RecordType.ASSIGNMENT_END
     _PATTERNS = [
         re.compile(
             r'''
@@ -330,7 +324,7 @@ class AssignmentEnd(Record):
 
         Only used for OCR Giro.
         """
-        if self.service_code == netsgiro.ServiceCode.OCR_GIRO:
+        if self.service_code == ServiceCode.OCR_GIRO:
             return self.nets_date_1
         else:
             return None
@@ -338,9 +332,9 @@ class AssignmentEnd(Record):
     @property
     def nets_date_earliest(self) -> Optional['datetime.date']:
         """Earliest date from the contained transactions."""
-        if self.service_code == netsgiro.ServiceCode.OCR_GIRO:
+        if self.service_code == ServiceCode.OCR_GIRO:
             return self.nets_date_2
-        elif self.service_code == netsgiro.ServiceCode.AVTALEGIRO:
+        elif self.service_code == ServiceCode.AVTALEGIRO:
             return self.nets_date_1
         else:
             raise ValueError(f'Unhandled service code: {self.service_code}')
@@ -348,9 +342,9 @@ class AssignmentEnd(Record):
     @property
     def nets_date_latest(self) -> Optional['datetime.date']:
         """Latest date from the contained transactions."""
-        if self.service_code == netsgiro.ServiceCode.OCR_GIRO:
+        if self.service_code == ServiceCode.OCR_GIRO:
             return self.nets_date_3
-        elif self.service_code == netsgiro.ServiceCode.AVTALEGIRO:
+        elif self.service_code == ServiceCode.AVTALEGIRO:
             return self.nets_date_2
         else:
             raise ValueError(f'Unhandled service code: {self.service_code}')
@@ -402,7 +396,7 @@ class TransactionAmountItem1(TransactionRecord):
     )
     sign: Optional[str] = attr.ib(default=None, validator=optional(str_of_length(1)))
 
-    RECORD_TYPE = netsgiro.RecordType.TRANSACTION_AMOUNT_ITEM_1
+    RECORD_TYPE = RecordType.TRANSACTION_AMOUNT_ITEM_1
     _PATTERNS = [
         re.compile(
             r'''
@@ -454,7 +448,7 @@ class TransactionAmountItem1(TransactionRecord):
 
     def to_ocr(self) -> str:
         """Get record as OCR string."""
-        if self.service_code == netsgiro.ServiceCode.OCR_GIRO:
+        if self.service_code == ServiceCode.OCR_GIRO:
             ocr_giro_fields = (
                 f'{self.centre_id:2}'
                 f'{self.day_code:02d}'
@@ -499,7 +493,7 @@ class TransactionAmountItem2(TransactionRecord):
     # Only AvtaleGiro
     payer_name: Optional[str] = attr.ib(default=None, converter=to_safe_str_or_none)
 
-    RECORD_TYPE = netsgiro.RecordType.TRANSACTION_AMOUNT_ITEM_2
+    RECORD_TYPE = RecordType.TRANSACTION_AMOUNT_ITEM_2
     _PATTERNS = [
         re.compile(
             r'''
@@ -550,7 +544,7 @@ class TransactionAmountItem2(TransactionRecord):
         common_fields = (
             f'NY{self.service_code:02d}{self.transaction_type:02d}31{self.transaction_number:07d}'
         )
-        if self.service_code == netsgiro.ServiceCode.OCR_GIRO:
+        if self.service_code == ServiceCode.OCR_GIRO:
             service_fields = (
                 f'{self.form_number:10}'
                 + (self.reference and f'{self.reference:9}' or (' ' * 9))
@@ -559,7 +553,7 @@ class TransactionAmountItem2(TransactionRecord):
                 + f'{self.debit_account:11}'
                 + ('0' * 22)
             )
-        elif self.service_code == netsgiro.ServiceCode.AVTALEGIRO:
+        elif self.service_code == ServiceCode.AVTALEGIRO:
             service_fields = (
                 (self.payer_name and f'{self.payer_name[:10]:10}' or (' ' * 10))
                 + (' ' * 25)
@@ -583,7 +577,7 @@ class TransactionAmountItem3(TransactionRecord):
         converter=to_safe_str_or_none, validator=optional(str_of_max_length(40))
     )
 
-    RECORD_TYPE = netsgiro.RecordType.TRANSACTION_AMOUNT_ITEM_3
+    RECORD_TYPE = RecordType.TRANSACTION_AMOUNT_ITEM_3
     _PATTERNS = [
         re.compile(
             r'''
@@ -630,7 +624,7 @@ class TransactionSpecification(TransactionRecord):
         validator=optional(str_of_max_length(40)),
     )
 
-    RECORD_TYPE = netsgiro.RecordType.TRANSACTION_SPECIFICATION
+    RECORD_TYPE = RecordType.TRANSACTION_SPECIFICATION
     _PATTERNS = [
         re.compile(
             r'''
@@ -662,7 +656,7 @@ class TransactionSpecification(TransactionRecord):
     def from_text(
         cls,
         *,
-        service_code: 'ServiceCode',
+        service_code: ServiceCode,
         transaction_type: 'TransactionType',
         transaction_number: int,
         text: Optional[str],
@@ -744,7 +738,7 @@ class AvtaleGiroAgreement(TransactionRecord):
     )
     notify: bool = attr.ib(converter=to_bool)
 
-    RECORD_TYPE = netsgiro.RecordType.TRANSACTION_AGREEMENTS
+    RECORD_TYPE = RecordType.TRANSACTION_AGREEMENTS
     _PATTERNS = [
         re.compile(
             r'''
