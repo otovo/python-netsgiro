@@ -649,7 +649,12 @@ class TransactionSpecification(TransactionRecord):
 
     @classmethod
     def from_text(
-        cls, *, service_code, transaction_type, transaction_number, text
+        cls,
+        *,
+        service_code: ServiceCode,
+        transaction_type: TransactionType,
+        transaction_number: int,
+        text: Optional[str],
     ) -> Iterable['TransactionSpecification']:
         """Create a sequence of specification records from a text string."""
         for line, column, txt in cls._split_text_to_lines_and_columns(text):
@@ -663,7 +668,7 @@ class TransactionSpecification(TransactionRecord):
             )
 
     @classmethod
-    def _split_text_to_lines_and_columns(cls, text) -> Iterable[Tuple[int, int, str]]:
+    def _split_text_to_lines_and_columns(cls, text: str) -> Iterable[Tuple[int, int, str]]:
         lines = text.splitlines()
 
         if len(lines) > cls._MAX_LINES:
