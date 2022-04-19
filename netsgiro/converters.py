@@ -13,6 +13,11 @@ from netsgiro.enums import (
 T = TypeVar('T')
 
 
+def to_int_or_none(value: Union[None, int, str]) -> Optional[int]:
+    """Convert input to int or None."""
+    return None if value is None else int(value)
+
+
 def value_or_none(converter: Callable[[Any], T]) -> Callable[[Any], Optional[T]]:
     """Make converter that returns value or ``None``.
 
@@ -32,14 +37,6 @@ def truthy_or_none(converter: Callable[[Any], T]) -> Callable[[Any], Optional[T]
     return lambda value: converter(value) if value else None
 
 
-def stripped_spaces_around(converter: Callable[[Any], T]) -> Callable[[Any], Optional[T]]:
-    """Make converter that strips leading and trailing spaces.
-
-    ``converter`` is called to further convert non-``None`` values.
-    """
-    return lambda value: None if value is None else converter(value.strip())
-
-
 def stripped_newlines(converter: Callable[[Any], T]) -> Callable[[Any], Optional[T]]:
     """Make converter that returns a string stripped of newlines or ``None``.
 
@@ -56,9 +53,11 @@ def fixed_len_str(length: int, converter: Callable[[Any], T]) -> Callable[[Any],
     return lambda value: converter('{value:{length}}'.format(value=value, length=length))
 
 
-to_safe_str_or_none: Callable = value_or_none(
-    stripped_newlines(stripped_spaces_around(truthy_or_none(str)))
-)
+def to_safe_str_or_none(value: Optional[str]) -> Optional[str]:
+    """Convert input to cleaned string or None."""
+    if not value:
+        return None
+    return value.replace('\r', '').replace('\n', '').strip()
 
 
 def to_service_code(value: Union[ServiceCode, int, str]) -> ServiceCode:
