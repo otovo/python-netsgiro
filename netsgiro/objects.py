@@ -632,7 +632,9 @@ class PaymentRequest:
             )
 
 
-_T = Union[TransactionAmountItem1, TransactionAmountItem2, TransactionAmountItem3]
+TransactionAmountItems = Union[
+    TransactionAmountItem1, TransactionAmountItem2, TransactionAmountItem3
+]
 
 
 @attr.s
@@ -732,7 +734,7 @@ class Transaction:
             filler=amount_item_2._filler,
         )
 
-    def to_records(self) -> Iterable[_T]:
+    def to_records(self) -> Iterable[TransactionAmountItems]:
         """Convert the transaction to a list of records."""
         yield TransactionAmountItem1(
             service_code=self.service_code,
