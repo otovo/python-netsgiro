@@ -95,7 +95,7 @@ def to_date(value: Union[datetime.date, str]) -> Optional[datetime.date]:
     return datetime.datetime.strptime(value, '%d%m%y').date()
 
 
-def to_date_or_none(value: Union[datetime.date, str]) -> Optional[datetime.date]:
+def to_date_or_none(value: Optional[Union[datetime.date, str]]) -> Optional[datetime.date]:
     """Convert input to date or None."""
     if isinstance(value, datetime.date):
         return value
