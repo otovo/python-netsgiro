@@ -43,6 +43,10 @@ __all__: List[str] = [
     'parse',
 ]
 
+TransactionAmountItems = Union[
+    TransactionAmountItem1, TransactionAmountItem2, TransactionAmountItem3
+]
+
 # Record or Record subclasses
 R = TypeVar('R', bound='Record')
 
@@ -198,7 +202,7 @@ class Transmission:
 
     def get_total_amount(self) -> Decimal:
         """Get the total amount from all transactions in the transmission."""
-        return sum(assignment.get_total_amount() for assignment in self.assignments)
+        return Decimal(sum(assignment.get_total_amount() for assignment in self.assignments))
 
 
 # Assigment transactions
@@ -301,24 +305,23 @@ class Assignment:
 
     @staticmethod
     def _group_by_transaction_number(records: List[TR]) -> OrderedDict[int, List[TR]]:
-        transactions: OrderedDict[int, List['TransactionRecord']] = OrderedDict()
-
-        transaction_record: 'TransactionRecord'
+        transactions: OrderedDict[int, List[TR]] = OrderedDict()
         for transaction_record in records:
-            if transaction_record.transaction_number not in transactions:
-                transactions[transaction_record.transaction_number] = []
-            transactions[transaction_record.transaction_number].append(transaction_record)
+            tr = transaction_record.transaction_number
+            if tr not in transactions:
+                transactions[tr] = []
+            transactions[tr].append(transaction_record)
 
         return transactions
 
-    def to_records(self) -> Iterable[TR]:
+    def to_records(self) -> Iterable[Union[AssignmentStart, TransactionAmountItems, AssignmentEnd]]:
         """Convert the assignment to a list of records."""
         yield self._get_start_record()
         for transaction in self.transactions:
             yield from transaction.to_records()
         yield self._get_end_record()
 
-    def _get_start_record(self) -> 'Record':
+    def _get_start_record(self) -> AssignmentStart:
         return AssignmentStart(
             service_code=self.service_code,
             assignment_type=self.type,
@@ -327,7 +330,7 @@ class Assignment:
             agreement_id=self.agreement_id,
         )
 
-    def _get_end_record(self) -> 'Record':
+    def _get_end_record(self) -> AssignmentEnd:
         if self.service_code == ServiceCode.OCR_GIRO:
             dates = {
                 'nets_date_1': self.date,
@@ -348,7 +351,7 @@ class Assignment:
             num_transactions=self.get_num_transactions(),
             num_records=self.get_num_records(),
             total_amount=int(self.get_total_amount() * 100),
-            **dates,
+            **dates,  # type: ignore[arg-type]
         )
 
     def add_payment_request(
@@ -398,7 +401,7 @@ class Assignment:
         reference: Optional[str] = None,
         payer_name: Optional[str] = None,
         bank_notification: Union[bool, str] = False,
-    ) -> 'Transaction':
+    ) -> 'PaymentRequest':
         """Add an AvtaleGiro cancellation to the assignment.
 
         The assignment must have service code
@@ -434,8 +437,8 @@ class Assignment:
         amount: Decimal,
         reference: Optional[str] = None,
         payer_name: Optional[str] = None,
-        bank_notification: bool = False,
-    ) -> 'Transaction':
+        bank_notification: Union[str, bool] = False,
+    ) -> 'PaymentRequest':
 
         text = bank_notification if isinstance(bank_notification, str) else ''
         number = self._next_transaction_number
@@ -620,7 +623,9 @@ class PaymentRequest:
             payer_name=amount_item_2.payer_name,
         )
 
-    def to_records(self) -> Iterable[TR]:
+    def to_records(
+        self,
+    ) -> Iterable[Union[TransactionAmountItem1, TransactionAmountItem2, TransactionSpecification]]:
         """Convert the transaction to a list of records."""
         yield TransactionAmountItem1(
             service_code=self.service_code,
@@ -645,11 +650,6 @@ class PaymentRequest:
                 transaction_number=self.number,
                 text=self.text,
             )
-
-
-TransactionAmountItems = Union[
-    TransactionAmountItem1, TransactionAmountItem2, TransactionAmountItem3
-]
 
 
 @attr.s
@@ -686,7 +686,7 @@ class Transaction:
     text: Optional[str] = attr.ib(validator=optional(instance_of(str)))
 
     #: Used for OCR Giro.
-    centre_id: Optional[int] = attr.ib(validator=optional(str_of_length(2)))
+    centre_id: Optional[str] = attr.ib(validator=optional(str_of_length(2)))
 
     #: Used for OCR Giro.
     day_code: Optional[int] = attr.ib(validator=optional(instance_of(int)))
