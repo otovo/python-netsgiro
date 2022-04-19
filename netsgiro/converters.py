@@ -55,9 +55,7 @@ def fixed_len_str(length: int, converter: Callable[[Any], T]) -> Callable[[Any],
 
 def to_safe_str_or_none(value: Optional[str]) -> Optional[str]:
     """Convert input to cleaned string or None."""
-    if not value:
-        return None
-    return value.replace('\r', '').replace('\n', '').strip()
+    return value.replace('\r', '').replace('\n', '').strip() if value else None
 
 
 def to_service_code(value: Union[ServiceCode, int, str]) -> ServiceCode:
