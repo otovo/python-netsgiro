@@ -33,7 +33,7 @@ if TYPE_CHECKING:
     from netsgiro.enums import AvtaleGiroRegistrationType
     from netsgiro.records import Record, TransactionRecord
 
-__all__ = [
+__all__: List[str] = [
     'Transmission',
     'Assignment',
     'Agreement',
@@ -51,8 +51,7 @@ class Transmission:
     multiple :class:`~netsgiro.Assignment` objects of various types.
     """
 
-    #: Data transmitters unique enumeration of the transmission. String of 7
-    #: digits.
+    #: Data transmitters unique enumeration of the transmission. String of 7 digits.
     number: str = attr.ib(validator=str_of_length(7))
 
     #: Data transmitter's Nets ID. String of 8 digits.

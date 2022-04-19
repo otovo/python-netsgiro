@@ -26,9 +26,9 @@ from netsgiro.validators import str_of_length, str_of_max_length
 if TYPE_CHECKING:
     import datetime
 
-    from netsgiro import AvtaleGiroRegistrationType, TransactionType
+    from netsgiro import AssignmentType, AvtaleGiroRegistrationType, ServiceCode, TransactionType
 
-__all__ = [
+__all__: List[str] = [
     'TransmissionStart',
     'TransmissionEnd',
     'AssignmentStart',
@@ -44,7 +44,7 @@ __all__ = [
 
 @attr.s
 class Record:
-    service_code = attr.ib(converter=to_service_code)
+    service_code: 'ServiceCode' = attr.ib(converter=to_service_code)
 
     _PATTERNS = []
 
@@ -156,7 +156,7 @@ class AssignmentStart(Record):
     Each assignment can contain any number of transactions.
     """
 
-    assignment_type = attr.ib(converter=to_assignment_type)
+    assignment_type: 'AssignmentType' = attr.ib(converter=to_assignment_type)
     assignment_number = attr.ib(validator=str_of_length(7))
     assignment_account = attr.ib(validator=str_of_length(11))
 
@@ -234,7 +234,7 @@ class AssignmentStart(Record):
 class AssignmentEnd(Record):
     """AssignmentEnd is the last record of an assignment."""
 
-    assignment_type = attr.ib(converter=to_assignment_type)
+    assignment_type: 'AssignmentType' = attr.ib(converter=to_assignment_type)
     num_transactions = attr.ib(converter=int)
     num_records = attr.ib(converter=int)
 
@@ -461,7 +461,7 @@ class TransactionAmountItem2(TransactionRecord):
     """
 
     # TODO Validate `reference` length, which depends on service code
-    reference = attr.ib(converter=to_safe_str_or_none)
+    reference: Optional[str] = attr.ib(converter=to_safe_str_or_none)
 
     # Only OCR Giro
     form_number = attr.ib(default=None, validator=optional(str_of_length(10)))
@@ -472,7 +472,7 @@ class TransactionAmountItem2(TransactionRecord):
     _filler = attr.ib(default=None)
 
     # Only AvtaleGiro
-    payer_name = attr.ib(default=None, converter=to_safe_str_or_none)
+    payer_name: Optional[str] = attr.ib(default=None, converter=to_safe_str_or_none)
 
     RECORD_TYPE = netsgiro.RecordType.TRANSACTION_AMOUNT_ITEM_2
     _PATTERNS = [
@@ -554,7 +554,9 @@ class TransactionAmountItem3(TransactionRecord):
     The record is only used for some OCR Giro transaction types.
     """
 
-    text = attr.ib(converter=to_safe_str_or_none, validator=optional(str_of_max_length(40)))
+    text: Optional[str] = attr.ib(
+        converter=to_safe_str_or_none, validator=optional(str_of_max_length(40))
+    )
 
     RECORD_TYPE = netsgiro.RecordType.TRANSACTION_AMOUNT_ITEM_3
     _PATTERNS = [
