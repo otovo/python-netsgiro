@@ -53,6 +53,8 @@ __all__: List[str] = [
     'parse',
 ]
 
+R = TypeVar('R', bound='Record')
+
 
 @attr.s
 class Record(ABC):
@@ -64,7 +66,7 @@ class Record(ABC):
     service_code: ServiceCode = attr.ib(converter=to_service_code)
 
     @classmethod
-    def from_string(cls, line: str) -> 'Record':
+    def from_string(cls: Type[R], line: str) -> R:
         """Parse OCR string into a record object."""
         for pattern in cls._PATTERNS:
             matches = pattern.match(line)
@@ -769,9 +771,6 @@ class AvtaleGiroAgreement(TransactionRecord):
         ).format(self=self)
 
 
-R = TypeVar('R', bound=Record)
-
-
 def parse(data: str) -> List[R]:
     """Parse an OCR file into a list of record objects."""
 
@@ -786,7 +785,7 @@ def parse(data: str) -> List[R]:
         cls.RECORD_TYPE: cls for cls in all_subclasses(Record) if hasattr(cls, 'RECORD_TYPE')
     }
 
-    results = []
+    results: List[R] = []
 
     for line in data.strip().splitlines():
         if len(line) != 80:
