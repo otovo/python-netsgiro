@@ -70,7 +70,7 @@ class Transmission:
     )
 
     #: List of assignments.
-    assignments: list['Assignment'] = attr.ib(default=attr.Factory(list), repr=False)
+    assignments: List['Assignment'] = attr.ib(default=attr.Factory(list), repr=False)
 
     @classmethod
     def from_records(cls, records: List['Record']) -> 'Transmission':
@@ -93,7 +93,7 @@ class Transmission:
 
     @staticmethod
     def _get_assignments(records: List['Record']) -> List['Assignment']:
-        assignments: OrderedDict[int, list['Record']] = OrderedDict()
+        assignments: OrderedDict[int, List['Record']] = OrderedDict()
 
         current_assignment_number = None
         for record in records:
@@ -224,7 +224,7 @@ class Assignment:
 
     #: List of transaction objects, like :class:`~netsgiro.Agreement`,
     #: :class:`~netsgiro.PaymentRequest`, :class:`~netsgiro.Transaction`.
-    transactions: list['Transaction'] = attr.ib(default=attr.Factory(list), repr=False)
+    transactions: List['Transaction'] = attr.ib(default=attr.Factory(list), repr=False)
 
     _next_transaction_number: int = attr.ib(default=1, init=False)
 
@@ -277,7 +277,7 @@ class Assignment:
     def _group_by_transaction_number(
         records: List['Record'],
     ) -> Mapping[int, List['Record']]:
-        transactions: OrderedDict[int, list['TransactionRecord']] = OrderedDict()
+        transactions: OrderedDict[int, List['TransactionRecord']] = OrderedDict()
 
         transaction_record: 'TransactionRecord'
         for transaction_record in records:
