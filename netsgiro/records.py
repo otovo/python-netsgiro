@@ -27,11 +27,11 @@ from netsgiro.converters import (
     to_bool,
     to_date,
     to_date_or_none,
+    to_int_or_none,
     to_record_type,
     to_safe_str_or_none,
     to_service_code,
     to_transaction_type,
-    value_or_none,
 )
 from netsgiro.validators import str_of_length, str_of_max_length
 
@@ -256,7 +256,7 @@ class AssignmentEnd(Record):
     num_records: int = attr.ib(converter=int)
 
     # Only for transactions and cancellations
-    total_amount: Optional[int] = attr.ib(default=None, converter=value_or_none(int))
+    total_amount: Optional[int] = attr.ib(default=None, converter=to_int_or_none)
     nets_date_1: Optional['datetime.date'] = attr.ib(default=None, converter=to_date_or_none)
     nets_date_2: Optional['datetime.date'] = attr.ib(default=None, converter=to_date_or_none)
     nets_date_3: Optional['datetime.date'] = attr.ib(default=None, converter=to_date_or_none)
@@ -391,8 +391,8 @@ class TransactionAmountItem1(TransactionRecord):
 
     # Only OCR Giro
     centre_id: Optional[str] = attr.ib(default=None, validator=optional(str_of_length(2)))
-    day_code: Optional[int] = attr.ib(default=None, converter=value_or_none(int))
-    partial_settlement_number: Optional[int] = attr.ib(default=None, converter=value_or_none(int))
+    day_code: Optional[int] = attr.ib(default=None, converter=to_int_or_none)
+    partial_settlement_number: Optional[int] = attr.ib(default=None, converter=to_int_or_none)
     partial_settlement_serial_number: Optional[str] = attr.ib(
         default=None, validator=optional(str_of_length(5))
     )
@@ -622,7 +622,7 @@ class TransactionSpecification(TransactionRecord):
     line_number: int = attr.ib(converter=int)
     column_number: int = attr.ib(converter=int)
     text = attr.ib(
-        converter=stripped_newlines(fixed_len_str(40, str)),
+        converter=stripped_newlines(fixed_len_str(40, str)),  # type: ignore[misc]
         validator=optional(str_of_max_length(40)),
     )
 
