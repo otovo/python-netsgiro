@@ -2,7 +2,18 @@
 
 import re
 from abc import ABC, abstractmethod
-from typing import TYPE_CHECKING, Iterable, List, Optional, Pattern, Tuple, Type, TypeVar, Union
+from typing import (
+    TYPE_CHECKING,
+    Iterable,
+    List,
+    Optional,
+    Pattern,
+    Tuple,
+    Type,
+    TypeVar,
+    Union,
+    cast,
+)
 
 import attr
 from attr.validators import optional
@@ -75,7 +86,7 @@ class Record(ABC):
 
 
 @attr.s
-class TransmissionStart(Record, ABC):
+class TransmissionStart(Record):
     """TransmissionStart is the first record in every OCR file.
 
     A file can only contain a single transmission.
@@ -651,13 +662,13 @@ class TransactionSpecification(TransactionRecord):
     def from_text(
         cls,
         *,
-        service_code: ServiceCode,
-        transaction_type: TransactionType,
+        service_code: 'ServiceCode',
+        transaction_type: 'TransactionType',
         transaction_number: int,
         text: Optional[str],
     ) -> Iterable['TransactionSpecification']:
         """Create a sequence of specification records from a text string."""
-        for line, column, txt in cls._split_text_to_lines_and_columns(text):
+        for line, column, txt in cls._split_text_to_lines_and_columns(text or ''):
             yield cls(
                 service_code=service_code,
                 transaction_type=transaction_type,
@@ -770,11 +781,12 @@ R = TypeVar('R', bound=Record)
 def parse(data: str) -> List[R]:
     """Parse an OCR file into a list of record objects."""
 
-    def all_subclasses(cls: Type[R]) -> List[Type[R]]:
+    def all_subclasses(cls: Union[Type[R], Type[Record]]) -> List[Type[R]]:
         """Return a list of subclasses for a given class."""
-        return cls.__subclasses__() + [
+        classes = cls.__subclasses__() + [
             subsubcls for subcls in cls.__subclasses__() for subsubcls in all_subclasses(subcls)
         ]
+        return cast(List[Type[R]], classes)
 
     record_classes = {
         cls.RECORD_TYPE: cls for cls in all_subclasses(Record) if hasattr(cls, 'RECORD_TYPE')
