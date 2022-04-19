@@ -22,6 +22,7 @@ from netsgiro.records import (
     TransactionAmountItem1,
     TransactionAmountItem2,
     TransactionAmountItem3,
+    TransactionRecord,
     TransactionSpecification,
     TransmissionEnd,
     TransmissionStart,
@@ -31,7 +32,7 @@ from netsgiro.validators import str_of_length
 
 if TYPE_CHECKING:
     from netsgiro.enums import AvtaleGiroRegistrationType
-    from netsgiro.records import Record, TransactionRecord
+    from netsgiro.records import Record
 
 __all__: List[str] = [
     'Transmission',
@@ -466,23 +467,24 @@ class Assignment:
             return Decimal(0)
         return sum(transaction.amount for transaction in transactions)
 
+    def _get_earliest_or_latest_transaction_date(self, latest: bool) -> Optional[datetime.date]:
+        """Get earliest or latest date from the assignment's transactions."""
+        date_: Optional[datetime.date] = None
+        for t in self.transactions:
+            iter_date = getattr(t, 'date', None)
+            if iter_date and (
+                date_ is None or (iter_date > date_ if latest else iter_date < date_)
+            ):
+                date_ = iter_date
+        return date_
+
     def get_earliest_transaction_date(self) -> Optional[datetime.date]:
         """Get earliest date from the assignment's transactions."""
-        transactions = [
-            transaction for transaction in self.transactions if hasattr(transaction, 'date')
-        ]
-        if not transactions:
-            return None
-        return min(transaction.date for transaction in transactions)
+        return self._get_earliest_or_latest_transaction_date(latest=False)
 
     def get_latest_transaction_date(self) -> Optional[datetime.date]:
         """Get latest date from the assignment's transactions."""
-        transactions = [
-            transaction for transaction in self.transactions if hasattr(transaction, 'date')
-        ]
-        if not transactions:
-            return None
-        return max(transaction.date for transaction in transactions)
+        return self._get_earliest_or_latest_transaction_date(latest=True)
 
 
 @attr.s
