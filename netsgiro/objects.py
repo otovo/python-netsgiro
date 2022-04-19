@@ -264,7 +264,7 @@ class Assignment:
             cb = cls._get_transactions
         elif sc == ServiceCode.AVTALEGIRO and at == AssignmentType.AVTALEGIRO_AGREEMENTS:
             cb = cls._get_agreements
-        elif sc == ServiceCode.AVTALEGIRO and at != AssignmentType.AVTALEGIRO_AGREEMENTS:
+        elif sc == ServiceCode.AVTALEGIRO:
             cb = cls._get_payment_requests
         else:
             raise ValueError(f'Unknown service code: {start.service_code}')
@@ -466,8 +466,7 @@ class Assignment:
         """Get the total amount from all transactions in the assignment."""
         total = Decimal(0)
         for t in self.transactions:
-            iter_amount = getattr(t, 'amount', None)
-            if iter_amount:
+            if iter_amount := getattr(t, 'amount', None):
                 total += iter_amount
         return total
 
