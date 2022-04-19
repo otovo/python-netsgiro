@@ -533,6 +533,10 @@ class Agreement:
         )
 
 
+# TransactionRecord and subclasses
+TR = TypeVar('TR', bound=TransactionRecord)
+
+
 @attr.s
 class PaymentRequest:
     """PaymentRequest contains an AvtaleGiro payment request or cancellation.
@@ -580,7 +584,7 @@ class PaymentRequest:
         return int(self.amount * 100)
 
     @classmethod
-    def from_records(cls, records: List[TransactionSpecification]) -> 'PaymentRequest':
+    def from_records(cls, records: List[TR]) -> 'PaymentRequest':
         """Build a Transaction object from a list of record objects."""
         amount_item_1 = records.pop(0)
         assert isinstance(amount_item_1, TransactionAmountItem1)
@@ -601,7 +605,7 @@ class PaymentRequest:
             payer_name=amount_item_2.payer_name,
         )
 
-    def to_records(self) -> Iterable['Record']:
+    def to_records(self) -> Iterable[TR]:
         """Convert the transaction to a list of records."""
         yield TransactionAmountItem1(
             service_code=self.service_code,
@@ -696,7 +700,7 @@ class Transaction:
         return int(self.amount * 100)
 
     @classmethod
-    def from_records(cls, records: List['TransactionRecord']) -> 'Transaction':
+    def from_records(cls, records: List[TR]) -> 'Transaction':
         """Build a Transaction object from a list of record objects."""
         amount_item_1 = records.pop(0)
         assert isinstance(amount_item_1, TransactionAmountItem1)
