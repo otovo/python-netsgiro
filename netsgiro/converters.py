@@ -2,7 +2,13 @@
 import datetime
 from typing import Any, Callable, Optional, TypeVar, Union
 
-from netsgiro import AssignmentType, AvtaleGiroRegistrationType, ServiceCode, TransactionType
+from netsgiro import (
+    AssignmentType,
+    AvtaleGiroRegistrationType,
+    RecordType,
+    ServiceCode,
+    TransactionType,
+)
 
 T = TypeVar('T')
 
@@ -68,6 +74,11 @@ def to_assignment_type(value: Union[AssignmentType, int, str]) -> AssignmentType
 def to_transaction_type(value: Union[TransactionType, int, str]) -> TransactionType:
     """Convert input to TransactionType."""
     return TransactionType(int(value))
+
+
+def to_record_type(value: Union[RecordType, int, str]) -> RecordType:
+    """Convert input to RecordType."""
+    return RecordType(int(value))
 
 
 def to_avtalegiro_registration_type(

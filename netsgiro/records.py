@@ -16,6 +16,7 @@ from netsgiro.converters import (
     to_bool,
     to_date,
     to_date_or_none,
+    to_record_type,
     to_safe_str_or_none,
     to_service_code,
     to_transaction_type,
@@ -767,7 +768,7 @@ def parse(data: str) -> List[Record]:
         if not record_type_str.isnumeric():
             raise ValueError(f'Record type must be numeric, got {record_type_str!r}')
 
-        record_type = netsgiro.RecordType(int(record_type_str))
+        record_type = to_record_type(record_type_str)
         record_cls = record_classes[record_type]
 
         results.append(record_cls.from_string(line))
