@@ -3,7 +3,7 @@
 import datetime
 from collections import OrderedDict
 from decimal import Decimal
-from typing import TYPE_CHECKING, Iterable, List, Mapping, Optional, Union
+from typing import TYPE_CHECKING, Iterable, List, Mapping, Optional, TypeVar, Union
 
 import attr
 from attrs.validators import instance_of, optional
@@ -42,6 +42,9 @@ __all__: List[str] = [
     'parse',
 ]
 
+# Record or Record subclasses
+R = TypeVar('R', bound='Record')
+
 
 @attr.s
 class Transmission:
@@ -72,7 +75,7 @@ class Transmission:
     assignments: List['Assignment'] = attr.ib(default=attr.Factory(list), repr=False)
 
     @classmethod
-    def from_records(cls, records: List['Record']) -> 'Transmission':
+    def from_records(cls, records: List[R]) -> 'Transmission':
         """Build a Transmission object from a list of record objects."""
         if len(records) < 2:
             raise ValueError(f'At least 2 records required, got {len(records)}')
@@ -91,8 +94,8 @@ class Transmission:
         )
 
     @staticmethod
-    def _get_assignments(records: List['Record']) -> List['Assignment']:
-        assignments: OrderedDict[int, List['Record']] = OrderedDict()
+    def _get_assignments(records: List[R]) -> List['Assignment']:
+        assignments: OrderedDict[int, List[R]] = OrderedDict()
 
         current_assignment_number = None
         for record in records:
@@ -228,7 +231,7 @@ class Assignment:
     _next_transaction_number: int = attr.ib(default=1, init=False)
 
     @classmethod
-    def from_records(cls, records: List['Record']) -> 'Assignment':
+    def from_records(cls, records: List[R]) -> 'Assignment':
         """Build an Assignment object from a list of record objects."""
         if len(records) < 2:
             raise ValueError(f'At least 2 records required, got {len(records)}')
