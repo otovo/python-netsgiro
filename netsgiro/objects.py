@@ -460,12 +460,12 @@ class Assignment:
 
     def get_total_amount(self) -> Decimal:
         """Get the total amount from all transactions in the assignment."""
-        transactions = [
-            transaction for transaction in self.transactions if hasattr(transaction, 'amount')
-        ]
-        if not transactions:
-            return Decimal(0)
-        return sum(transaction.amount for transaction in transactions)
+        total = Decimal(0)
+        for t in self.transactions:
+            iter_amount = getattr(t, 'amount', None)
+            if iter_amount:
+                total += iter_amount
+        return total
 
     def _get_earliest_or_latest_transaction_date(self, latest: bool) -> Optional[datetime.date]:
         """Get earliest or latest date from the assignment's transactions."""
