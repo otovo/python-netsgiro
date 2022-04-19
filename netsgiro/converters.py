@@ -50,25 +50,42 @@ def fixed_len_str(length: int, converter: Callable[[Any], T]) -> Callable[[Any],
     return lambda value: converter('{value:{length}}'.format(value=value, length=length))
 
 
+to_safe_str_or_none: Callable = value_or_none(
+    stripped_newlines(stripped_spaces_around(truthy_or_none(str)))
+)
+
+
 def to_service_code(value: Union[ServiceCode, int, str]) -> ServiceCode:
+    """Convert input to ServiceCode."""
     return ServiceCode(int(value))
 
 
 def to_assignment_type(value: Union[AssignmentType, int, str]) -> AssignmentType:
+    """Convert input to AssignmentType."""
     return AssignmentType(int(value))
 
 
 def to_transaction_type(value: Union[TransactionType, int, str]) -> TransactionType:
+    """Convert input to TransactionType."""
     return TransactionType(int(value))
 
 
 def to_avtalegiro_registration_type(
     value: Union[AvtaleGiroRegistrationType, int, str]
 ) -> AvtaleGiroRegistrationType:
+    """Convert input to AvtaleGiroRegistrationType."""
     return AvtaleGiroRegistrationType(int(value))
 
 
-def to_date(value: Union[datetime.date, str, None]) -> Optional[datetime.date]:
+def to_date(value: Union[datetime.date, str]) -> Optional[datetime.date]:
+    """Convert input to date."""
+    if isinstance(value, datetime.date):
+        return value
+    return datetime.datetime.strptime(value, '%d%m%y').date()
+
+
+def to_date_or_none(value: Union[datetime.date, str, None]) -> Optional[datetime.date]:
+    """Convert input to date or None."""
     if isinstance(value, datetime.date):
         return value
     if value is None or value == '000000':
@@ -77,6 +94,7 @@ def to_date(value: Union[datetime.date, str, None]) -> Optional[datetime.date]:
 
 
 def to_bool(value: Union[bool, str]) -> bool:
+    """Convert input to bool."""
     if isinstance(value, bool):
         return value
     if value == 'J':
@@ -85,6 +103,3 @@ def to_bool(value: Union[bool, str]) -> bool:
         return False
     else:
         raise ValueError(f"Expected 'J' or 'N', got {value!r}")
-
-
-to_safe_str_or_none = value_or_none(stripped_newlines(stripped_spaces_around(truthy_or_none(str))))

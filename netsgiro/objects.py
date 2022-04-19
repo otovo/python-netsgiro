@@ -3,12 +3,18 @@
 import datetime
 from collections import OrderedDict
 from decimal import Decimal
-from typing import TYPE_CHECKING, Iterable, List, Mapping, Optional, Sequence, TypeVar, Union
+from typing import TYPE_CHECKING, Callable, Iterable, List, Optional, TypeVar, Union, cast
 
 import attr
 from attrs.validators import instance_of, optional
 
 from netsgiro import AssignmentType, ServiceCode, TransactionType
+from netsgiro.converters import (
+    to_assignment_type,
+    to_avtalegiro_registration_type,
+    to_service_code,
+    to_transaction_type,
+)
 from netsgiro.records import (
     AssignmentEnd,
     AssignmentStart,
@@ -16,17 +22,17 @@ from netsgiro.records import (
     TransactionAmountItem1,
     TransactionAmountItem2,
     TransactionAmountItem3,
+    TransactionRecord,
     TransactionSpecification,
     TransmissionEnd,
     TransmissionStart,
 )
 from netsgiro.records import parse as records_parse
-from netsgiro.records import to_assignment_type, to_service_code, to_transaction_type
 from netsgiro.validators import str_of_length
 
 if TYPE_CHECKING:
     from netsgiro.enums import AvtaleGiroRegistrationType
-    from netsgiro.records import Record, TransactionRecord
+    from netsgiro.records import Record
 
 __all__: List[str] = [
     'Transmission',
@@ -37,7 +43,8 @@ __all__: List[str] = [
     'parse',
 ]
 
-R = TypeVar('R', bound='Record')
+# Record or Record subclasses
+RSC = TypeVar('RSC', bound='Record')
 
 
 @attr.s
@@ -48,8 +55,7 @@ class Transmission:
     multiple :class:`~netsgiro.Assignment` objects of various types.
     """
 
-    #: Data transmitters unique enumeration of the transmission. String of 7
-    #: digits.
+    #: Data transmitters unique enumeration of the transmission. String of 7 digits.
     number: str = attr.ib(validator=str_of_length(7))
 
     #: Data transmitter's Nets ID. String of 8 digits.
@@ -67,10 +73,10 @@ class Transmission:
     )
 
     #: List of assignments.
-    assignments: list['Assignment'] = attr.ib(default=attr.Factory(list), repr=False)
+    assignments: List['Assignment'] = attr.ib(default=attr.Factory(list), repr=False)
 
     @classmethod
-    def from_records(cls, records: List[R]) -> 'Transmission':
+    def from_records(cls, records: List[RSC]) -> 'Transmission':
         """Build a Transmission object from a list of record objects."""
         if len(records) < 2:
             raise ValueError(f'At least 2 records required, got {len(records)}')
@@ -89,8 +95,8 @@ class Transmission:
         )
 
     @staticmethod
-    def _get_assignments(records: List[R]) -> List['Assignment']:
-        assignments: OrderedDict[str, list[R]] = OrderedDict()
+    def _get_assignments(records: List[RSC]) -> List['Assignment']:
+        assignments: OrderedDict[str, List[RSC]] = OrderedDict()
 
         current_assignment_number = None
         for record in records:
@@ -147,6 +153,8 @@ class Transmission:
         else:
             date = self.date
 
+        assert isinstance(date, datetime.date)
+
         return TransmissionEnd(
             service_code=ServiceCode.NONE,
             num_transactions=self.get_num_transactions(),
@@ -193,7 +201,11 @@ class Transmission:
         return Decimal(sum(assignment.get_total_amount() for assignment in self.assignments))
 
 
-T = Sequence[Union['Agreement', 'Record', 'Transaction', 'PaymentRequest']]
+# Assigment transactions
+TS = List[Union['Transaction', 'Agreement', 'PaymentRequest']]
+
+# Transaction record subclasses
+TR = TypeVar('TR', bound=TransactionRecord)
 
 
 @attr.s
@@ -229,12 +241,12 @@ class Assignment:
 
     #: List of transaction objects, like :class:`~netsgiro.Agreement`,
     #: :class:`~netsgiro.PaymentRequest`, :class:`~netsgiro.Transaction`.
-    transactions: T = attr.ib(default=attr.Factory(list), repr=False)
+    transactions: TS = attr.ib(default=attr.Factory(list), repr=False)
 
     _next_transaction_number: int = attr.ib(default=1, init=False)
 
     @classmethod
-    def from_records(cls, records: List['Record']) -> 'Assignment':
+    def from_records(cls, records: List[RSC]) -> 'Assignment':
         """Build an Assignment object from a list of record objects."""
         if len(records) < 2:
             raise ValueError(f'At least 2 records required, got {len(records)}')
@@ -244,16 +256,20 @@ class Assignment:
         assert isinstance(start, AssignmentStart)
         assert isinstance(end, AssignmentEnd)
 
-        transactions: T
-        if start.service_code == ServiceCode.AVTALEGIRO:
-            if start.assignment_type == AssignmentType.AVTALEGIRO_AGREEMENTS:
-                transactions = cls._get_agreements(body)
-            else:
-                transactions = cls._get_payment_requests(body)
-        elif start.service_code == ServiceCode.OCR_GIRO:
-            transactions = cls._get_transactions(body)
+        sc = start.service_code
+        at = start.assignment_type
+
+        cb: Callable
+        if sc == ServiceCode.OCR_GIRO:
+            cb = cls._get_transactions
+        elif sc == ServiceCode.AVTALEGIRO and at == AssignmentType.AVTALEGIRO_AGREEMENTS:
+            cb = cls._get_agreements
+        elif sc == ServiceCode.AVTALEGIRO and at != AssignmentType.AVTALEGIRO_AGREEMENTS:
+            cb = cls._get_payment_requests
         else:
             raise ValueError(f'Unknown service code: {start.service_code}')
+
+        transactions: TS = cb(body)
 
         return cls(
             service_code=start.service_code,
@@ -266,30 +282,28 @@ class Assignment:
         )
 
     @staticmethod
-    def _get_agreements(records: List[R]) -> List['Agreement']:
+    def _get_agreements(records: List[AvtaleGiroAgreement]) -> List['Agreement']:
         return [Agreement.from_records([r]) for r in records]
 
     @classmethod
-    def _get_payment_requests(
-        cls, records: List[TransactionSpecification]
-    ) -> List['PaymentRequest']:
+    def _get_payment_requests(cls, records: List[TR]) -> List['PaymentRequest']:
         transactions = cls._group_by_transaction_number(records)
         return [PaymentRequest.from_records(rs) for rs in transactions.values()]
 
     @classmethod
-    def _get_transactions(cls, records: List['TransactionRecord']) -> List['Transaction']:
+    def _get_transactions(cls, records: List[TR]) -> List['Transaction']:
         transactions = cls._group_by_transaction_number(records)
         return [Transaction.from_records(rs) for rs in transactions.values()]
 
     @staticmethod
-    def _group_by_transaction_number(records: List[R]) -> Mapping[int, List[R]]:
-        transactions: OrderedDict[int, list['TransactionRecord']] = OrderedDict()
+    def _group_by_transaction_number(records: List[TR]) -> OrderedDict[int, List[TR]]:
+        transactions: OrderedDict[int, List[TR]] = OrderedDict()
 
-        transaction_record: 'TransactionRecord'
         for transaction_record in records:
-            if transaction_record.transaction_number not in transactions:
-                transactions[transaction_record.transaction_number] = []
-            transactions[transaction_record.transaction_number].append(transaction_record)
+            tr = transaction_record.transaction_number
+            if tr not in transactions:
+                transactions[tr] = []
+            transactions[tr].append(transaction_record)
 
         return transactions
 
@@ -341,7 +355,7 @@ class Assignment:
         amount: Decimal,
         reference: Optional[str] = None,
         payer_name: Optional[str] = None,
-        bank_notification: Union[bool, str] = False,
+        bank_notification: Union[str, bool] = False,
     ) -> 'PaymentRequest':
         """Add an AvtaleGiro payment request to the assignment.
 
@@ -379,8 +393,8 @@ class Assignment:
         amount: Decimal,
         reference: Optional[str] = None,
         payer_name: Optional[str] = None,
-        bank_notification: Union[bool, str] = False,
-    ) -> 'Transaction':
+        bank_notification: Union[str, bool] = False,
+    ) -> 'PaymentRequest':
         """Add an AvtaleGiro cancellation to the assignment.
 
         The assignment must have service code
@@ -416,7 +430,7 @@ class Assignment:
         amount: Decimal,
         reference: Optional[str] = None,
         payer_name: Optional[str] = None,
-        bank_notification: bool = False,
+        bank_notification: Union[str, bool] = False,
     ) -> 'PaymentRequest':
 
         text = bank_notification if isinstance(bank_notification, str) else ''
@@ -450,30 +464,31 @@ class Assignment:
 
     def get_total_amount(self) -> Decimal:
         """Get the total amount from all transactions in the assignment."""
-        transactions = [
-            transaction for transaction in self.transactions if hasattr(transaction, 'amount')
-        ]
-        if not transactions:
-            return Decimal(0)
-        return Decimal(sum(transaction.amount for transaction in transactions))
+        total = Decimal(0)
+        for t in self.transactions:
+            iter_amount = getattr(t, 'amount', None)
+            if iter_amount:
+                total += iter_amount
+        return total
+
+    def _get_earliest_or_latest_transaction_date(self, latest: bool) -> Optional[datetime.date]:
+        """Get earliest or latest date from the assignment's transactions."""
+        date_: Optional[datetime.date] = None
+        for t in self.transactions:
+            iter_date = getattr(t, 'date', None)
+            if iter_date and (
+                date_ is None or (iter_date > date_ if latest else iter_date < date_)
+            ):
+                date_ = iter_date
+        return date_
 
     def get_earliest_transaction_date(self) -> Optional[datetime.date]:
         """Get earliest date from the assignment's transactions."""
-        transactions = [
-            transaction for transaction in self.transactions if hasattr(transaction, 'date')
-        ]
-        if not transactions:
-            return None
-        return min(transaction.date for transaction in transactions)
+        return self._get_earliest_or_latest_transaction_date(latest=False)
 
     def get_latest_transaction_date(self) -> Optional[datetime.date]:
         """Get latest date from the assignment's transactions."""
-        transactions = [
-            transaction for transaction in self.transactions if hasattr(transaction, 'date')
-        ]
-        if not transactions:
-            return None
-        return max(transaction.date for transaction in transactions)
+        return self._get_earliest_or_latest_transaction_date(latest=True)
 
 
 @attr.s
@@ -493,7 +508,9 @@ class Agreement:
 
     #: Type of agreement registration update.
     #: One of :class:`~AvtaleGiroRegistrationType`.
-    registration_type: AvtaleGiroRegistrationType = attr.ib(converter=AvtaleGiroRegistrationType)
+    registration_type: 'AvtaleGiroRegistrationType' = attr.ib(
+        converter=to_avtalegiro_registration_type
+    )
 
     #: KID number to identify the customer and invoice.
     kid: Optional[str] = attr.ib(validator=optional(instance_of(str)))
@@ -504,7 +521,7 @@ class Agreement:
     TRANSACTION_TYPE = TransactionType.AVTALEGIRO_AGREEMENT
 
     @classmethod
-    def from_records(cls, records: List[R]) -> 'Agreement':
+    def from_records(cls, records: List[AvtaleGiroAgreement]) -> 'Agreement':
         """Build an Agreement object from a list of record objects."""
         assert len(records) == 1
         record = records[0]
@@ -578,14 +595,15 @@ class PaymentRequest:
         return int(self.amount * 100)
 
     @classmethod
-    def from_records(cls, records: List[TransactionSpecification]) -> 'PaymentRequest':
+    def from_records(cls, records: List[TR]) -> 'PaymentRequest':
         """Build a Transaction object from a list of record objects."""
         amount_item_1 = records.pop(0)
         assert isinstance(amount_item_1, TransactionAmountItem1)
         amount_item_2 = records.pop(0)
         assert isinstance(amount_item_2, TransactionAmountItem2)
+        text = TransactionSpecification.to_text(cast(List['TransactionSpecification'], records))
 
-        text = TransactionSpecification.to_text(records)
+        assert isinstance(amount_item_1.nets_date, datetime.date)
 
         return cls(
             service_code=amount_item_1.service_code,
@@ -622,7 +640,7 @@ class PaymentRequest:
                 service_code=self.service_code,
                 transaction_type=self.type,
                 transaction_number=self.number,
-                text=self.text,  # type: ignore[arg-type]
+                text=self.text,
             )
 
 
@@ -694,7 +712,7 @@ class Transaction:
         return int(self.amount * 100)
 
     @classmethod
-    def from_records(cls, records: List['TransactionRecord']) -> 'Transaction':
+    def from_records(cls, records: List[TR]) -> 'Transaction':
         """Build a Transaction object from a list of record objects."""
         amount_item_1 = records.pop(0)
         assert isinstance(amount_item_1, TransactionAmountItem1)
@@ -766,5 +784,4 @@ class Transaction:
 
 def parse(data: str) -> Transmission:
     """Parse an OCR file into a Transmission object."""
-    records = records_parse(data)
-    return Transmission.from_records(records)
+    return Transmission.from_records(records_parse(data))

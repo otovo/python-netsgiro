@@ -1,11 +1,10 @@
 """The lower-level records API."""
 
 import re
-from abc import ABC, abstractmethod
+from abc import ABC, ABCMeta, abstractmethod
+from collections import abc
 from typing import (
     TYPE_CHECKING,
-    ClassVar,
-    Dict,
     Iterable,
     List,
     Optional,
@@ -14,19 +13,13 @@ from typing import (
     Type,
     TypeVar,
     Union,
+    cast,
 )
 
 import attr
 from attr.validators import optional
 
-import netsgiro
-from netsgiro import (
-    AssignmentType,
-    AvtaleGiroRegistrationType,
-    RecordType,
-    ServiceCode,
-    TransactionType,
-)
+from netsgiro import RecordType, ServiceCode
 from netsgiro.converters import (
     fixed_len_str,
     stripped_newlines,
@@ -34,6 +27,7 @@ from netsgiro.converters import (
     to_avtalegiro_registration_type,
     to_bool,
     to_date,
+    to_date_or_none,
     to_safe_str_or_none,
     to_service_code,
     to_transaction_type,
@@ -44,8 +38,7 @@ from netsgiro.validators import str_of_length, str_of_max_length
 if TYPE_CHECKING:
     import datetime
 
-    from netsgiro import AvtaleGiroRegistrationType, TransactionType
-    from netsgiro.objects import Record
+    from netsgiro import AssignmentType, AvtaleGiroRegistrationType, TransactionType
 
 __all__ = [
     'TransmissionStart',
@@ -64,7 +57,11 @@ R = TypeVar('R', bound='Record')
 
 
 @attr.s
-class Record:
+class Record(ABC):
+    """
+    Abstract base class.
+    """
+
     _PATTERNS: List[Pattern]
     RECORD_TYPE: RecordType
 
@@ -178,7 +175,7 @@ class AssignmentStart(Record):
     Each assignment can contain any number of transactions.
     """
 
-    assignment_type: AssignmentType = attr.ib(converter=to_assignment_type)
+    assignment_type: 'AssignmentType' = attr.ib(converter=to_assignment_type)
     assignment_number: str = attr.ib(validator=str_of_length(7))
     assignment_account: str = attr.ib(validator=str_of_length(11))
 
@@ -256,17 +253,15 @@ class AssignmentStart(Record):
 class AssignmentEnd(Record):
     """AssignmentEnd is the last record of an assignment."""
 
-    assignment_type: AssignmentType = attr.ib(converter=to_assignment_type)
+    assignment_type: 'AssignmentType' = attr.ib(converter=to_assignment_type)
     num_transactions: int = attr.ib(converter=int)
     num_records: int = attr.ib(converter=int)
 
     # Only for transactions and cancellations
-    total_amount: Optional[int] = attr.ib(
-        default=None, converter=value_or_none(int)  # type: ignore[misc]
-    )
-    nets_date_1: Optional['datetime.date'] = attr.ib(default=None, converter=to_date)
-    nets_date_2: Optional['datetime.date'] = attr.ib(default=None, converter=to_date)
-    nets_date_3: Optional['datetime.date'] = attr.ib(default=None, converter=to_date)
+    total_amount: Optional[int] = attr.ib(default=None, converter=value_or_none(int))
+    nets_date_1: Optional['datetime.date'] = attr.ib(default=None, converter=to_date_or_none)
+    nets_date_2: Optional['datetime.date'] = attr.ib(default=None, converter=to_date_or_none)
+    nets_date_3: Optional['datetime.date'] = attr.ib(default=None, converter=to_date_or_none)
 
     RECORD_TYPE = RecordType.ASSIGNMENT_END
     _PATTERNS: List[Pattern] = [
@@ -391,18 +386,14 @@ class TransactionAmountItem1(TransactionRecord):
     nets_date: 'datetime.date' = attr.ib(converter=to_date)
     amount: int = attr.ib(converter=int)
     kid: Optional[str] = attr.ib(
-        converter=to_safe_str_or_none,  # type: ignore[misc]
+        converter=to_safe_str_or_none,
         validator=optional(str_of_max_length(25)),
     )
 
     # Only OCR Giro
     centre_id: Optional[str] = attr.ib(default=None, validator=optional(str_of_length(2)))
-    day_code: Optional[int] = attr.ib(
-        default=None, converter=value_or_none(int)  # type: ignore[misc]
-    )
-    partial_settlement_number: Optional[int] = attr.ib(
-        default=None, converter=value_or_none(int)  # type: ignore[misc]
-    )
+    day_code: Optional[int] = attr.ib(default=None, converter=value_or_none(int))
+    partial_settlement_number: Optional[int] = attr.ib(default=None, converter=value_or_none(int))
     partial_settlement_serial_number: Optional[str] = attr.ib(
         default=None, validator=optional(str_of_length(5))
     )
@@ -492,20 +483,18 @@ class TransactionAmountItem2(TransactionRecord):
     """
 
     # TODO Validate `reference` length, which depends on service code
-    reference: Optional[str] = attr.ib(converter=to_safe_str_or_none)  # type: ignore[misc]
+    reference: Optional[str] = attr.ib(converter=to_safe_str_or_none)
 
     # Only OCR Giro
     form_number: Optional[str] = attr.ib(default=None, validator=optional(str_of_length(10)))
-    bank_date: Optional['datetime.date'] = attr.ib(default=None, converter=to_date)
+    bank_date: Optional['datetime.date'] = attr.ib(default=None, converter=to_date_or_none)
     debit_account: Optional[str] = attr.ib(default=None, validator=optional(str_of_length(11)))
     # XXX In use in OCR Giro "from giro debited account" transactions in test
     # data, but documented as a filler field.
     _filler: Optional[str] = attr.ib(default=None)
 
     # Only AvtaleGiro
-    payer_name: Optional[str] = attr.ib(
-        default=None, converter=to_safe_str_or_none  # type: ignore[misc]
-    )
+    payer_name: Optional[str] = attr.ib(default=None, converter=to_safe_str_or_none)
 
     RECORD_TYPE: RecordType = RecordType.TRANSACTION_AMOUNT_ITEM_2
     _PATTERNS: List[Pattern] = [
@@ -588,7 +577,7 @@ class TransactionAmountItem3(TransactionRecord):
     """
 
     text: Optional[str] = attr.ib(
-        converter=to_safe_str_or_none,  # type: ignore[misc]
+        converter=to_safe_str_or_none,
         validator=optional(str_of_max_length(40)),
     )
 
@@ -635,7 +624,7 @@ class TransactionSpecification(TransactionRecord):
     line_number: int = attr.ib(converter=int)
     column_number: int = attr.ib(converter=int)
     text: Optional[str] = attr.ib(
-        converter=stripped_newlines(fixed_len_str(40, str)),  # type: ignore[misc]
+        converter=stripped_newlines(fixed_len_str(40, str)),
         validator=optional(str_of_max_length(40)),
     )
 
@@ -672,12 +661,12 @@ class TransactionSpecification(TransactionRecord):
         cls,
         *,
         service_code: ServiceCode,
-        transaction_type: TransactionType,
+        transaction_type: 'TransactionType',
         transaction_number: int,
-        text: str,
+        text: Optional[str],
     ) -> Iterable['TransactionSpecification']:
         """Create a sequence of specification records from a text string."""
-        for line, column, txt in cls._split_text_to_lines_and_columns(text):
+        for line, column, txt in cls._split_text_to_lines_and_columns(text or ''):
             yield cls(
                 service_code=service_code,
                 transaction_type=transaction_type,
@@ -749,7 +738,7 @@ class AvtaleGiroAgreement(TransactionRecord):
         converter=to_avtalegiro_registration_type
     )
     kid: Optional[str] = attr.ib(
-        converter=to_safe_str_or_none,  # type: ignore[misc]
+        converter=to_safe_str_or_none,
         validator=optional(str_of_max_length(25)),
     )
     notify: bool = attr.ib(converter=to_bool)
@@ -788,11 +777,11 @@ class AvtaleGiroAgreement(TransactionRecord):
 def parse(data: str) -> List[R]:
     """Parse an OCR file into a list of record objects."""
 
-    def all_subclasses(cls: Type[Union[R]]) -> list[Type[R]]:
+    def all_subclasses(cls: Union[Type[R], Type[Record]]) -> List[Type[R]]:
         """
         Return a list of subclasses.
 
-        For, e.g., ``Record``` The list should looks something like:
+        For, e.g., ``Record``` The list would look something like:
 
             - netsgiro.records.TransmissionStart
             - netsgiro.records.TransmissionEnd
@@ -805,9 +794,13 @@ def parse(data: str) -> List[R]:
             - netsgiro.records.TransactionSpecification
             - netsgiro.records.AvtaleGiroAgreement
         """
-        return cls.__subclasses__() + [
-            subsubcls for subcls in cls.__subclasses__() for subsubcls in all_subclasses(subcls)
-        ]
+        return cast(
+            List[Type[R]],
+            cls.__subclasses__()
+            + [
+                subsubcls for subcls in cls.__subclasses__() for subsubcls in all_subclasses(subcls)
+            ],
+        )
 
     record_classes = {
         cls.RECORD_TYPE: cls for cls in all_subclasses(Record) if hasattr(cls, 'RECORD_TYPE')
