@@ -142,11 +142,18 @@ class Transmission:
             for assignment in self.assignments
         )
         if self.assignments and avtalegiro_payment_request:
-            date = min(
-                assignment.get_earliest_transaction_date() for assignment in self.assignments
-            )
+            date: Optional[datetime.date] = None
+            for assignment in self.assignments:
+                earliest_transaction_date = assignment.get_earliest_transaction_date()
+                if date is None or (
+                    isinstance(earliest_transaction_date, datetime.date)
+                    and earliest_transaction_date < date
+                ):
+                    date = earliest_transaction_date
         else:
             date = self.date
+
+        assert isinstance(date, datetime.date)
 
         return TransmissionEnd(
             service_code=ServiceCode.NONE,
