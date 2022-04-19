@@ -3,7 +3,7 @@
 import datetime
 from collections import OrderedDict
 from decimal import Decimal
-from typing import TYPE_CHECKING, Callable, Iterable, List, Mapping, Optional, TypeVar, Union
+from typing import TYPE_CHECKING, Callable, Iterable, List, Optional, TypeVar, Union, cast
 
 import attr
 from attrs.validators import instance_of, optional
@@ -96,7 +96,7 @@ class Transmission:
 
     @staticmethod
     def _get_assignments(records: List[R]) -> List['Assignment']:
-        assignments: OrderedDict[int, List[R]] = OrderedDict()
+        assignments: OrderedDict[str, List[R]] = OrderedDict()
 
         current_assignment_number = None
         for record in records:
@@ -197,6 +197,9 @@ class Transmission:
 # Assigment transactions
 TS = List[Union['Transaction', 'Agreement', 'PaymentRequest']]
 
+# TransactionRecord and subclasses
+TR = TypeVar('TR', bound=TransactionRecord)
+
 
 @attr.s
 class Assignment:
@@ -280,19 +283,17 @@ class Assignment:
         return [Agreement.from_records([r]) for r in records]
 
     @classmethod
-    def _get_payment_requests(cls, records: List['Record']) -> List['PaymentRequest']:
+    def _get_payment_requests(cls, records: List[TR]) -> List['PaymentRequest']:
         transactions = cls._group_by_transaction_number(records)
         return [PaymentRequest.from_records(rs) for rs in transactions.values()]
 
     @classmethod
-    def _get_transactions(cls, records: List['Record']) -> List['Transaction']:
+    def _get_transactions(cls, records: List[TR]) -> List['Transaction']:
         transactions = cls._group_by_transaction_number(records)
         return [Transaction.from_records(rs) for rs in transactions.values()]
 
     @staticmethod
-    def _group_by_transaction_number(
-        records: List['Record'],
-    ) -> Mapping[int, List['Record']]:
+    def _group_by_transaction_number(records: List[TR]) -> OrderedDict[int, List[TR]]:
         transactions: OrderedDict[int, List['TransactionRecord']] = OrderedDict()
 
         transaction_record: 'TransactionRecord'
@@ -303,7 +304,7 @@ class Assignment:
 
         return transactions
 
-    def to_records(self) -> Iterable['Record']:
+    def to_records(self) -> Iterable[TR]:
         """Convert the assignment to a list of records."""
         yield self._get_start_record()
         for transaction in self.transactions:
@@ -544,10 +545,6 @@ class Agreement:
         )
 
 
-# TransactionRecord and subclasses
-TR = TypeVar('TR', bound=TransactionRecord)
-
-
 @attr.s
 class PaymentRequest:
     """PaymentRequest contains an AvtaleGiro payment request or cancellation.
@@ -602,7 +599,7 @@ class PaymentRequest:
         amount_item_2 = records.pop(0)
         assert isinstance(amount_item_2, TransactionAmountItem2)
 
-        text = TransactionSpecification.to_text(records)
+        text = TransactionSpecification.to_text(cast(List['TransactionSpecification'], records))
 
         return cls(
             service_code=amount_item_1.service_code,
@@ -785,5 +782,4 @@ class Transaction:
 
 def parse(data: str) -> Transmission:
     """Parse an OCR file into a Transmission object."""
-    records = records_parse(data)
-    return Transmission.from_records(records)
+    return Transmission.from_records(records_parse(data))
