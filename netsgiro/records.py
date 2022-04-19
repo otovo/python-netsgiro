@@ -15,6 +15,7 @@ from netsgiro.converters import (
     to_avtalegiro_registration_type,
     to_bool,
     to_date,
+    to_date_or_none,
     to_safe_str_or_none,
     to_service_code,
     to_transaction_type,
@@ -112,7 +113,7 @@ class TransmissionEnd(Record):
     num_transactions = attr.ib(converter=int)
     num_records = attr.ib(converter=int)
     total_amount = attr.ib(converter=int)
-    nets_date = attr.ib(converter=to_date)
+    nets_date: 'datetime.date' = attr.ib(converter=to_date)
 
     RECORD_TYPE = netsgiro.RecordType.TRANSMISSION_END
     _PATTERNS = [
@@ -239,9 +240,9 @@ class AssignmentEnd(Record):
 
     # Only for transactions and cancellations
     total_amount = attr.ib(default=None, converter=value_or_none(int))
-    nets_date_1 = attr.ib(default=None, converter=to_date)
-    nets_date_2 = attr.ib(default=None, converter=to_date)
-    nets_date_3 = attr.ib(default=None, converter=to_date)
+    nets_date_1: Optional['datetime.date'] = attr.ib(default=None, converter=to_date_or_none)
+    nets_date_2: Optional['datetime.date'] = attr.ib(default=None, converter=to_date_or_none)
+    nets_date_3: Optional['datetime.date'] = attr.ib(default=None, converter=to_date_or_none)
 
     RECORD_TYPE = netsgiro.RecordType.ASSIGNMENT_END
     _PATTERNS = [
@@ -464,7 +465,7 @@ class TransactionAmountItem2(TransactionRecord):
 
     # Only OCR Giro
     form_number = attr.ib(default=None, validator=optional(str_of_length(10)))
-    bank_date = attr.ib(default=None, converter=to_date)
+    bank_date: Optional['datetime.date'] = attr.ib(default=None, converter=to_date_or_none)
     debit_account = attr.ib(default=None, validator=optional(str_of_length(11)))
     # XXX In use in OCR Giro "from giro debited account" transactions in test
     # data, but documented as a filler field.
