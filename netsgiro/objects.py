@@ -266,7 +266,7 @@ class Assignment:
         )
 
     @staticmethod
-    def _get_agreements(records: List['Record']) -> List['Agreement']:
+    def _get_agreements(records: List[AvtaleGiroAgreement]) -> List['Agreement']:
         return [Agreement.from_records([r]) for r in records]
 
     @classmethod
@@ -506,7 +506,7 @@ class Agreement:
     TRANSACTION_TYPE = TransactionType.AVTALEGIRO_AGREEMENT
 
     @classmethod
-    def from_records(cls, records: List['Record']) -> 'Agreement':
+    def from_records(cls, records: List[AvtaleGiroAgreement]) -> 'Agreement':
         """Build an Agreement object from a list of record objects."""
         assert len(records) == 1
         record = records[0]
@@ -521,7 +521,7 @@ class Agreement:
             notify=record.notify,
         )
 
-    def to_records(self) -> Iterable['Record']:
+    def to_records(self) -> Iterable[AvtaleGiroAgreement]:
         """Convert the agreement to a list of records."""
         yield AvtaleGiroAgreement(
             service_code=self.service_code,
