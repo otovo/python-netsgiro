@@ -3,7 +3,7 @@
 import datetime
 from collections import OrderedDict
 from decimal import Decimal
-from typing import TYPE_CHECKING, Iterable, List, Mapping, Optional, TypeVar, Union
+from typing import TYPE_CHECKING, Callable, Iterable, List, Mapping, Optional, TypeVar, Union
 
 import attr
 from attrs.validators import instance_of, optional
@@ -193,6 +193,10 @@ class Transmission:
         return sum(assignment.get_total_amount() for assignment in self.assignments)
 
 
+# Assigment transactions
+TS = List[Union['Transaction', 'Agreement', 'PaymentRequest']]
+
+
 @attr.s
 class Assignment:
     """An Assignment groups multiple transactions within a transmission.
@@ -226,7 +230,7 @@ class Assignment:
 
     #: List of transaction objects, like :class:`~netsgiro.Agreement`,
     #: :class:`~netsgiro.PaymentRequest`, :class:`~netsgiro.Transaction`.
-    transactions: List['Transaction'] = attr.ib(default=attr.Factory(list), repr=False)
+    transactions: TS = attr.ib(default=attr.Factory(list), repr=False)
 
     _next_transaction_number: int = attr.ib(default=1, init=False)
 
