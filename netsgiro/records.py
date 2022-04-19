@@ -678,9 +678,10 @@ class TransactionSpecification(TransactionRecord):
 
         text = ''
         for _, column, specification in tuples:
-            text += specification.text
-            if column == cls._MAX_COLUMNS:
-                text += '\n'
+            if specification.text:
+                text += specification.text
+                if column == cls._MAX_COLUMNS:
+                    text += '\n'
 
         return text
 
