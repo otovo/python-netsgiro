@@ -351,7 +351,7 @@ class Assignment:
             num_transactions=self.get_num_transactions(),
             num_records=self.get_num_records(),
             total_amount=int(self.get_total_amount() * 100),
-            **dates,  # type: ignore[arg-type]
+            **dates,
         )
 
     def add_payment_request(
