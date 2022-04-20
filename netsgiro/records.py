@@ -78,7 +78,6 @@ class Record(ABC):
     @abstractmethod
     def to_ocr(self) -> str:
         """Get record as OCR string."""
-        ...
 
 
 @attr.s
@@ -338,7 +337,7 @@ class AssignmentEnd(Record):
             return self.nets_date_2
         elif self.service_code == ServiceCode.AVTALEGIRO:
             return self.nets_date_1
-        else:
+        else:  # pragma: no cover
             raise ValueError(f'Unhandled service code: {self.service_code}')
 
     @property
@@ -348,7 +347,7 @@ class AssignmentEnd(Record):
             return self.nets_date_3
         elif self.service_code == ServiceCode.AVTALEGIRO:
             return self.nets_date_2
-        else:
+        else:  # pragma: no cover
             raise ValueError(f'Unhandled service code: {self.service_code}')
 
     def to_ocr(self) -> str:
@@ -562,7 +561,7 @@ class TransactionAmountItem2(TransactionRecord):
                 + (self.reference and f'{self.reference:25}' or (' ' * 25))
                 + ('0' * 5)
             )
-        else:
+        else:  # pragma: no cover
             service_fields = ' ' * 35
 
         return common_fields + service_fields
