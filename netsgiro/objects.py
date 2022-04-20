@@ -470,8 +470,7 @@ class Assignment:
         """Get the total amount from all transactions in the assignment."""
         total = Decimal(0)
         for t in self.transactions:
-            iter_amount = getattr(t, 'amount', None)
-            if iter_amount:
+            if iter_amount := getattr(t, 'amount', None):
                 total += iter_amount
         return total
 
