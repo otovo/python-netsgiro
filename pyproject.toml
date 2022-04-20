@@ -29,6 +29,9 @@ classifiers=[
 python = ">=3.7"
 attrs = ">=17.4"
 
+# Backports
+"backports.zoneinfo" = { version="^0.2.1", python="<3.9" }
+
 [tool.poetry.dev-dependencies]
 check-manifest = "*"
 hypothesis = "*"
