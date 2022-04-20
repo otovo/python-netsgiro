@@ -1,8 +1,10 @@
 from datetime import datetime, timedelta
 
 import holidays
+import pytest
 
 from netsgiro.utils import OSLO_TZ, get_minimum_due_date
+from netsgiro.validators import validate_due_date
 
 monday = datetime(2022, 3, 28, 13, 59, tzinfo=OSLO_TZ)
 
@@ -24,8 +26,8 @@ def test_minimum_due_date_after_cutoff():
     generated after 14:00 Norwegian time should be adjusted by 5 days.
     """
     assert (
-        get_minimum_due_date(monday_after_cutoff)
-        == (monday_after_cutoff + timedelta(days=5)).date()
+            get_minimum_due_date(monday_after_cutoff)
+            == (monday_after_cutoff + timedelta(days=5)).date()
     )
 
 
@@ -49,8 +51,8 @@ def test_minimum_due_date_with_holidays_after_cutoff():
     holidays is upped to 3, so we expect 2 more days of offsetting.
     """
     assert (
-        get_minimum_due_date(day_before_easter_after_cutoff)
-        == (day_before_easter_after_cutoff + timedelta(days=8)).date()
+            get_minimum_due_date(day_before_easter_after_cutoff)
+            == (day_before_easter_after_cutoff + timedelta(days=8)).date()
     )
 
 
@@ -70,3 +72,11 @@ def test_minimum_due_date_without_holiday_dependency():
     sys.modules['holidays'] = None
     assert get_minimum_due_date(monday) == (monday + timedelta(days=4)).date()
     sys.modules['holidays'] = holidays
+
+
+def test_validate_due_date():
+    with pytest.raises(ValueError, match='The minimum due date of a transaction'):
+        validate_due_date(datetime.now().date())
+
+    with pytest.raises(ValueError, match='The maximum due date of a transaction'):
+        validate_due_date((datetime.now() + timedelta(days=366)).date())
