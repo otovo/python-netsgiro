@@ -3,6 +3,34 @@ Changelog
 =========
 
 
+v2.0.0 (2022-05-03)
+===================
+
+**Breaking**
+
+- Dropped support for Python 3.5 and 3.6 (both have reached EOL).
+
+**New**
+
+- Add support for Python 3.9, 3.10, and added 3.11 pre-releases to test-suite.
+- Fully annotated the project and added a ``py.typed`` to make the package `PEP 561`_-compliant.
+- Added a ``get_minimum_due_date`` utility function for retrieving the earliest valid due date for a payment request.
+- Added a ``validate_due_date`` kwarg to the ``add_payment_request`` ``Assignment`` method, to optionally perform due date validation. When enabled, due dates less than the minimum (4 calendar days in the future, offset by holidays) or more than the maximum (12 months in the future) will raise an exception.
+
+.. _PEP 561: https://peps.python.org/pep-0561/
+
+**Internal**
+
+- Switched CI pipeline from CircleCI to Github actions.
+- Added `isort`_, `black`_, `pyupgrade`_, and `pre-commit`_ for linting.
+- Switched to `Poetry`_ for package and dependency management.
+
+.. _isort: https://github.com/PyCQA/isort
+.. _black: https://github.com/psf/black
+.. _pyupgrade: https://github.com/asottile/pyupgrade
+.. _pre-commit: https://github.com/pre-commit/pre-commit
+.. _Poetry: https://python-poetry.org/
+
 v1.3.0 (2020-06-10)
 ===================
 
