@@ -88,7 +88,7 @@ def to_avtalegiro_registration_type(
     return AvtaleGiroRegistrationType(int(value))
 
 
-def to_date(value: Union[datetime.date, str]) -> Optional[datetime.date]:
+def to_date(value: Union[datetime.date, str]) -> datetime.date:
     """Convert input to date."""
     if isinstance(value, datetime.date):
         return value
