@@ -1,8 +1,15 @@
 """Custom validators for :mod:`attrs`."""
-from typing import Any, Callable
+from datetime import datetime
+from typing import TYPE_CHECKING, Any, Callable
 
 from attr import Attribute
 from attr.validators import instance_of
+
+from netsgiro.utils import OSLO_TZ, get_minimum_due_date
+
+if TYPE_CHECKING:
+    from datetime import date
+
 
 C = Callable[[object, Attribute, Any], None]
 
@@ -31,3 +38,13 @@ def str_of_max_length(length: int) -> C:
             )
 
     return validator
+
+
+def validate_minimum_date(value: 'date') -> None:
+    """Make sure payment request dates are gt the minimum allowed date."""
+    if value < get_minimum_due_date(now=datetime.now(tz=OSLO_TZ)):
+        raise ValueError(
+            'The minimum due date of a transaction is today + 4 calendar days.'
+            ' OCR files with due dates earlier than this will be rejected when'
+            ' submitted.'
+        )
