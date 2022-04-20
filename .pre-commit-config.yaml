@@ -50,3 +50,4 @@ repos:
           - --config-file=setup.cfg
         additional_dependencies:
           - pytest
+          - types-backports
