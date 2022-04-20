@@ -1,0 +1,4 @@
+# https://docs.sourcery.ai/Configuration/Project-Settings/
+
+refactor:
+  python_version: '3.7'
