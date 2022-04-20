@@ -30,7 +30,7 @@ from netsgiro.records import (
     TransmissionStart,
 )
 from netsgiro.records import parse as records_parse
-from netsgiro.validators import str_of_length
+from netsgiro.validators import str_of_length, validate_minimum_date
 
 if TYPE_CHECKING:
     from netsgiro.enums import AvtaleGiroRegistrationType
@@ -365,6 +365,7 @@ class Assignment:
         reference: Optional[str] = None,
         payer_name: Optional[str] = None,
         bank_notification: Union[bool, str] = False,
+        strict: bool = False,
     ) -> 'PaymentRequest':
         """Add an AvtaleGiro payment request to the assignment.
 
@@ -378,6 +379,10 @@ class Assignment:
         assert (
             self.type == AssignmentType.TRANSACTIONS
         ), 'Can only add payment requests to transaction assignments'
+
+        if strict:
+            # Make sure we're not passing invalid due dates
+            validate_minimum_date(due_date)
 
         if bank_notification:
             transaction_type = TransactionType.AVTALEGIRO_WITH_BANK_NOTIFICATION
