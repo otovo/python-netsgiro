@@ -14,6 +14,7 @@ from netsgiro.records import (
     AssignmentEnd,
     AssignmentStart,
     AvtaleGiroAgreement,
+    Record,
     TransactionAmountItem1,
     TransactionAmountItem2,
     TransactionAmountItem3,
@@ -390,3 +391,44 @@ def test_avtalegiro_new_or_updated_agreement():
     assert record.registration_type == AvtaleGiroRegistrationType.NEW_OR_UPDATED_AGREEMENT
     assert record.kid == '008000011688373'
     assert record.notify is False
+
+
+def test__split_text_to_lines_and_columns_validation():
+    """
+    Make sure the validation in
+    TransactionSpecification._split_text_to_lines_and_columns_validation works.
+    """
+    # Test <= max line count
+    for i in [0, 1, 42]:
+        for _ in TransactionSpecification._split_text_to_lines_and_columns('test\n' * i):
+            pass
+
+    # Test > max line count
+    for i in [43, 100, 1000]:
+        with pytest.raises(ValueError, match='Max 42 specification lines allowed'):
+            for _ in TransactionSpecification._split_text_to_lines_and_columns('test\n' * i):
+                pass
+
+    # Test <= max line length
+    for i in [0, 1, 80]:
+        for _ in TransactionSpecification._split_text_to_lines_and_columns('i' * i):
+            pass
+
+    # Test > max line length
+    for i in [81, 100, 1000]:
+        with pytest.raises(ValueError, match='Specification lines must be max 80 chars long'):
+            for _ in TransactionSpecification._split_text_to_lines_and_columns('i' * i):
+                pass
+
+
+def test_record__to_ocr():
+    """Test that the record to_ocr abstract method is required."""
+
+    class SomeRecordDerivative(Record):
+        ...
+
+    with pytest.raises(
+        TypeError,
+        match="Can't instantiate abstract class SomeRecordDerivative with abstract method to_ocr",
+    ):
+        SomeRecordDerivative()
