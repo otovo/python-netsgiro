@@ -274,7 +274,7 @@ class Assignment:
             else:
                 # -> List[PaymentRequest]
                 cb = cls._get_payment_requests
-        else:
+        else:  # pragma: no cover
             raise ValueError(f'Unknown service code: {start.service_code}')
 
         transactions: TS = cb(body)
@@ -342,7 +342,7 @@ class Assignment:
                 'nets_date_1': self.get_earliest_transaction_date(),
                 'nets_date_2': self.get_latest_transaction_date(),
             }
-        else:
+        else:  # pragma: no cover
             raise ValueError(f'Unhandled service code: {self.service_code}')
 
         return AssignmentEnd(
