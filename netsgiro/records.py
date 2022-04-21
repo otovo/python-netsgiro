@@ -325,10 +325,7 @@ class AssignmentEnd(Record):
 
         Only used for OCR Giro.
         """
-        if self.service_code == ServiceCode.OCR_GIRO:
-            return self.nets_date_1
-        else:
-            return None
+        return self.nets_date_1 if self.service_code == ServiceCode.OCR_GIRO else None
 
     @property
     def nets_date_earliest(self) -> Optional['datetime.date']:
