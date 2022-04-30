@@ -4,6 +4,7 @@ import re
 from abc import ABC, abstractmethod
 from typing import (
     TYPE_CHECKING,
+    ClassVar,
     Iterable,
     List,
     Optional,
@@ -15,8 +16,8 @@ from typing import (
     cast,
 )
 
-import attr
 from attr.validators import optional
+from attrs import define, field
 
 from netsgiro import RecordType, ServiceCode
 from netsgiro.converters import (
@@ -56,14 +57,14 @@ __all__: List[str] = [
 R = TypeVar('R', bound='Record')
 
 
-@attr.s
+@define
 class Record(ABC):
     """Record base class."""
 
-    _PATTERNS: List[Pattern]
-    RECORD_TYPE: RecordType
+    _PATTERNS: ClassVar[List[Pattern]]
+    RECORD_TYPE: ClassVar[RecordType]
 
-    service_code: ServiceCode = attr.ib(converter=to_service_code)
+    service_code: ServiceCode = field(converter=to_service_code)
 
     @classmethod
     def from_string(cls: Type[R], line: str) -> R:
@@ -80,7 +81,7 @@ class Record(ABC):
         """Get record as OCR string."""
 
 
-@attr.s
+@define
 class TransmissionStart(Record):
     """TransmissionStart is the first record in every OCR file.
 
@@ -89,12 +90,12 @@ class TransmissionStart(Record):
     Each transmission can contain any number of assignments.
     """
 
-    transmission_number: str = attr.ib(validator=str_of_length(7))
-    data_transmitter: str = attr.ib(validator=str_of_length(8))
-    data_recipient: str = attr.ib(validator=str_of_length(8))
+    transmission_number: str = field(validator=str_of_length(7))
+    data_transmitter: str = field(validator=str_of_length(8))
+    data_recipient: str = field(validator=str_of_length(8))
 
-    RECORD_TYPE = RecordType.TRANSMISSION_START
-    _PATTERNS = [
+    RECORD_TYPE: ClassVar[RecordType] = RecordType.TRANSMISSION_START
+    _PATTERNS: ClassVar[List[Pattern]] = [
         re.compile(
             r'''
             ^
@@ -122,17 +123,17 @@ class TransmissionStart(Record):
         )
 
 
-@attr.s
+@define
 class TransmissionEnd(Record):
     """TransmissionEnd is the first record in every OCR file."""
 
-    num_transactions: int = attr.ib(converter=int)
-    num_records: int = attr.ib(converter=int)
-    total_amount: int = attr.ib(converter=int)
-    nets_date: 'datetime.date' = attr.ib(converter=to_date)
+    num_transactions: int = field(converter=int)
+    num_records: int = field(converter=int)
+    total_amount: int = field(converter=int)
+    nets_date: 'datetime.date' = field(converter=to_date)
 
-    RECORD_TYPE = RecordType.TRANSMISSION_END
-    _PATTERNS = [
+    RECORD_TYPE: ClassVar[RecordType] = RecordType.TRANSMISSION_END
+    _PATTERNS: ClassVar[List[Pattern]] = [
         re.compile(
             r'''
             ^
@@ -165,22 +166,22 @@ class TransmissionEnd(Record):
         )
 
 
-@attr.s
+@define
 class AssignmentStart(Record):
     """AssignmentStart is the first record of an assignment.
 
     Each assignment can contain any number of transactions.
     """
 
-    assignment_type: 'AssignmentType' = attr.ib(converter=to_assignment_type)
-    assignment_number: str = attr.ib(validator=str_of_length(7))
-    assignment_account: str = attr.ib(validator=str_of_length(11))
+    assignment_type: 'AssignmentType' = field(converter=to_assignment_type)
+    assignment_number: str = field(validator=str_of_length(7))
+    assignment_account: str = field(validator=str_of_length(11))
 
     # Only for assignment_type == AssignmentType.TRANSACTIONS
-    agreement_id: Optional[str] = attr.ib(default=None, validator=optional(str_of_length(9)))
+    agreement_id: Optional[str] = field(default=None, validator=optional(str_of_length(9)))
 
-    RECORD_TYPE = RecordType.ASSIGNMENT_START
-    _PATTERNS = [
+    RECORD_TYPE: ClassVar[RecordType] = RecordType.ASSIGNMENT_START
+    _PATTERNS: ClassVar[List[Pattern]] = [
         re.compile(
             r'''
             ^
@@ -246,22 +247,22 @@ class AssignmentStart(Record):
         )
 
 
-@attr.s
+@define
 class AssignmentEnd(Record):
     """AssignmentEnd is the last record of an assignment."""
 
-    assignment_type: 'AssignmentType' = attr.ib(converter=to_assignment_type)
-    num_transactions: int = attr.ib(converter=int)
-    num_records: int = attr.ib(converter=int)
+    assignment_type: 'AssignmentType' = field(converter=to_assignment_type)
+    num_transactions: int = field(converter=int)
+    num_records: int = field(converter=int)
 
     # Only for transactions and cancellations
-    total_amount: Optional[int] = attr.ib(default=None, converter=to_int_or_none)
-    nets_date_1: Optional['datetime.date'] = attr.ib(default=None, converter=to_date_or_none)
-    nets_date_2: Optional['datetime.date'] = attr.ib(default=None, converter=to_date_or_none)
-    nets_date_3: Optional['datetime.date'] = attr.ib(default=None, converter=to_date_or_none)
+    total_amount: Optional[int] = field(default=None, converter=to_int_or_none)
+    nets_date_1: Optional['datetime.date'] = field(default=None, converter=to_date_or_none)
+    nets_date_2: Optional['datetime.date'] = field(default=None, converter=to_date_or_none)
+    nets_date_3: Optional['datetime.date'] = field(default=None, converter=to_date_or_none)
 
-    RECORD_TYPE = RecordType.ASSIGNMENT_END
-    _PATTERNS = [
+    RECORD_TYPE: ClassVar[RecordType] = RecordType.ASSIGNMENT_END
+    _PATTERNS: ClassVar[List[Pattern]] = [
         re.compile(
             r'''
             ^
@@ -364,38 +365,38 @@ class AssignmentEnd(Record):
         )
 
 
-@attr.s
+@define
 class TransactionRecord(Record, ABC):
     """Transaction record base class."""
 
-    transaction_type: 'TransactionType' = attr.ib(converter=to_transaction_type)
-    transaction_number: int = attr.ib(converter=int)
+    transaction_type: 'TransactionType' = field(converter=to_transaction_type)
+    transaction_number: int = field(converter=int)
 
 
-@attr.s
+@define
 class TransactionAmountItem1(TransactionRecord):
     """TransactionAmountItem1 is the first record of a transaction.
 
     The record is used both for AvtaleGiro and for OCR Giro.
     """
 
-    nets_date: 'datetime.date' = attr.ib(converter=to_date)
-    amount: int = attr.ib(converter=int)
-    kid: Optional[str] = attr.ib(
+    nets_date: 'datetime.date' = field(converter=to_date)
+    amount: int = field(converter=int)
+    kid: Optional[str] = field(
         converter=to_safe_str_or_none, validator=optional(str_of_max_length(25))
     )
 
     # Only OCR Giro
-    centre_id: Optional[str] = attr.ib(default=None, validator=optional(str_of_length(2)))
-    day_code: Optional[int] = attr.ib(default=None, converter=to_int_or_none)
-    partial_settlement_number: Optional[int] = attr.ib(default=None, converter=to_int_or_none)
-    partial_settlement_serial_number: Optional[str] = attr.ib(
+    centre_id: Optional[str] = field(default=None, validator=optional(str_of_length(2)))
+    day_code: Optional[int] = field(default=None, converter=to_int_or_none)
+    partial_settlement_number: Optional[int] = field(default=None, converter=to_int_or_none)
+    partial_settlement_serial_number: Optional[str] = field(
         default=None, validator=optional(str_of_length(5))
     )
-    sign: Optional[str] = attr.ib(default=None, validator=optional(str_of_length(1)))
+    sign: Optional[str] = field(default=None, validator=optional(str_of_length(1)))
 
-    RECORD_TYPE = RecordType.TRANSACTION_AMOUNT_ITEM_1
-    _PATTERNS = [
+    RECORD_TYPE: ClassVar[RecordType] = RecordType.TRANSACTION_AMOUNT_ITEM_1
+    _PATTERNS: ClassVar[List[Pattern]] = [
         re.compile(
             r'''
             ^
@@ -470,7 +471,7 @@ class TransactionAmountItem1(TransactionRecord):
         )
 
 
-@attr.s
+@define
 class TransactionAmountItem2(TransactionRecord):
     """TransactionAmountItem2 is the second record of a transaction.
 
@@ -478,21 +479,21 @@ class TransactionAmountItem2(TransactionRecord):
     """
 
     # TODO Validate `reference` length, which depends on service code
-    reference: Optional[str] = attr.ib(converter=to_safe_str_or_none)
+    reference: Optional[str] = field(converter=to_safe_str_or_none)
 
     # Only OCR Giro
-    form_number: Optional[str] = attr.ib(default=None, validator=optional(str_of_length(10)))
-    bank_date: Optional['datetime.date'] = attr.ib(default=None, converter=to_date_or_none)
-    debit_account: Optional[str] = attr.ib(default=None, validator=optional(str_of_length(11)))
+    form_number: Optional[str] = field(default=None, validator=optional(str_of_length(10)))
+    bank_date: Optional['datetime.date'] = field(default=None, converter=to_date_or_none)
+    debit_account: Optional[str] = field(default=None, validator=optional(str_of_length(11)))
     # XXX In use in OCR Giro "from giro debited account" transactions in test
     # data, but documented as a filler field.
-    _filler: Optional[str] = attr.ib(default=None)
+    _filler: Optional[str] = field(default=None)
 
     # Only AvtaleGiro
-    payer_name: Optional[str] = attr.ib(default=None, converter=to_safe_str_or_none)
+    payer_name: Optional[str] = field(default=None, converter=to_safe_str_or_none)
 
-    RECORD_TYPE = RecordType.TRANSACTION_AMOUNT_ITEM_2
-    _PATTERNS = [
+    RECORD_TYPE: ClassVar[RecordType] = RecordType.TRANSACTION_AMOUNT_ITEM_2
+    _PATTERNS: ClassVar[List[Pattern]] = [
         re.compile(
             r'''
             ^
@@ -564,19 +565,19 @@ class TransactionAmountItem2(TransactionRecord):
         return common_fields + service_fields
 
 
-@attr.s
+@define
 class TransactionAmountItem3(TransactionRecord):
     """TransactionAmountItem3 is the third record of a transaction.
 
     The record is only used for some OCR Giro transaction types.
     """
 
-    text: Optional[str] = attr.ib(
+    text: Optional[str] = field(
         converter=to_safe_str_or_none, validator=optional(str_of_max_length(40))
     )
 
-    RECORD_TYPE = RecordType.TRANSACTION_AMOUNT_ITEM_3
-    _PATTERNS = [
+    RECORD_TYPE: ClassVar[RecordType] = RecordType.TRANSACTION_AMOUNT_ITEM_3
+    _PATTERNS: ClassVar[List[Pattern]] = [
         re.compile(
             r'''
             ^
@@ -604,7 +605,7 @@ class TransactionAmountItem3(TransactionRecord):
         )
 
 
-@attr.s
+@define
 class TransactionSpecification(TransactionRecord):
     """TransactionSpecification is used for AvtaleGiro transactions.
 
@@ -615,15 +616,15 @@ class TransactionSpecification(TransactionRecord):
     specification text.
     """
 
-    line_number: int = attr.ib(converter=int)
-    column_number: int = attr.ib(converter=int)
-    text = attr.ib(
+    line_number: int = field(converter=int)
+    column_number: int = field(converter=int)
+    text = field(
         converter=stripped_newlines(fixed_len_str(40, str)),  # type: ignore[misc]
         validator=optional(str_of_max_length(40)),
     )
 
-    RECORD_TYPE = RecordType.TRANSACTION_SPECIFICATION
-    _PATTERNS = [
+    RECORD_TYPE: ClassVar[RecordType] = RecordType.TRANSACTION_SPECIFICATION
+    _PATTERNS: ClassVar[List[Pattern]] = [
         re.compile(
             r'''
             ^
@@ -720,7 +721,7 @@ class TransactionSpecification(TransactionRecord):
         )
 
 
-@attr.s
+@define
 class AvtaleGiroAgreement(TransactionRecord):
     """AvtaleGiroAgreement is used by Nets to notify about agreement changes.
 
@@ -728,16 +729,16 @@ class AvtaleGiroAgreement(TransactionRecord):
     notification preferences.
     """
 
-    registration_type: 'AvtaleGiroRegistrationType' = attr.ib(
+    registration_type: 'AvtaleGiroRegistrationType' = field(
         converter=to_avtalegiro_registration_type
     )
-    kid: Optional[str] = attr.ib(
+    kid: Optional[str] = field(
         converter=to_safe_str_or_none, validator=optional(str_of_max_length(25))
     )
-    notify: bool = attr.ib(converter=to_bool)
+    notify: bool = field(converter=to_bool)
 
-    RECORD_TYPE = RecordType.TRANSACTION_AGREEMENTS
-    _PATTERNS = [
+    RECORD_TYPE: ClassVar[RecordType] = RecordType.TRANSACTION_AGREEMENTS
+    _PATTERNS: ClassVar[List[Pattern]] = [
         re.compile(
             r'''
             ^
