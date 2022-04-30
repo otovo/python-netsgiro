@@ -1,18 +1,11 @@
 """The higher-level objects API."""
 
 import datetime
+from collections import OrderedDict
 from decimal import Decimal
-from typing import (
-    TYPE_CHECKING,
-    Callable,
-    Iterable,
-    List,
-    Optional,
-    OrderedDict,
-    TypeVar,
-    Union,
-    cast,
-)
+from typing import TYPE_CHECKING, Callable, ClassVar, Iterable, List, Optional
+from typing import OrderedDict as OrderedDictType
+from typing import TypeVar, Union, cast
 
 import attr
 from attrs.validators import instance_of, optional
@@ -109,7 +102,7 @@ class Transmission:
 
     @staticmethod
     def _get_assignments(records: List[R]) -> List['Assignment']:
-        assignments: OrderedDict[str, List[R]] = OrderedDict()
+        assignments: OrderedDictType[str, List[R]] = OrderedDict()
 
         current_assignment_number = None
         for record in records:
@@ -313,8 +306,8 @@ class Assignment:
         return [Transaction.from_records(rs) for rs in transactions.values()]
 
     @staticmethod
-    def _group_by_transaction_number(records: List[TR]) -> OrderedDict[int, List[TR]]:
-        transactions: OrderedDict[int, List[TR]] = OrderedDict()
+    def _group_by_transaction_number(records: List[TR]) -> OrderedDictType[int, List[TR]]:
+        transactions: OrderedDictType[int, List[TR]] = OrderedDict()
         for transaction_record in records:
             tr = transaction_record.transaction_number
             if tr not in transactions:
