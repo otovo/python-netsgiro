@@ -1,9 +1,18 @@
 """The higher-level objects API."""
 
 import datetime
-from collections import OrderedDict
 from decimal import Decimal
-from typing import TYPE_CHECKING, Callable, Iterable, List, Optional, TypeVar, Union, cast
+from typing import (
+    TYPE_CHECKING,
+    Callable,
+    Iterable,
+    List,
+    Optional,
+    OrderedDict,
+    TypeVar,
+    Union,
+    cast,
+)
 
 import attr
 from attrs.validators import instance_of, optional
