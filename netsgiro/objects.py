@@ -365,7 +365,7 @@ class Assignment:
         reference: Optional[str] = None,
         payer_name: Optional[str] = None,
         bank_notification: Union[bool, str] = False,
-        strict: bool = False,
+        validate_due_date: bool = False,
     ) -> 'PaymentRequest':
         """Add an AvtaleGiro payment request to the assignment.
 
@@ -380,7 +380,7 @@ class Assignment:
             self.type == AssignmentType.TRANSACTIONS
         ), 'Can only add payment requests to transaction assignments'
 
-        if strict:
+        if validate_due_date:
             # Make sure we're not passing invalid due dates
             validate_minimum_date(due_date)
 
