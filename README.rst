@@ -50,9 +50,9 @@ Project resources
     :target: https://pypi.org/project/netsgiro/
     :alt: Latest PyPI version
 
-.. image:: https://img.shields.io/circleci/project/github/otovo/python-netsgiro/master.svg
-    :target: https://circleci.com/gh/otovo/python-netsgiro
-    :alt: CircleCI build status
+.. image:: https://github.com/otovo/python-netsgiro/actions/workflows/test.yml/badge.svg
+    :target: https://github.com/otovo/python-netsgiro/actions/workflows/test.yml
+    :alt: Github actions test pipeline status
 
 .. image:: https://img.shields.io/readthedocs/netsgiro.svg
    :target: https://netsgiro.readthedocs.io/
