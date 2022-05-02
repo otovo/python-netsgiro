@@ -20,6 +20,11 @@ classifiers=[
     'Programming Language :: Python :: 3.10',
     'Typing :: Typed'
 ]
+include = [
+    'LICENSE',
+    'docs/*.rst',
+    'references/*.pdf',
+]
 
 [tool.poetry.urls]
 "Docs" = "https://netsgiro.readthedocs.io/"
