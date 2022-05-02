@@ -6,7 +6,6 @@ on:
 
 jobs:
   build-and-publish:
-    needs: build-and-publish-test
     name: Build and publish
     runs-on: ubuntu-latest
     steps:
