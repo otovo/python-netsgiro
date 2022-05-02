@@ -1,3 +1,19 @@
+.. image:: https://img.shields.io/pypi/v/netsgiro.svg?style=flat
+    :target: https://pypi.org/project/netsgiro/
+    :alt: Latest PyPI version
+
+.. image:: https://github.com/otovo/python-netsgiro/actions/workflows/test.yml/badge.svg
+    :target: https://github.com/otovo/python-netsgiro/actions/workflows/test.yml
+    :alt: Github actions test pipeline status
+
+.. image:: https://img.shields.io/readthedocs/netsgiro.svg
+   :target: https://netsgiro.readthedocs.io/
+   :alt: Read the Docs build status
+
+.. image:: https://img.shields.io/codecov/c/github/otovo/python-netsgiro/master.svg
+   :target: https://codecov.io/gh/otovo/python-netsgiro
+   :alt: Test coverage
+
 ========
 netsgiro
 ========
@@ -45,19 +61,3 @@ Project resources
 - `Documentation <https://netsgiro.readthedocs.io/>`_
 - `Source code <https://github.com/otovo/python-netsgiro>`_
 - `Issue tracker <https://github.com/otovo/python-netsgiro/issues>`_
-
-.. image:: https://img.shields.io/pypi/v/netsgiro.svg?style=flat
-    :target: https://pypi.org/project/netsgiro/
-    :alt: Latest PyPI version
-
-.. image:: https://github.com/otovo/python-netsgiro/actions/workflows/test.yml/badge.svg
-    :target: https://github.com/otovo/python-netsgiro/actions/workflows/test.yml
-    :alt: Github actions test pipeline status
-
-.. image:: https://img.shields.io/readthedocs/netsgiro.svg
-   :target: https://netsgiro.readthedocs.io/
-   :alt: Read the Docs build status
-
-.. image:: https://img.shields.io/codecov/c/github/otovo/python-netsgiro/master.svg
-   :target: https://codecov.io/gh/otovo/python-netsgiro
-   :alt: Test coverage
