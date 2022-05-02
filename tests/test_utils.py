@@ -26,8 +26,8 @@ def test_minimum_due_date_after_cutoff():
     generated after 14:00 Norwegian time should be adjusted by 5 days.
     """
     assert (
-            get_minimum_due_date(monday_after_cutoff)
-            == (monday_after_cutoff + timedelta(days=5)).date()
+        get_minimum_due_date(monday_after_cutoff)
+        == (monday_after_cutoff + timedelta(days=5)).date()
     )
 
 
@@ -51,8 +51,8 @@ def test_minimum_due_date_with_holidays_after_cutoff():
     holidays is upped to 3, so we expect 2 more days of offsetting.
     """
     assert (
-            get_minimum_due_date(day_before_easter_after_cutoff)
-            == (day_before_easter_after_cutoff + timedelta(days=8)).date()
+        get_minimum_due_date(day_before_easter_after_cutoff)
+        == (day_before_easter_after_cutoff + timedelta(days=8)).date()
     )
 
 

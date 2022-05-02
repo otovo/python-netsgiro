@@ -30,7 +30,8 @@ from netsgiro.records import (
     TransmissionStart,
 )
 from netsgiro.records import parse as records_parse
-from netsgiro.validators import str_of_length, validate_due_date
+from netsgiro.validators import str_of_length
+from netsgiro.validators import validate_due_date as _validate_due_date
 
 if TYPE_CHECKING:
     from netsgiro.enums import AvtaleGiroRegistrationType
@@ -382,7 +383,7 @@ class Assignment:
 
         if validate_due_date:
             # Make sure we're not passing invalid due dates
-            validate_due_date(due_date)
+            _validate_due_date(due_date)
 
         if bank_notification:
             transaction_type = TransactionType.AVTALEGIRO_WITH_BANK_NOTIFICATION
