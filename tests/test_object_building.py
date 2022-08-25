@@ -159,7 +159,7 @@ def test_transmission_add_payment_cancellation_assertions():
 
     # Test wrong assignment type
     bad_assignment_type_assignment = transmission.add_assignment(
-        **(good_data | {'assignment_type': netsgiro.AssignmentType.AVTALEGIRO_AGREEMENTS})
+        **{**good_data, **{'assignment_type': netsgiro.AssignmentType.AVTALEGIRO_AGREEMENTS}}
     )
     with pytest.raises(
         AssertionError, match='Can only add cancellation to cancellation assignments'
