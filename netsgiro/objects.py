@@ -447,7 +447,6 @@ class Assignment:
         payer_name: Optional[str] = None,
         bank_notification: Union[str, bool] = False,
     ) -> 'PaymentRequest':
-
         text = bank_notification if isinstance(bank_notification, str) else ''
         number = self._next_transaction_number
         self._next_transaction_number += 1

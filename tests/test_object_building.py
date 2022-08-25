@@ -152,7 +152,7 @@ def test_transmission_add_payment_cancellation_assertions():
 
     # Test wrong service code
     bad_service_code_assignment = transmission.add_assignment(
-        **(good_data | {'service_code': netsgiro.ServiceCode.OCR_GIRO})
+        **{**good_data, **{'service_code': netsgiro.ServiceCode.OCR_GIRO}}
     )
     with pytest.raises(AssertionError, match='Can only add cancellation to AvtaleGiro assignments'):
         bad_service_code_assignment.add_payment_cancellation(**assignment_data)

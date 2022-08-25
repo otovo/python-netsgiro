@@ -429,6 +429,6 @@ def test_record__to_ocr():
 
     with pytest.raises(
         TypeError,
-        match="Can't instantiate abstract class SomeRecordDerivative with abstract method to_ocr",
+        match="Can't instantiate abstract class SomeRecordDerivative with abstract method",
     ):
         SomeRecordDerivative()
