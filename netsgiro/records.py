@@ -366,7 +366,7 @@ class AssignmentEnd(Record):
 
 
 @define
-class TransactionRecord(Record, ABC):
+class TransactionRecord(Record):
     """Transaction record base class."""
 
     transaction_type: 'TransactionType' = field(converter=to_transaction_type)
