@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "netsgiro"
-version = "2.0.0"
+version = "2.0.1"
 description = "File parsers for Nets AvtaleGiro and OCR Giro"
 homepage = 'https://pypi.org/project/netsgiro/'
 repository = 'https://github.com/otovo/python-netsgiro'
