@@ -130,7 +130,7 @@ class TransmissionEnd(Record):
     num_transactions: int = field(converter=int)
     num_records: int = field(converter=int)
     total_amount: int = field(converter=int)
-    nets_date: 'datetime.date' = field(converter=to_date)
+    nets_date: 'datetime.date' = field(converter=to_date_or_none)
 
     RECORD_TYPE: ClassVar[RecordType] = RecordType.TRANSMISSION_END
     _PATTERNS: ClassVar[List[Pattern]] = [
